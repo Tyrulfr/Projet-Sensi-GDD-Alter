@@ -24,10 +24,8 @@
     {
       "id": "m02",
       "numero": 2,
-      "etat": "a-venir",
-      "titre": "Une donnée, plusieurs usages",
-      "duree": 7,
-      "objectif": "Comprendre qu'une même donnée peut être utilisée par plusieurs services."
+      "etat": "disponible",
+      "fichier": "module-02.json"
     },
     {
       "id": "m03",

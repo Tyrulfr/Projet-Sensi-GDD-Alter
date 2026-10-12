@@ -68,6 +68,12 @@
     test('Texte enrichi : échappement HTML et gras', function () {
       egal(U.richText('a <b> **c**'), '<p>a &lt;b&gt; <strong>c</strong></p>');
       egal(U.richText('un\n\ndeux'), '<p>un</p><p>deux</p>');
+      egal(U.richText('un\ndeux'), '<p>un<br>deux</p>');
+    });
+
+    test('Texte enrichi : listes à puces', function () {
+      egal(U.richText('Intro :\n\n- a ;\n- **b**'), '<p>Intro :</p><ul><li>a ;</li><li><strong>b</strong></li></ul>');
+      egal(U.richText('Pour corriger :\n- a'), '<p>Pour corriger :<br>- a</p>', 'liste non séparée par une ligne vide');
     });
 
     test('Chaque activité du module accepte sa réponse attendue', function () {
@@ -248,6 +254,70 @@
     });
   }
 
+  /* Module 2 : défi sans seuil de réussite -> statut « completed » quel que soit le score. */
+  function lancerModule2(module) {
+    var idEval = module.validation.evaluation;
+    var lecons = module.lecons.filter(function (l) { return l.type === 'lecon'; });
+
+    test('M2 : chaque activité accepte sa réponse attendue', function () {
+      Object.keys(module.activites).forEach(function (id) {
+        var act = module.activites[id];
+        vrai(A.corriger(act, A.reponseAttendue(act)).correct, id);
+      });
+    });
+
+    test('M2 : bonnes réponses du défi conformes au scénario (B, A, C)', function () {
+      egal(bonnesReponses(module, idEval), { 'm02-q1': 'b', 'm02-q2': 'a', 'm02-q3': 'c' });
+    });
+
+    test('M2 : défi réussi à 3/3 -> terminé, sans réussite/échec, score 100', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var r = m.soumettreEvaluation(idEval, bonnesReponses(module, idEval));
+      egal([r.bonnes, r.total, r.score], [3, 3, 100]);
+      var s = m.statut();
+      egal([s.completion, s.reussite, s.score, s.seuil, s.progression], ['termine', 'inconnue', 100, null, 100]);
+      egal(GDD.TraceurScorm12.statutScorm(s), 'completed');
+    });
+
+    test('M2 : défi à 0/3 -> toujours completed (jamais failed), score 0', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var r = m.soumettreEvaluation(idEval, { 'm02-q1': 'a', 'm02-q2': 'b', 'm02-q3': 'a' });
+      egal(r.score, 0);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+    });
+
+    test('M2 : leçons vues sans défi -> incomplete', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'incomplete');
+    });
+
+    test('M2 : adaptateur SCORM 1.2 -> completed, score brut, 3 interactions, sortie normale', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = new GDD.Moteur(module, new GDD.TraceurScorm12()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var codes = bonnesReponses(module, idEval); codes['m02-q3'] = 'b';
+      m.soumettreEvaluation(idEval, codes);
+      egal(api.d['cmi.core.lesson_status'], 'completed');
+      egal([api.d['cmi.core.score.raw'], api.d['cmi.core.score.min'], api.d['cmi.core.score.max']], ['67', '0', '100']);
+      egal(api.d['cmi.interactions.2.id'], 'm02-q3');
+      egal(api.d['cmi.interactions.2.result'], 'wrong');
+      m.terminer();
+      egal(api.d['cmi.core.exit'], '', 'sortie normale une fois terminé');
+      delete window.API;
+    });
+
+    test('M2 : reprise après interruption en leçon 2', function () {
+      var t = new TraceurTest(); var m = new GDD.Moteur(module, t); m.demarrer();
+      m.marquerVue(lecons[0].id); m.repondre('m02-a1', 'f'); m.definirPosition(1);
+      var m2 = new GDD.Moteur(module, new TraceurTest({ etat: t.paquets[t.paquets.length - 1].etat })); m2.demarrer();
+      vrai(m2.estVue(lecons[0].id)); egal(m2.etat.p, 1); vrai(!m2.estAccessible(3), 'défi verrouillé');
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -264,8 +334,10 @@
     window.RESULTATS_TESTS = { total: resultats.length, echecs: echecs, details: resultats };
   }
 
-  fetch('../contenus/modules/module-01.json')
-    .then(function (r) { return r.json(); })
-    .then(function (module) { lancer(module); afficher(); })
+  function charger(fichier) {
+    return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
+  }
+  Promise.all([charger('module-01.json'), charger('module-02.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

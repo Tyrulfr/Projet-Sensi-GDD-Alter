@@ -12,7 +12,8 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_CONTENUS = RACINE / "contenus"
 
-TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "activite", "aretenir"}
+TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "activite", "aretenir"}
+PRESENTATIONS = {"toutes", "une-par-une"}
 TYPES_ACTIVITES = {"choix-unique", "choix-multiple", "vrai-faux", "classement"}
 NAVIGATIONS = {"sequentielle", "libre"}
 # Identifiants utilisés dans cmi.interactions (CMIIdentifier SCORM 1.2 : pas d'espace, 255 car. max).
@@ -173,6 +174,24 @@ def valider_module(mod, entree, r, ids_globaux):
                 elif bt == "definition":
                     if not (texte_present(b, "terme") and texte_present(b, "texte")):
                         r.erreur(blieu, "« terme » et « texte » sont obligatoires")
+                elif bt == "schema":
+                    if not texte_present(b.get("source") or {}, "libelle") or not texte_present(b, "flux"):
+                        r.erreur(blieu, "« source.libelle » et « flux » sont obligatoires")
+                    cibles = b.get("cibles") or []
+                    if len(cibles) < 2:
+                        r.erreur(blieu, "au moins deux cibles sont nécessaires")
+                    for j, c in enumerate(cibles, 1):
+                        if not all(texte_present(c, k) for k in ("libelle", "usage", "detail")):
+                            r.erreur(blieu, f"cible {j} : « libelle », « usage » et « detail » sont obligatoires")
+                    if not texte_present(b, "legende"):
+                        r.avertir(blieu, "schéma sans légende (préciser s'il s'agit d'un exemple illustratif)")
+                elif bt == "chronologie":
+                    etapes = b.get("etapes") or []
+                    if len(etapes) < 2:
+                        r.erreur(blieu, "au moins deux étapes sont nécessaires")
+                    for j, e in enumerate(etapes, 1):
+                        if not (texte_present(e, "titre") and texte_present(e, "texte")):
+                            r.erreur(blieu, f"étape {j} : « titre » et « texte » sont obligatoires")
                 elif not texte_present(b, "texte"):
                     r.erreur(blieu, "« texte » manquant")
             if blocs and blocs[-1].get("type") != "aretenir":
@@ -188,6 +207,18 @@ def valider_module(mod, entree, r, ids_globaux):
                     utilisations[q] += 1
                     if activites[q].get("notation", {}).get("formative", True):
                         r.avertir(llieu, f"question « {q} » marquée formative dans une évaluation")
+            if lec.get("presentation", "toutes") not in PRESENTATIONS:
+                r.erreur(llieu, f"« presentation » doit valoir {sorted(PRESENTATIONS)}")
+            messages = lec.get("messagesResultat")
+            if messages is not None:
+                if not isinstance(messages, list) or not messages:
+                    r.erreur(llieu, "« messagesResultat » doit être une liste non vide")
+                else:
+                    for j, msg in enumerate(messages, 1):
+                        if not isinstance(msg.get("min"), (int, float)) or not 0 <= msg["min"] <= 100 or not texte_present(msg, "texte"):
+                            r.erreur(llieu, f"message {j} : « min » (0 à 100, en %) et « texte » sont obligatoires")
+                    if not any(msg.get("min") == 0 for msg in messages):
+                        r.avertir(llieu, "aucun message avec « min » à 0 : un score faible n'aura pas de message")
         else:
             r.erreur(llieu, f"type de leçon inconnu « {lec.get('type')} »")
 
@@ -209,8 +240,10 @@ def valider_module(mod, entree, r, ids_globaux):
     if ev:
         if not any(l.get("id") == ev and l.get("type") == "evaluation" for l in lecons):
             r.erreur(lieu, f"validation.evaluation « {ev} » ne désigne pas une leçon de type evaluation")
-        if not isinstance(seuil, (int, float)) or not 0 <= seuil <= 100:
-            r.erreur(lieu, "validation.seuilReussite doit être compris entre 0 et 100")
+        if seuil is not None and (not isinstance(seuil, (int, float)) or not 0 <= seuil <= 100):
+            r.erreur(lieu, "validation.seuilReussite doit être compris entre 0 et 100 (ou absent : module « terminé » sans seuil)")
+    elif seuil is not None:
+        r.erreur(lieu, "validation.seuilReussite n'a de sens qu'avec validation.evaluation")
     couverts = {a.get("objectif") for a in activites.values()}
     for o in objectifs - couverts:
         r.avertir(lieu, f"objectif « {o} » n'est couvert par aucune activité")

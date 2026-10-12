@@ -39,11 +39,18 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   };
 
-  /* Texte enrichi minimal et sûr : paragraphes séparés par une ligne vide, **gras**. */
+  /*
+   * Texte enrichi minimal et sûr : paragraphes séparés par une ligne vide, **gras**,
+   * listes à puces (paragraphe dont toutes les lignes commencent par « - »).
+   */
   U.richText = function (str) {
+    function enrichir(t) { return U.escapeHtml(t).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>'); }
     return String(str || '').split(/\n\s*\n/).map(function (p) {
-      var html = U.escapeHtml(p.trim()).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>');
-      return '<p>' + html + '</p>';
+      var lignes = p.trim().split('\n');
+      if (lignes.every(function (l) { return /^\s*-\s+/.test(l); })) {
+        return '<ul>' + lignes.map(function (l) { return '<li>' + enrichir(l.replace(/^\s*-\s+/, '')) + '</li>'; }).join('') + '</ul>';
+      }
+      return '<p>' + lignes.map(enrichir).join('<br>') + '</p>';
     }).join('');
   };
 

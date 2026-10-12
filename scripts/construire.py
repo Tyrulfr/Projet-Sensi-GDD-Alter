@@ -4,7 +4,7 @@
 Usage : python3 scripts/construire.py
 Produit :
   index.html + contenus/contenu.js  site web (racine du dépôt, publiable tel quel par GitHub Pages)
-  exports/module-XX-scorm.zip       un package SCORM autonome par module disponible
+  exports/module-XX-<titre>-scorm12.zip  un package SCORM autonome par module disponible
   dist/scorm/<module>/              contenu décompressé de chaque package (pour le simulateur)
   dist/simulateur/                  simulateur d'API SCORM 1.2 pour les tests
 """
@@ -14,6 +14,7 @@ import re
 import shutil
 import subprocess
 import sys
+import unicodedata
 import zipfile
 from pathlib import Path
 from xml.etree import ElementTree
@@ -146,7 +147,10 @@ def zipper(dossier, archive):
 
 
 def nom_archive(module):
-    return f"module-{int(module['numero']):02d}-scorm.zip"
+    """module-02-une-donnee-plusieurs-usages-scorm12.zip"""
+    sans_accents = unicodedata.normalize("NFKD", module["titre"]).encode("ascii", "ignore").decode("ascii")
+    slug = re.sub(r"[^a-z0-9]+", "-", sans_accents.lower()).strip("-")
+    return f"module-{int(module['numero']):02d}-{slug}-scorm12.zip"
 
 
 def construire():
@@ -171,6 +175,11 @@ def construire():
 
     print("3. Packages SCORM 1.2 -> exports/")
     EXPORTS.mkdir(exist_ok=True)
+    attendus = {nom_archive(m) for m in modules.values()}
+    for perime in EXPORTS.glob("*.zip"):
+        if perime.name not in attendus:
+            perime.unlink()
+            print(f"   ancien package supprimé : {perime.relative_to(RACINE)}")
     for mid, module in modules.items():
         dossier = DIST / "scorm" / mid
         copier_moteur(dossier)

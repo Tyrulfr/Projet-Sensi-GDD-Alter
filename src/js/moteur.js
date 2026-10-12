@@ -197,15 +197,17 @@
     if (commence) { completion = 'en-cours'; }
     if (vues === obligatoires.length && (!idEval || resEval)) { completion = 'termine'; }
 
+    /* Sans seuil, le module est seulement « terminé » (completed) ; le score reste enregistré. */
+    var avecSeuil = typeof seuil === 'number';
     var reussite = 'inconnue';
-    if (completion === 'termine' && idEval && resEval) {
+    if (completion === 'termine' && idEval && resEval && avecSeuil) {
       reussite = resEval.b >= seuil ? 'reussi' : 'echoue';
     }
     return {
       completion: completion,
       reussite: reussite,
       score: resEval ? resEval.b : null,
-      seuil: seuil,
+      seuil: avecSeuil ? seuil : null,
       vues: vues,
       obligatoires: obligatoires.length,
       progression: Math.round(((vues + (resEval ? 1 : 0)) / (obligatoires.length + (idEval ? 1 : 0))) * 100)

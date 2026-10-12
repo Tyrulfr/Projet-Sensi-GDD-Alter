@@ -37,7 +37,8 @@ Dans le navigateur, le même code sert les deux modes :
 
 - **Leçon vue** : tous ses blocs ont été affichés (l'apprenant est arrivé au bloc « À retenir »).
 - **Activité formative** : correction immédiate, réponse mémorisée, possibilité de réessayer ; n'entre pas dans la note.
-- **Quiz** : les 4 questions sont validées ensemble ; score = points obtenus / points possibles, en %. Tentatives illimitées ; le **meilleur score** est conservé.
+- **Quiz** (module 1) : les 4 questions sont validées ensemble ; score = points obtenus / points possibles, en %. Tentatives illimitées ; le **meilleur score** est conservé.
+- **Défi** (module 2) : une question à la fois avec correction immédiate ; le score n'est enregistré qu'à la fin des 3 questions (un défi interrompu reprend au début). Mêmes règles de score et de tentatives.
 - **Navigation séquentielle** : une leçon s'ouvre quand les précédentes sont vues ; le quiz après toutes les leçons.
 
 | Situation | Statut moteur | `cmi.core.lesson_status` |
@@ -46,7 +47,10 @@ Dans le navigateur, le même code sert les deux modes :
 | Leçons en cours, ou quiz non passé | en cours | `incomplete` |
 | Leçons vues + quiz ≥ seuil | terminé + réussi | `passed` |
 | Leçons vues + quiz < seuil | terminé + échoué | `failed` (peut repasser à `passed`) |
+| Module **sans seuil** (module 2) : leçons vues + défi fait, quel que soit le score | terminé | `completed` (score transmis) |
 | Module sans quiz, leçons vues | terminé | `completed` |
+
+Le seuil (`validation.seuilReussite`) est facultatif et réglable module par module : l'ajouter au module 2 suffit à passer en logique `passed`/`failed`, sans modifier le code.
 
 Un module consulté, terminé et réussi sont donc bien distingués.
 
@@ -66,7 +70,7 @@ Cycle de vie : recherche de l'API (fenêtres parentes puis fenêtre d'origine) �
 
 Cas particuliers gérés : mode `review`/`browse` du LMS (aucune écriture), absence d'API (aperçu avec avertissement, rien n'est enregistré), état de reprise corrompu ou issu d'une version antérieure du contenu (éléments inconnus ignorés), dépassement de la limite de 4096 caractères (dégradation progressive : on abandonne le détail des réponses avant la progression).
 
-Le manifeste déclare un `adlcp:masteryscore` égal au seuil (70) : certains LMS l'utilisent pour calculer eux-mêmes le statut.
+Le manifeste déclare un `adlcp:masteryscore` égal au seuil (70 pour le module 1) : certains LMS l'utilisent pour calculer eux-mêmes le statut. Le module 2, sans seuil, n'en déclare pas : le LMS ne doit pas transformer `completed` en `passed`/`failed` (à vérifier sur eCampus).
 
 **Suivi transversal** : chaque module est un package indépendant. SCORM 1.2 ne permet pas à un module de connaître les résultats des autres : la consolidation des 7 modules (et une éventuelle attestation / un badge) devra être faite par le LMS (achèvement de cours Moodle, par exemple).
 
@@ -84,6 +88,9 @@ Navigation complète au clavier, lien d'évitement, focus déplacé sur chaque n
 6. **Version SCORM** : 1.2 retenue ; à confirmer avec les administrateurs d'eCampus (version de Moodle, réglages d'import, gestion des tentatives).
 7. **Sortie après réussite** (`exit` vide) : selon le réglage du LMS, une nouvelle ouverture peut créer une nouvelle tentative. Alternative : toujours `suspend`.
 8. **Reconnaissance de complétion** (attestation, badge) : à définir côté LMS.
+9. **Module 2 sans seuil** : statut `completed` une fois le défi fait, quel que soit le score. Faut-il un seuil (et lequel : 2/3 ?) pour obtenir `passed` ?
+10. **Contenus du module 2** : exemples (RH, scolarité, bibliothèque, maintenance) présentés comme illustratifs ; formulations à faire relire, notamment « patrimoine informationnel ».
+11. **Nom des archives** : `module-XX-<titre>-scorm12.zip`. Le ZIP du module 1 a été renommé (ancienne adresse `module-01-scorm.zip` supprimée).
 
 ## 7. Évolutions possibles de l'espace concepteur
 

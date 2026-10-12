@@ -1,0 +1,230 @@
+{
+  "id": "m02",
+  "numero": 2,
+  "titre": "Une donnée, plusieurs usages",
+  "sousTitre": "Comprendre comment les données circulent entre les services.",
+  "duree": 8,
+  "statutContenu": "proposition - à valider",
+  "objectif": "Une donnée peut être créée à un endroit, utilisée à plusieurs endroits et produire des conséquences au-delà du service qui l'a enregistrée.",
+  "objectifsSpecifiques": [
+    { "id": "os2-1", "texte": "Reconnaître qu'une donnée peut avoir plusieurs usages." },
+    { "id": "os2-2", "texte": "Identifier les services susceptibles d'utiliser une même information." },
+    { "id": "os2-3", "texte": "Comprendre comment une erreur de saisie ou une information non actualisée peut se propager." },
+    { "id": "os2-4", "texte": "Expliquer pourquoi la qualité des données concerne plusieurs acteurs." },
+    { "id": "os2-5", "texte": "Comprendre la donnée comme un patrimoine informationnel partagé, dont l'accès et la réutilisation doivent être encadrés." }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m02-defi"
+  },
+  "lecons": [
+    {
+      "id": "m02-l1",
+      "type": "lecon",
+      "titre": "Une information peut servir plusieurs fois",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Un nouvel agent rejoint l'université. Au service RH, une gestionnaire enregistre son arrivée : son nom, son affectation, sa date d'arrivée et sa situation professionnelle.\n\nPour elle, la saisie est terminée. Pour l'information, le parcours ne fait que commencer."
+        },
+        {
+          "type": "schema",
+          "titre": "Où cette information peut-elle être utile ?",
+          "consigne": "Sélectionne chaque service pour découvrir pourquoi l'information lui est utile.",
+          "source": { "libelle": "Service RH", "detail": "Saisie de l'arrivée d'un agent" },
+          "flux": "Information sur l'affectation",
+          "cibles": [
+            { "id": "gestion", "libelle": "Gestion administrative", "usage": "Mise à jour du dossier", "detail": "Le dossier administratif de l'agent doit refléter sa situation réelle : affectation, date d'arrivée, rattachement." },
+            { "id": "informatique", "libelle": "Informatique", "usage": "Organisation des accès autorisés", "detail": "L'affectation permet de préparer un compte et d'ouvrir les accès aux applications utiles à ses missions, et seulement à celles-ci." },
+            { "id": "services-generaux", "libelle": "Services généraux", "usage": "Organisation des locaux", "detail": "Savoir qui arrive et dans quelle structure aide à prévoir un bureau, un badge ou du matériel." },
+            { "id": "pilotage", "libelle": "Pilotage", "usage": "Suivi des effectifs par structure", "detail": "Additionnées, les affectations permettent de suivre les effectifs de chaque structure et d'éclairer les décisions." }
+          ],
+          "legende": "Exemple illustratif : il ne décrit pas les circuits réels de l'Université Paris-Saclay."
+        },
+        {
+          "type": "texte",
+          "titre": "Une saisie, plusieurs usages",
+          "texte": "La personne qui saisit une donnée ne connaît pas toujours tous les usages qui en seront faits ensuite. C'est normal : chaque service connaît d'abord ses propres besoins.\n\nC'est justement pour cela que des **règles communes** sont utiles : elles permettent à chacun de produire une information fiable, compréhensible et réutilisable par les autres."
+        },
+        {
+          "type": "exemple",
+          "etiquette": "Point de vigilance",
+          "titre": "Partager ne veut pas dire tout ouvrir",
+          "texte": "Partager une information ne signifie pas que tout le monde peut accéder à tout. Chaque service n'a besoin que des informations utiles à ses missions : l'informatique a besoin de l'affectation pour ouvrir des accès, pas du dossier complet de l'agent."
+        },
+        { "type": "activite", "ref": "m02-a1" },
+        {
+          "type": "aretenir",
+          "texte": "Une donnée peut être produite dans un service et être utile à d'autres."
+        }
+      ]
+    },
+    {
+      "id": "m02-l2",
+      "type": "lecon",
+      "titre": "Quand une erreur voyage",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Un agent a changé de service : il travaille désormais à la scolarité. Pourtant, un fichier local, utilisé pour produire des tableaux de suivi, indique toujours son ancienne affectation."
+        },
+        {
+          "type": "chronologie",
+          "titre": "Suis le parcours de l'information",
+          "etapes": [
+            { "titre": "Une information non actualisée", "texte": "Le changement d'affectation a bien été pris en compte par le service concerné, mais le fichier local n'a pas été mis à jour. Personne ne s'en aperçoit." },
+            { "titre": "Un fichier réutilisé", "texte": "Quelques semaines plus tard, ce fichier sert de base à une extraction pour un tableau de suivi. L'ancienne affectation y est reprise telle quelle." },
+            { "titre": "Un résultat incorrect", "texte": "Le tableau présente une mauvaise répartition des effectifs : un service apparaît avec un agent de trop, la scolarité avec un agent de moins." },
+            { "titre": "Plusieurs personnes doivent intervenir", "texte": "Pour corriger, il faut :\n- retrouver l'origine de l'erreur ;\n- identifier l'information qui fait référence ;\n- corriger les différents supports qui ont repris l'erreur." }
+          ],
+          "conclusion": "Une seule information non actualisée a mobilisé plusieurs personnes, dans plusieurs services, pour être corrigée."
+        },
+        { "type": "activite", "ref": "m02-a2" },
+        {
+          "type": "texte",
+          "titre": "Pas une faute individuelle",
+          "texte": "Ce type de situation ne vient pas d'une personne négligente. Il s'explique souvent par :\n\n- des applications qui ne sont pas reliées entre elles ;\n- des procédures différentes d'un service à l'autre ;\n- un manque de règles communes ;\n- des informations qui circulent difficilement ;\n- des fichiers locaux qui ne sont pas synchronisés.\n\nLa gouvernance de la donnée aide à améliorer ces situations **collectivement**, en clarifiant les sources, les responsabilités et les circuits de mise à jour."
+        },
+        {
+          "type": "aretenir",
+          "texte": "Une petite erreur peut avoir des conséquences importantes lorsqu'une donnée est réutilisée."
+        }
+      ]
+    },
+    {
+      "id": "m02-l3",
+      "type": "lecon",
+      "titre": "À qui appartient la donnée ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "La bibliothèque universitaire gère son catalogue d'ouvrages. Un autre service souhaite utiliser certaines informations bibliographiques pour réaliser un inventaire. Comment réagir ?"
+        },
+        { "type": "activite", "ref": "m02-a3" },
+        {
+          "type": "texte",
+          "titre": "Un patrimoine informationnel partagé",
+          "texte": "Les données produites par un service peuvent avoir une valeur pour d'autres : elles forment un **patrimoine informationnel** de l'établissement.\n\nCela ne signifie pas pour autant :\n\n- que les données peuvent être diffusées librement ;\n- que les services perdent leurs responsabilités ;\n- que tout devient accessible à tout le monde ;\n- que les règles de confidentialité deviennent inutiles.\n\nLes services conservent leur expertise et leurs responsabilités sur les données qu'ils gèrent. Ce sont eux qui savent le mieux ce que contient l'information, ce qui peut être réutilisé et dans quelles conditions."
+        },
+        {
+          "type": "aretenir",
+          "texte": "Les données peuvent être utiles à plusieurs services, tout en restant soumises à des responsabilités et des règles d'accès."
+        }
+      ]
+    },
+    {
+      "id": "m02-defi",
+      "type": "evaluation",
+      "titre": "Le défi du module",
+      "surtitre": "Défi final",
+      "libelleAcces": "Relever le défi",
+      "libelleRecommencer": "Recommencer le défi",
+      "presentation": "une-par-une",
+      "introduction": "Trois situations, une question à la fois. Tu découvres la correction après chaque réponse, et tu peux recommencer le défi autant de fois que tu le souhaites.",
+      "activites": ["m02-q1", "m02-q2", "m02-q3"],
+      "messagesResultat": [
+        { "min": 100, "texte": "Bravo ! Tu as bien identifié comment une information circule entre les services et pourquoi son partage doit être encadré." },
+        { "min": 60, "texte": "C'est un bon début. Relis la correction de la question à revoir : elle reprend un point clé du module." },
+        { "min": 0, "texte": "Ces notions sont nouvelles pour beaucoup de personnes. Prends le temps de relire les corrections et les points à retenir, puis recommence le défi quand tu le souhaites." }
+      ]
+    }
+  ],
+  "activites": {
+    "m02-a1": {
+      "type": "vrai-faux",
+      "objectif": "os2-1",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Vrai ou faux : une information saisie par le service RH ne sert qu'au service RH.",
+      "reponse": false,
+      "explication": {
+        "correct": "C'est bien faux. Comme dans l'exemple, une même information peut servir à la gestion administrative, à l'informatique, aux services généraux ou au pilotage, chacun pour ses propres missions.",
+        "incorrect": "En réalité, c'est faux. Une même information peut servir à plusieurs services, chacun pour ses propres missions : gestion administrative, informatique, services généraux, pilotage."
+      }
+    },
+    "m02-a2": {
+      "type": "choix-unique",
+      "objectif": "os2-3",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "À quel moment le problème aurait-il pu être évité ou limité ?",
+      "choix": [
+        { "id": "a", "texte": "En vérifiant l'actualisation de l'information à sa source appropriée.", "feedback": "Oui : avant de réutiliser une information, vérifier qu'elle est à jour à la bonne source limite la propagation de l'erreur." },
+        { "id": "b", "texte": "En interdisant à tous les autres services de produire des tableaux.", "feedback": "Les tableaux de suivi sont utiles aux missions des services. Le problème ne vient pas du tableau, mais de l'information non actualisée qu'il a reprise." },
+        { "id": "c", "texte": "En créant systématiquement une nouvelle copie du fichier.", "feedback": "Une copie de plus multiplie les versions : elle augmente le risque d'écart au lieu de le réduire." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Vérifier la bonne source, l'actualisation et la cohérence d'une information permet de limiter les erreurs qui peuvent se répercuter dans d'autres activités.",
+        "incorrect": "La meilleure réponse est de vérifier l'actualisation de l'information à sa source appropriée. Vérifier la bonne source, l'actualisation et la cohérence d'une information permet de limiter les erreurs qui peuvent se répercuter dans d'autres activités."
+      }
+    },
+    "m02-a3": {
+      "type": "choix-unique",
+      "objectif": "os2-5",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Deux réactions sont possibles à la bibliothèque. Laquelle te paraît la plus adaptée ?",
+      "choix": [
+        { "id": "a", "texte": "« Ces données appartiennent à notre service, nous devons les conserver exclusivement chez nous. »", "feedback": "Cette réaction protège les données, mais elle prive l'établissement d'informations utiles à d'autres missions, alors qu'un partage encadré est souvent possible." },
+        { "id": "b", "texte": "« Ces informations pourraient être utiles à d'autres. Vérifions ce qui peut être réutilisé et dans quelles conditions. »", "feedback": "Cette réaction reconnaît la valeur de l'information pour d'autres services, sans renoncer aux responsabilités de la bibliothèque." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Oui. La bibliothèque reste responsable de son catalogue : c'est elle qui sait ce qui peut être réutilisé et dans quelles conditions. Partager, c'est mettre à disposition ce qui est utile, dans un cadre adapté.",
+        "incorrect": "La réaction la plus adaptée est la seconde : vérifier ce qui peut être réutilisé et dans quelles conditions. La bibliothèque garde ses responsabilités, tout en permettant à l'information de servir à d'autres missions."
+      }
+    },
+    "m02-q1": {
+      "type": "choix-unique",
+      "objectif": "os2-2",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Une gestionnaire RH modifie l'affectation d'un agent. Pourquoi cette mise à jour peut-elle intéresser d'autres services ?",
+      "choix": [
+        { "id": "a", "texte": "Parce que tous les services doivent automatiquement recevoir l'intégralité du dossier." },
+        { "id": "b", "texte": "Parce que certains services peuvent avoir besoin de cette information pour leurs propres missions." },
+        { "id": "c", "texte": "Parce que le dossier doit être copié dans tous les tableaux Excel." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Une information telle que l'affectation peut être utile à plusieurs services, notamment pour leurs activités de gestion ou de pilotage. Sa transmission doit néanmoins respecter les finalités et les habilitations autorisées.",
+        "incorrect": "La bonne réponse est la deuxième. Une information telle que l'affectation peut être utile à plusieurs services, notamment pour leurs activités de gestion ou de pilotage. Sa transmission doit néanmoins respecter les finalités et les habilitations autorisées."
+      }
+    },
+    "m02-q2": {
+      "type": "choix-unique",
+      "objectif": "os2-4",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un tableau de scolarité contient un code de formation incorrect. Ce tableau est ensuite repris dans un bilan. Quel est le principal risque ?",
+      "choix": [
+        { "id": "a", "texte": "Le résultat du bilan peut devenir incorrect." },
+        { "id": "b", "texte": "L'erreur concerne uniquement la personne ayant créé le tableau." },
+        { "id": "c", "texte": "Le logiciel doit obligatoirement être remplacé." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Une erreur peut se répercuter dans les tableaux, les statistiques ou les documents produits à partir d'une même information. Identifier et corriger la source appropriée aide à éviter sa répétition.",
+        "incorrect": "Le principal risque est que le bilan devienne incorrect. Une erreur peut se répercuter dans les tableaux, les statistiques ou les documents produits à partir d'une même information. Identifier et corriger la source appropriée aide à éviter sa répétition."
+      }
+    },
+    "m02-q3": {
+      "type": "choix-unique",
+      "objectif": "os2-5",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Le service maintenance gère l'inventaire des équipements. Un autre service souhaite disposer de certaines de ces informations pour préparer des travaux. Quelle attitude privilégier ?",
+      "choix": [
+        { "id": "a", "texte": "Refuser systématiquement, puisque l'inventaire est géré par la maintenance." },
+        { "id": "b", "texte": "Transmettre intégralement l'inventaire sans vérification." },
+        { "id": "c", "texte": "Identifier les informations nécessaires et vérifier les conditions de leur transmission." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Le partage responsable consiste à mettre à disposition les informations utiles, dans un cadre adapté aux missions et aux règles applicables.",
+        "incorrect": "L'attitude à privilégier est d'identifier les informations nécessaires et de vérifier les conditions de leur transmission. Le partage responsable consiste à mettre à disposition les informations utiles, dans un cadre adapté aux missions et aux règles applicables."
+      }
+    }
+  },
+  "synthese": [
+    "Une donnée peut être produite dans un service et être utile à d'autres.",
+    "Une petite erreur peut avoir des conséquences importantes lorsqu'une donnée est réutilisée : vérifier la bonne source et son actualisation limite sa propagation.",
+    "Les données forment un patrimoine informationnel partagé : elles peuvent servir à plusieurs services, tout en restant soumises à des responsabilités et à des règles d'accès."
+  ]
+}

@@ -60,13 +60,17 @@
           ])
         ]);
       case 'exemple':
-        return h('aside', { class: 'bloc bloc-exemple', 'aria-label': 'Exemple' }, [
-          h('p', { class: 'bloc-etiquette', text: 'Exemple' }),
+        return h('aside', { class: 'bloc bloc-exemple', 'aria-label': bloc.etiquette || 'Exemple' }, [
+          h('p', { class: 'bloc-etiquette', text: bloc.etiquette || 'Exemple' }),
           bloc.titre ? h('h3', { text: bloc.titre }) : null,
           h('div', { class: 'bloc-corps', html: U.richText(bloc.texte) })
         ]);
       case 'tableau':
         return UI.tableau(bloc);
+      case 'schema':
+        return UI.schema(bloc);
+      case 'chronologie':
+        return UI.chronologie(bloc);
       case 'aretenir':
         return h('div', { class: 'bloc bloc-aretenir' }, [
           h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '★ ' }), 'À retenir']),
@@ -75,6 +79,77 @@
       default:
         return h('div', { class: 'bloc', text: '[Bloc inconnu : ' + bloc.type + ']' });
     }
+  };
+
+  /* Schéma de circulation : une source, un flux, plusieurs usages à explorer. */
+  UI.schema = function (bloc) {
+    var idDetail = uid('schema');
+    var detail = h('div', { class: 'schema-detail', id: idDetail, role: 'status' },
+      h('p', { class: 'schema-invite', text: bloc.consigne || 'Sélectionne un service pour découvrir son usage de l\'information.' }));
+    var boutons = [];
+    var cibles = h('ul', { class: 'schema-cibles' });
+    bloc.cibles.forEach(function (c) {
+      var bouton = h('button', {
+        type: 'button', class: 'schema-cible', 'aria-pressed': 'false', 'aria-controls': idDetail,
+        onclick: function () {
+          boutons.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+          bouton.setAttribute('aria-pressed', 'true');
+          bouton.classList.add('est-consulte');
+          bouton.querySelector('.schema-cible-etat').textContent = '✓ Consulté';
+          detail.innerHTML = '';
+          detail.appendChild(h('p', { class: 'schema-detail-titre' }, [h('strong', { text: c.libelle }), ' : ' + c.usage]));
+          detail.appendChild(h('div', { html: U.richText(c.detail) }));
+        }
+      }, [
+        h('span', { class: 'schema-cible-libelle', text: c.libelle }),
+        h('span', { class: 'schema-cible-usage', text: c.usage }),
+        h('span', { class: 'schema-cible-etat', text: 'Découvrir' })
+      ]);
+      boutons.push(bouton);
+      cibles.appendChild(h('li', null, bouton));
+    });
+    return h('div', { class: 'bloc bloc-schema' }, [
+      h('p', { class: 'bloc-etiquette', text: 'Schéma' }),
+      bloc.titre ? h('h3', { text: bloc.titre }) : null,
+      h('div', { class: 'schema' }, [
+        h('div', { class: 'schema-source' }, [h('span', { class: 'schema-source-libelle', text: bloc.source.libelle }),
+          bloc.source.detail ? h('span', { class: 'schema-source-detail', text: bloc.source.detail }) : null]),
+        h('div', { class: 'schema-flux', 'aria-hidden': 'true' }, [h('span', { text: bloc.flux }), h('span', { class: 'schema-fleche', text: '↓' })]),
+        h('p', { class: 'sr-only', text: 'Cette information peut servir à ' + bloc.cibles.length + ' services :' }),
+        cibles,
+        detail
+      ]),
+      bloc.legende ? h('p', { class: 'bloc-legende', text: bloc.legende }) : null
+    ]);
+  };
+
+  /*
+   * Chronologie progressive.
+   * options : visibles (nombre d'étapes affichées), suivante (function) pour révéler l'étape suivante.
+   */
+  UI.chronologie = function (bloc, options) {
+    var o = options || {};
+    var total = bloc.etapes.length;
+    var visibles = Math.min(o.visibles || total, total);
+    var liste = h('ol', { class: 'chronologie' });
+    bloc.etapes.slice(0, visibles).forEach(function (e, i) {
+      liste.appendChild(h('li', { class: 'chronologie-etape', id: (o.prefixeId || 'chrono') + '-' + i, tabindex: '-1' }, [
+        h('span', { class: 'chronologie-numero', 'aria-hidden': 'true', text: String(i + 1) }),
+        h('div', { class: 'chronologie-corps' }, [
+          h('p', { class: 'chronologie-titre' }, [h('span', { class: 'sr-only', text: 'Étape ' + (i + 1) + ' : ' }), e.titre]),
+          h('div', { html: U.richText(e.texte) })
+        ])
+      ]));
+    });
+    return h('div', { class: 'bloc bloc-chronologie' }, [
+      h('p', { class: 'bloc-etiquette', text: 'Scénario' }),
+      bloc.titre ? h('h3', { text: bloc.titre }) : null,
+      liste,
+      visibles < total
+        ? h('div', { class: 'actions' }, h('button', { type: 'button', class: 'bouton bouton-secondaire', onclick: o.suivante },
+          'Étape suivante (' + (visibles + 1) + ' sur ' + total + ')'))
+        : (bloc.conclusion ? h('div', { class: 'chronologie-conclusion', html: U.richText(bloc.conclusion) }) : null)
+    ]);
   };
 
   UI.tableau = function (bloc) {
@@ -262,13 +337,13 @@
     return bloc;
   };
 
-  UI.barreProgression = function (valeur, libelle) {
+  UI.barreProgression = function (valeur, libelle, texte) {
     return h('div', { class: 'progression' }, [
       h('div', {
         class: 'progression-barre', role: 'progressbar', 'aria-valuemin': '0', 'aria-valuemax': '100',
         'aria-valuenow': String(valeur), 'aria-label': libelle || 'Progression'
       }, h('div', { class: 'progression-remplissage', style: 'width:' + valeur + '%' })),
-      h('span', { class: 'progression-texte', text: valeur + ' %' })
+      h('span', { class: 'progression-texte', text: texte || (valeur + ' %') })
     ]);
   };
 

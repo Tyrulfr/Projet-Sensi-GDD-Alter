@@ -28,8 +28,11 @@ Conseil : utiliser un éditeur qui signale les erreurs JSON (Cursor, VS Code). L
 }
 ```
 
+- `sousTitre` (facultatif) : affiché sous le titre sur la page du module.
 - `navigation` : `sequentielle` (chaque leçon s'ouvre après la précédente) ou `libre`.
-- `seuilReussite` : pourcentage minimal au quiz (valeur à valider institutionnellement).
+- `seuilReussite` (facultatif) : pourcentage minimal au quiz (valeur à valider institutionnellement).
+  - **avec seuil** (module 1) : statut « réussi » (`passed`) ou « à repasser » (`failed`) ;
+  - **sans seuil** (module 2) : une fois les leçons vues et le quiz fait, le module est « terminé » (`completed`), quel que soit le score ; le score est tout de même enregistré.
 - Pour un module sans quiz, supprimer `evaluation` : le module sera « terminé » une fois les leçons vues.
 
 ## Une leçon
@@ -41,14 +44,36 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `situation` | `texte` |
 | `texte` | `titre` (facultatif), `texte` |
 | `definition` | `terme`, `texte` |
-| `exemple` | `titre` (facultatif), `texte` |
+| `exemple` | `titre` (facultatif), `texte`, `etiquette` (facultatif, « Exemple » par défaut ; ex. « Point de vigilance ») |
 | `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes) |
+| `schema` | schéma de circulation cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `id`, `libelle`, `usage`, `detail`), `legende` (ex. « Exemple illustratif ») |
+| `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
 | `activite` | `ref` : identifiant d'une activité définie dans `activites` |
 | `aretenir` | `texte` |
 
-Dans les textes : `**mot**` met en gras ; une ligne vide (`\n\n`) crée un nouveau paragraphe.
+Dans les textes : `**mot**` met en gras ; une ligne vide (`\n\n`) crée un nouveau paragraphe ; un paragraphe dont **toutes** les lignes commencent par `- ` devient une liste à puces (le séparer du texte précédent par une ligne vide).
 
-Le quiz est une leçon de type `evaluation` avec une liste `activites` de questions.
+## Le quiz ou le défi
+
+Le quiz est une leçon de type `evaluation` avec une liste `activites` de questions. Options facultatives :
+
+| Champ | Effet |
+|---|---|
+| `presentation` | `toutes` (défaut, module 1 : toutes les questions sur une page) ou `une-par-une` (module 2 : une question à la fois, « Vérifier ma réponse », correction immédiate, « Question suivante », puis résultat) |
+| `surtitre` | texte au-dessus du titre (défaut « Évaluation » ; module 2 : « Défi final ») |
+| `libelleAcces` | bouton de la dernière leçon (défaut « Passer au quiz » ; module 2 : « Relever le défi ») |
+| `libelleRecommencer` | bouton de nouvelle tentative (défaut « Repasser le quiz » ; module 2 : « Recommencer le défi ») |
+| `messagesResultat` | messages selon le score, en % : `[{ "min": 100, "texte": "…" }, { "min": 60, "texte": "…" }, { "min": 0, "texte": "…" }]`. Le message retenu est celui du plus grand `min` atteint. Avec 3 questions : 3/3 = 100 %, 2/3 = 67 %, 1/3 = 33 % |
+
+La page de résultat affiche aussi la `synthese` du module (« L'essentiel du module ») et, sur le site web uniquement, un bouton vers le module suivant **s'il est disponible** dans le catalogue.
+
+## Modifier une leçon ou une question
+
+- **Changer un texte** : ouvrir `contenus/modules/module-02.json`, trouver le texte (recherche Cmd+F), le modifier entre les guillemets.
+- **Ajouter un bloc** : insérer un objet `{ "type": "…", … }` dans la liste `blocs` de la leçon, à la position voulue (attention aux virgules entre blocs).
+- **Modifier une question** : dans `activites`, changer `consigne`, `choix`, `reponse` et les deux `explication`. Si la bonne réponse change, mettre à jour `reponse` **et** les explications.
+- **Ajouter une question au défi** : créer l'activité (`"notation": { "formative": false, "points": 1 }`), puis ajouter son identifiant dans la liste `activites` de la leçon `evaluation`. Penser à revoir les `messagesResultat` et l'`introduction` (« Trois situations… »).
+- Puis `./build.sh` : le site **et** le package SCORM sont régénérés ensemble.
 
 ## Une activité
 
@@ -70,6 +95,7 @@ Règles imposées par SCORM 1.2 (vérifiées automatiquement) :
 
 ## Ajouter un module
 
-1. Copier `contenus/modules/module-01.json` en `module-02.json` et adapter tous les identifiants (`m02-…`).
-2. Dans `contenus/catalogue.json`, passer le module à `"etat": "disponible"` et ajouter `"fichier": "module-02.json"` (le titre, la durée et l'objectif sont alors lus dans le fichier du module).
-3. `./build.sh` génère automatiquement `exports/module-02-scorm.zip`.
+1. Copier un module existant (`module-02.json` pour un module avec défi sans seuil) en `module-03.json` et adapter tous les identifiants (`m03-…`).
+2. Dans `contenus/catalogue.json`, passer le module à `"etat": "disponible"` et ajouter `"fichier": "module-03.json"` (le titre, la durée et l'objectif sont alors lus dans le fichier du module).
+3. `./build.sh` génère automatiquement `exports/module-03-<titre-du-module>-scorm12.zip` (nom calculé à partir du numéro et du titre, sans accents) et ajoute le lien de téléchargement sur la page Parcours. Le bouton « Module 3 » apparaît automatiquement à la fin du module 2.
+4. Attention : modifier le **titre** d'un module change le nom de son ZIP (l'ancien est supprimé au build).
