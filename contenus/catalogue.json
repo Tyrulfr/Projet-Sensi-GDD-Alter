@@ -1,0 +1,73 @@
+{
+  "id": "ups-gdd",
+  "version": "0.1.0",
+  "titre": "La donnée, une affaire collective",
+  "sousTitre": "Sensibilisation à la gouvernance de la donnée",
+  "institution": "Université Paris-Saclay",
+  "introduction": "Tous les jours, tu saisis, consultes, transmets ou corriges des données : un dossier d'agent, une inscription, un prêt de livre, une facture, une intervention technique. Cette formation t'aide à comprendre pourquoi ces gestes comptent pour tout l'établissement, et quels réflexes simples permettent de mieux travailler ensemble.",
+  "public": "Personnels administratifs et techniques, quel que soit le service. Aucune connaissance préalable n'est nécessaire.",
+  "objectifs": [
+    "Expliquer simplement ce qu'est une donnée et ce qu'est la gouvernance de la donnée.",
+    "Comprendre pourquoi tes activités quotidiennes sont concernées.",
+    "Identifier les conséquences d'une donnée incorrecte ou mal structurée.",
+    "Comprendre l'intérêt de règles, de référentiels et de responsabilités communes.",
+    "Distinguer partage responsable des données et accès indiscriminé.",
+    "Reconnaître les bons réflexes professionnels."
+  ],
+  "modules": [
+    {
+      "id": "m01",
+      "numero": 1,
+      "etat": "disponible",
+      "fichier": "module-01.json"
+    },
+    {
+      "id": "m02",
+      "numero": 2,
+      "etat": "a-venir",
+      "titre": "Une donnée, plusieurs usages",
+      "duree": 7,
+      "objectif": "Comprendre qu'une même donnée peut être utilisée par plusieurs services."
+    },
+    {
+      "id": "m03",
+      "numero": 3,
+      "etat": "a-venir",
+      "titre": "Qualité et structuration des données",
+      "duree": 9,
+      "objectif": "Identifier ce qui rend une donnée fiable et réutilisable."
+    },
+    {
+      "id": "m04",
+      "numero": 4,
+      "etat": "a-venir",
+      "titre": "Partager sans perdre le contrôle",
+      "duree": 8,
+      "objectif": "Comprendre les principes du partage responsable."
+    },
+    {
+      "id": "m05",
+      "numero": 5,
+      "etat": "a-venir",
+      "titre": "Qui organise les données ?",
+      "duree": 7,
+      "objectif": "Comprendre la gouvernance et la distinguer de la gestion opérationnelle."
+    },
+    {
+      "id": "m06",
+      "numero": 6,
+      "etat": "a-venir",
+      "titre": "Les bons réflexes professionnels",
+      "duree": 7,
+      "objectif": "Reconnaître les pratiques favorisant une bonne gestion collective."
+    },
+    {
+      "id": "m07",
+      "numero": 7,
+      "etat": "a-venir",
+      "titre": "Validation et consolidation",
+      "duree": 10,
+      "objectif": "Vérifier l'acquisition des messages essentiels."
+    }
+  ]
+}

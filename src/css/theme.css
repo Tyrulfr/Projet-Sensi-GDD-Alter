@@ -1,0 +1,33 @@
+/*
+ * Thème configurable. Couleurs « inspirées » de l'environnement visuel de
+ * l'Université Paris-Saclay : ce n'est pas la charte officielle, à faire valider
+ * par la direction de la communication avant diffusion.
+ * Tous les couples texte/fond ci-dessous visent un contraste ≥ 4,5:1 (WCAG AA).
+ */
+:root {
+  --couleur-primaire: #63003c;
+  --couleur-primaire-fonce: #45002a;
+  --couleur-primaire-clair: #f7eef3;
+  --couleur-accent: #005a70;
+  --couleur-accent-clair: #e6f2f5;
+
+  --couleur-texte: #1f1f24;
+  --couleur-texte-doux: #4a4a55;
+  --couleur-fond: #f6f6f8;
+  --couleur-surface: #ffffff;
+  --couleur-bordure: #cfcfd8;
+
+  --couleur-succes: #1d6b35;
+  --couleur-succes-clair: #e8f4ec;
+  --couleur-erreur: #a3262a;
+  --couleur-erreur-clair: #fbeceb;
+  --couleur-alerte: #7a4a00;
+  --couleur-alerte-clair: #fff4e0;
+
+  --couleur-focus: #0b57d0;
+
+  --police: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --taille-base: 1.0625rem;
+  --rayon: 10px;
+  --largeur-lecture: 46rem;
+}

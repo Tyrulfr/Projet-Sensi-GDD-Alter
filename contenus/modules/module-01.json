@@ -1,0 +1,282 @@
+{
+  "id": "m01",
+  "numero": 1,
+  "titre": "La donnée dans mon quotidien",
+  "duree": 10,
+  "statutContenu": "proposition - à valider",
+  "objectif": "Reconnaître les données manipulées dans tes activités professionnelles.",
+  "objectifsSpecifiques": [
+    { "id": "os1-1", "texte": "Distinguer une donnée d'une information." },
+    { "id": "os1-2", "texte": "Reconnaître une donnée personnelle et une donnée métier." },
+    { "id": "os1-3", "texte": "Identifier les supports et les applications où les données sont enregistrées." }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m01-quiz",
+    "seuilReussite": 70
+  },
+  "lecons": [
+    {
+      "id": "m01-l1",
+      "type": "lecon",
+      "titre": "Des données partout dans mon travail",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Lundi matin. Une collègue du service RH te transmet un fichier contenant les noms, prénoms et affectations des agents. Tu dois préparer une liste des agents par service pour organiser une réunion."
+        },
+        {
+          "type": "texte",
+          "titre": "Ce que tu viens de manipuler",
+          "texte": "Sans y penser, tu utilises des **données** : des noms, des prénoms, des noms de services. Prises une par une, ce sont des éléments bruts.\n\nUne fois rassemblées et organisées pour répondre à une question précise (« qui travaille dans quel service ? »), elles deviennent une **information** utile pour agir."
+        },
+        {
+          "type": "definition",
+          "terme": "Donnée",
+          "texte": "Un élément brut enregistré : un nom, une date, un montant, un code, un nombre. Elle peut être écrite sur papier, saisie dans un tableur ou enregistrée dans une application."
+        },
+        {
+          "type": "definition",
+          "terme": "Information",
+          "texte": "Ce que l'on obtient en interprétant des données dans un contexte, pour répondre à une question ou prendre une décision."
+        },
+        {
+          "type": "tableau",
+          "titre": "La même logique dans tous les services",
+          "colonnes": ["Service", "Exemples de données", "Information obtenue"],
+          "lignes": [
+            ["Ressources humaines", "Date d'entrée, grade, affectation", "« 12 agents du service pourront partir à la retraite d'ici deux ans. »"],
+            ["Bibliothèque", "Code-barres d'un ouvrage, date de prêt, date de retour", "« 40 ouvrages sont en retard ce mois-ci. »"],
+            ["Maintenance", "Numéro de salle, type d'équipement, date de la dernière intervention", "« Le chauffage du bâtiment B doit être révisé avant l'hiver. »"],
+            ["Scolarité", "Numéro étudiant, formation, date d'inscription", "« La licence 1 compte 30 inscrits de plus que l'an dernier. »"]
+          ]
+        },
+        { "type": "activite", "ref": "m01-a1" },
+        {
+          "type": "aretenir",
+          "texte": "Une donnée est un élément brut enregistré. Une information naît quand on interprète des données pour répondre à une question. Ton travail quotidien produit et utilise les deux."
+        }
+      ]
+    },
+    {
+      "id": "m01-l2",
+      "type": "lecon",
+      "titre": "Données métier et données personnelles",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "À la bibliothèque, Karim prépare les relances pour les ouvrages en retard. Son tableau contient le titre des livres, la date de retour prévue… mais aussi le nom et l'adresse électronique des lecteurs."
+        },
+        {
+          "type": "texte",
+          "titre": "Deux façons de regarder une donnée",
+          "texte": "Toutes ces données servent l'activité de la bibliothèque : ce sont des **données métier**. Certaines d'entre elles permettent en plus de savoir de qui il s'agit : ce sont des **données personnelles**.\n\nUne donnée peut donc être à la fois une donnée métier et une donnée personnelle."
+        },
+        {
+          "type": "definition",
+          "terme": "Donnée métier",
+          "texte": "Une donnée produite ou utilisée pour réaliser une activité de l'établissement : inscrire un étudiant, payer une facture, prêter un livre, planifier une intervention."
+        },
+        {
+          "type": "definition",
+          "terme": "Donnée personnelle",
+          "texte": "Toute information se rapportant à une personne physique identifiée ou identifiable, directement (un nom, une photo) ou indirectement (un numéro étudiant, un identifiant de connexion, ou plusieurs données croisées entre elles)."
+        },
+        {
+          "type": "exemple",
+          "titre": "Attention aux identifications indirectes",
+          "texte": "« Le seul agent de catégorie A du service, arrivé en 2019 » : aucun nom n'est écrit, et pourtant toute l'équipe sait de qui il s'agit. C'est donc bien une donnée personnelle."
+        },
+        {
+          "type": "texte",
+          "titre": "Pas interdites, mais à manier avec attention",
+          "texte": "Les données personnelles ne sont pas interdites : sans elles, impossible de payer les agents ou d'inscrire les étudiants. Elles demandent simplement plus d'attention : on les protège et on les utilise pour la mission prévue. Le module 4 y revient en détail."
+        },
+        { "type": "activite", "ref": "m01-a2" },
+        {
+          "type": "aretenir",
+          "texte": "Les données personnelles sont des données qui permettent d'identifier quelqu'un, même indirectement. Elles sont souvent indispensables au travail : elles ne sont pas interdites, elles demandent de l'attention."
+        }
+      ]
+    },
+    {
+      "id": "m01-l3",
+      "type": "lecon",
+      "titre": "Où vivent les données ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Au service maintenance, Sophie doit savoir quand la chaudière du bâtiment C a été révisée. Elle trouve une date dans un tableur partagé, une autre dans un courriel, et une troisième dans le logiciel de suivi des interventions. Laquelle croire ?"
+        },
+        {
+          "type": "texte",
+          "titre": "Support et application",
+          "texte": "Une donnée est toujours enregistrée quelque part : c'est son **support de stockage**. Elle peut aussi être gérée par une **application**, c'est-à-dire un logiciel conçu pour une activité précise, qui encadre la saisie et organise les données."
+        },
+        {
+          "type": "tableau",
+          "titre": "Les principaux supports",
+          "colonnes": ["Support", "Exemples", "Point d'attention"],
+          "lignes": [
+            ["Papier", "Dossier, registre, formulaire signé", "Difficile à partager et à mettre à jour."],
+            ["Fichier bureautique", "Tableur, document texte", "Facile à copier, donc vite multiplié en versions différentes."],
+            ["Messagerie", "Pièce jointe, contenu d'un courriel", "La donnée y reste figée et devient difficile à retrouver."],
+            ["Application de gestion", "Logiciel RH, de scolarité, de bibliothèque, de suivi des interventions", "Elle prévoit des règles de saisie, des droits d'accès et un historique."]
+          ]
+        },
+        {
+          "type": "exemple",
+          "titre": "Ce qui s'est passé pour Sophie",
+          "texte": "Trois supports contiennent trois versions de la même donnée. Personne n'a commis de faute : la date a été recopiée, puis chaque copie a vécu sa vie. C'est l'une des difficultés que la gouvernance de la donnée aide à résoudre."
+        },
+        { "type": "activite", "ref": "m01-a3" },
+        { "type": "activite", "ref": "m01-a4" },
+        {
+          "type": "aretenir",
+          "texte": "Une même donnée peut exister sur plusieurs supports. Quand les copies se multiplient, elles finissent par diverger : il faut savoir quelle source fait référence."
+        }
+      ]
+    },
+    {
+      "id": "m01-quiz",
+      "type": "evaluation",
+      "titre": "Quiz du module",
+      "introduction": "Quatre questions pour faire le point. Il n'y a pas de limite de temps et tu pourras recommencer si tu le souhaites. Le seuil de réussite est de 70 %.",
+      "activites": ["m01-q1", "m01-q2", "m01-q3", "m01-q4"]
+    }
+  ],
+  "activites": {
+    "m01-a1": {
+      "type": "choix-multiple",
+      "objectif": "os1-1",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Parmi ces éléments, lesquels sont des données brutes ?",
+      "choix": [
+        { "id": "a", "texte": "La date de naissance d'un agent" },
+        { "id": "b", "texte": "Le numéro d'inventaire d'un ordinateur" },
+        { "id": "c", "texte": "Le montant d'une facture" },
+        { "id": "d", "texte": "Le constat « les retards de paiement ont doublé cette année »" }
+      ],
+      "reponses": ["a", "b", "c"],
+      "explication": {
+        "correct": "Exactement. Une date, un numéro ou un montant sont des éléments bruts enregistrés. Le constat sur les retards de paiement est une information : il a fallu comparer de nombreuses données pour l'obtenir.",
+        "incorrect": "Pas tout à fait. Une date, un numéro ou un montant sont des données brutes. En revanche, « les retards de paiement ont doublé » est une information : elle résulte de l'analyse de nombreuses données."
+      }
+    },
+    "m01-a2": {
+      "type": "classement",
+      "objectif": "os1-2",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Pour chaque donnée, indique s'il s'agit d'une donnée personnelle ou non.",
+      "categories": [
+        { "id": "p", "texte": "Donnée personnelle" },
+        { "id": "n", "texte": "Donnée non personnelle" }
+      ],
+      "elements": [
+        { "id": "1", "texte": "Le numéro étudiant d'une inscrite", "categorie": "p", "explication": "Il permet de retrouver une personne précise : c'est une identification indirecte." },
+        { "id": "2", "texte": "Le numéro d'une salle de cours", "categorie": "n", "explication": "Il désigne un lieu, pas une personne." },
+        { "id": "3", "texte": "L'adresse électronique professionnelle prenom.nom d'un agent", "categorie": "p", "explication": "Même professionnelle, elle identifie directement une personne." },
+        { "id": "4", "texte": "Le nombre total d'inscrits dans une formation de 200 étudiants", "categorie": "n", "explication": "C'est un total : il ne permet pas de remonter à une personne en particulier." },
+        { "id": "5", "texte": "La photo d'une collègue dans l'annuaire interne", "categorie": "p", "explication": "Une photo permet d'identifier directement une personne." },
+        { "id": "6", "texte": "Le numéro d'inventaire d'un vidéoprojecteur", "categorie": "n", "explication": "Il désigne un équipement, pas une personne." }
+      ],
+      "explication": {
+        "correct": "Bravo, ton classement est juste. Retiens qu'une donnée est personnelle dès qu'elle permet d'identifier quelqu'un, directement ou indirectement.",
+        "incorrect": "Certaines réponses sont à revoir. Une donnée est personnelle dès qu'elle permet d'identifier quelqu'un, directement (nom, photo) ou indirectement (numéro, identifiant)."
+      }
+    },
+    "m01-a3": {
+      "type": "vrai-faux",
+      "objectif": "os1-3",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Vrai ou faux : une donnée n'existe vraiment que si elle est enregistrée dans une application informatique.",
+      "reponse": false,
+      "explication": {
+        "correct": "C'est bien faux. Un formulaire papier, un tableur ou un courriel contiennent aussi des données. L'application apporte un cadre et des contrôles, mais ce n'est pas le seul support.",
+        "incorrect": "En réalité, c'est faux. Un formulaire papier, un tableur ou un courriel contiennent aussi des données. L'application apporte un cadre et des contrôles, mais ce n'est pas le seul support."
+      }
+    },
+    "m01-a4": {
+      "type": "choix-unique",
+      "objectif": "os1-3",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Pour connaître la date réelle de la dernière révision de la chaudière, quelle source Sophie devrait-elle consulter en priorité ?",
+      "choix": [
+        { "id": "a", "texte": "Le tableur partagé, car c'est le plus facile à consulter", "feedback": "Le tableur est pratique, mais c'est souvent une copie : rien ne garantit qu'il soit à jour." },
+        { "id": "b", "texte": "Le logiciel de suivi des interventions, prévu pour enregistrer ces opérations", "feedback": "C'est l'outil prévu pour cette activité : il fait en principe référence." },
+        { "id": "c", "texte": "Le courriel le plus récent", "feedback": "Un courriel fige une donnée à un instant donné ; il n'est pas fait pour servir de référence." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "L'outil prévu pour l'activité est en principe la source de référence. En cas de doute, Sophie peut vérifier auprès du technicien et signaler l'écart pour que les autres copies soient corrigées.",
+        "incorrect": "La meilleure option est le logiciel de suivi des interventions : c'est l'outil prévu pour enregistrer ces opérations. En cas de doute, Sophie peut vérifier auprès du technicien et signaler l'écart."
+      }
+    },
+    "m01-q1": {
+      "type": "choix-unique",
+      "objectif": "os1-1",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un tableau indique, pour chaque agent, sa date d'arrivée dans l'établissement. Ta responsable te demande combien d'agents sont arrivés cette année. Le chiffre que tu lui donnes est…",
+      "choix": [
+        { "id": "a", "texte": "une donnée brute" },
+        { "id": "b", "texte": "une information obtenue à partir de données" },
+        { "id": "c", "texte": "une donnée personnelle" }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Oui : tu as compté et interprété des dates pour répondre à une question. C'est une information.",
+        "incorrect": "La bonne réponse est « une information obtenue à partir de données » : tu as compté et interprété des dates d'arrivée pour répondre à une question."
+      }
+    },
+    "m01-q2": {
+      "type": "choix-multiple",
+      "objectif": "os1-2",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Lesquelles de ces données sont des données personnelles ?",
+      "choix": [
+        { "id": "a", "texte": "Le numéro étudiant" },
+        { "id": "b", "texte": "L'identifiant de connexion d'un agent" },
+        { "id": "c", "texte": "Le budget annuel du service" },
+        { "id": "d", "texte": "Les horaires d'ouverture de la bibliothèque" }
+      ],
+      "reponses": ["a", "b"],
+      "explication": {
+        "correct": "Exact. Le numéro étudiant et l'identifiant de connexion permettent de retrouver une personne précise.",
+        "incorrect": "Les bonnes réponses sont le numéro étudiant et l'identifiant de connexion : ils permettent de retrouver une personne précise. Le budget et les horaires ne concernent personne en particulier."
+      }
+    },
+    "m01-q3": {
+      "type": "vrai-faux",
+      "objectif": "os1-2",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Vrai ou faux : les services ne doivent jamais utiliser de données personnelles.",
+      "reponse": false,
+      "explication": {
+        "correct": "C'est bien faux. Les données personnelles sont indispensables à de nombreuses missions (paie, inscriptions, prêts). Elles demandent de l'attention, pas une interdiction.",
+        "incorrect": "C'est faux : les données personnelles sont indispensables à de nombreuses missions (paie, inscriptions, prêts). Elles doivent être protégées et utilisées pour la mission prévue."
+      }
+    },
+    "m01-q4": {
+      "type": "choix-unique",
+      "objectif": "os1-3",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Tu trouves deux adresses différentes pour un même fournisseur : l'une dans un ancien tableur, l'autre dans l'application financière. Quel est le meilleur réflexe ?",
+      "choix": [
+        { "id": "a", "texte": "Utiliser l'adresse du tableur, que tu connais bien" },
+        { "id": "b", "texte": "Utiliser l'adresse de l'application financière et signaler l'écart à la personne qui gère le tableur" },
+        { "id": "c", "texte": "Créer un nouveau tableur contenant les deux adresses" }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Oui. L'application prévue pour l'activité fait en principe référence, et signaler l'écart évite que l'erreur se propage.",
+        "incorrect": "Le meilleur réflexe est d'utiliser l'application financière, qui fait en principe référence, et de signaler l'écart. Un nouveau tableur ajouterait une copie de plus."
+      }
+    }
+  },
+  "synthese": [
+    "Une donnée est un élément brut ; une information est ce que l'on en tire pour répondre à une question.",
+    "Une donnée personnelle permet d'identifier quelqu'un, même indirectement. Elle n'est pas interdite : elle demande de l'attention.",
+    "Les données vivent sur différents supports. Quand les copies se multiplient, il faut savoir quelle source fait référence."
+  ]
+}

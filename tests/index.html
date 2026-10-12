@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Tests unitaires - moteur de formation</title>
+  <style>
+    body { font-family: system-ui, sans-serif; margin: 1.5rem; }
+    .ok { color: #1d6b35; } .ko { color: #a3262a; font-weight: 700; }
+    #resume { font-size: 1.2rem; font-weight: 700; }
+    li { margin: .15rem 0; }
+  </style>
+</head>
+<body>
+  <h1>Tests unitaires du moteur</h1>
+  <p>À ouvrir via un serveur local (<code>./serve.sh</code> puis <code>http://localhost:8000/tests/</code>).</p>
+  <p id="resume" role="status">Exécution…</p>
+  <ol id="resultats"></ol>
+  <script src="../src/js/util.js"></script>
+  <script src="../src/js/activites.js"></script>
+  <script src="../src/js/moteur.js"></script>
+  <script src="../src/js/suivi-local.js"></script>
+  <script src="../src/js/suivi-scorm12.js"></script>
+  <script src="tests.js"></script>
+</body>
+</html>

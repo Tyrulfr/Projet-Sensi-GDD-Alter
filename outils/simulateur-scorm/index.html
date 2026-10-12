@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Simulateur SCORM 1.2 - outil de test</title>
+  <link rel="stylesheet" href="simulateur.css">
+</head>
+<body>
+  <header>
+    <h1>Simulateur d'API SCORM 1.2</h1>
+    <p class="avertissement"><strong>Outil de test uniquement.</strong> Il reproduit le comportement attendu d'un LMS SCORM 1.2 pour vérifier le dialogue avec un module. Il ne remplace pas un essai sur une vraie plateforme (Moodle, eCampus, SCORM Cloud…).</p>
+  </header>
+
+  <section class="commandes" aria-label="Commandes">
+    <label for="package">Package :</label>
+    <select id="package"></select>
+    <button type="button" id="lancer">Lancer le module</button>
+    <button type="button" id="fermer" disabled>Fermer la fenêtre du module</button>
+    <button type="button" id="effacer">Effacer les données LMS</button>
+    <label class="option"><input type="checkbox" id="sans-interactions"> Simuler un LMS sans cmi.interactions</label>
+    <span id="session" class="session" role="status">Session : aucune</span>
+  </section>
+
+  <div class="disposition">
+    <section class="cadre" aria-label="Module">
+      <iframe id="cadre" title="Module SCORM" src="about:blank"></iframe>
+    </section>
+    <section class="panneaux">
+      <h2>Contrôles</h2>
+      <ul id="controles"></ul>
+      <h2>Données LMS (cmi)</h2>
+      <table id="donnees"><thead><tr><th scope="col">Élément</th><th scope="col">Valeur</th></tr></thead><tbody></tbody></table>
+      <h2>Journal des appels <button type="button" id="vider-journal" class="petit">Vider</button></h2>
+      <ol id="journal" reversed></ol>
+    </section>
+  </div>
+
+  <script src="packages.js"></script>
+  <script src="simulateur.js"></script>
+</body>
+</html>

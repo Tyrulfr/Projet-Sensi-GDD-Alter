@@ -1,0 +1,63 @@
+name: Construire et publier
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Valider les contenus et construire
+        run: ./build.sh
+
+      - name: Assembler le site publié
+        run: |
+          mkdir -p _site/exports
+          cp -R dist/site/. _site/
+          cp -R dist/scorm dist/simulateur _site/
+          cp exports/*.zip _site/exports/
+          cp -R src contenus tests _site/
+          touch _site/.nojekyll
+
+      - name: Conserver les packages SCORM
+        uses: actions/upload-artifact@v4
+        with:
+          name: packages-scorm
+          path: exports/*.zip
+
+      - if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deployer:
+    if: github.event_name != 'pull_request'
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4
