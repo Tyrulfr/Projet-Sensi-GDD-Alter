@@ -18,37 +18,39 @@ Uniquement Python 3 (déjà présent sur macOS) et un navigateur. Aucune dépend
 
 | Commande | Effet |
 |---|---|
-| `./build.sh` | Valide les contenus, puis génère `dist/site/`, `dist/scorm/<module>/`, `dist/simulateur/` et `exports/module-XX-scorm.zip` |
+| `./build.sh` | Valide les contenus, puis génère `index.html` + `contenus/contenu.js` (site web), `exports/module-XX-scorm.zip` (packages SCORM) et, pour les tests locaux, `dist/scorm/` et `dist/simulateur/` |
 | `./serve.sh` | Sert le projet sur `http://localhost:8000` (site, simulateur SCORM, tests) |
 | `python3 scripts/valider_contenus.py` | Valide uniquement les contenus |
 
 Après `./serve.sh` :
 
-- site web : <http://localhost:8000/dist/site/>
+- site web : <http://localhost:8000/>
 - simulateur SCORM 1.2 : <http://localhost:8000/dist/simulateur/>
 - tests unitaires : <http://localhost:8000/tests/>
 
 ## Publication sur GitHub
 
-Les dossiers générés (`dist/`, `exports/`) ne sont pas versionnés : à chaque `push` sur `main`, le workflow `.github/workflows/publier.yml` valide les contenus, reconstruit tout et publie sur GitHub Pages. Une pull request déclenche seulement la validation et la construction.
+Le site est publié par GitHub Pages **directement depuis la branche `main`** (réglage : Settings → Pages → Deploy from a branch → `main` / racine). La page `index.html` à la racine du dépôt est l'accueil de la formation : elle présente les modules et permet de les suivre.
 
-Réglage à faire une seule fois : **Settings → Pages → Build and deployment → Source : GitHub Actions**.
+Les fichiers générés publiés (`index.html`, `contenus/contenu.js`, `exports/*.zip`) sont donc versionnés. **Après toute modification des contenus ou du code : lancer `./build.sh`, puis committer.** Le workflow `.github/workflows/publier.yml` vérifie à chaque `push` que les contenus sont valides et que ces fichiers sont bien à jour ; sinon, l'exécution échoue avec un message explicite.
 
 Adresses publiées :
 
-- site web : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/>
-- simulateur SCORM : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/simulateur/>
+- formation : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/>
 - tests unitaires : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/tests/>
-- package SCORM du module 1 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-01-scorm.zip>
+- package SCORM du module 1 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-01-scorm.zip> (aussi accessible depuis la page Parcours)
 
-Les ZIP sont aussi disponibles dans l'onglet **Actions**, artefact `packages-scorm` de chaque exécution.
+Le simulateur SCORM n'est disponible qu'en local (`./serve.sh`).
 
 ## Organisation
 
 ```text
+index.html                accueil de la formation (GÉNÉRÉ par ./build.sh)
 contenus/                 SOURCE PÉDAGOGIQUE UNIQUE (à modifier pour faire évoluer la formation)
   catalogue.json          formation, objectifs, liste des 7 modules
   modules/module-01.json  leçons, blocs, activités, quiz, synthèse du module 1
+  contenu.js              version compilée des contenus (GÉNÉRÉ)
+exports/                  packages SCORM 1.2, un ZIP par module (GÉNÉRÉ)
 src/
   index.html              gabarit commun site / SCORM
   js/util.js              utilitaires (formats SCORM, texte enrichi)
@@ -65,7 +67,7 @@ outils/simulateur-scorm/  faux LMS SCORM 1.2 pour les tests
 tests/                    tests unitaires du moteur (navigateur)
 concepteur/               guide de rédaction des contenus
 docs/                     conception et rapport de tests
-dist/, exports/           fichiers générés (non versionnés)
+dist/                     fichiers de test générés (non versionnés)
 ```
 
 ## Documentation

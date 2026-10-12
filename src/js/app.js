@@ -133,12 +133,13 @@
       h('section', { class: 'carte' }, [
         h('h2', { text: 'À l\'issue de la formation, tu sauras' }),
         h('ul', { class: 'liste-objectifs' }, catalogue.objectifs.map(function (o) { return h('li', { text: o }); }))
-      ])
+      ]),
+      h('h2', { text: 'Les modules de la formation' }),
+      listeModules('h3')
     ];
   }
 
-  function pageParcours() {
-    document.title = 'Parcours - ' + catalogue.titre;
+  function listeModules(niveauTitre) {
     var liste = h('ol', { class: 'liste-modules' });
     catalogue.modules.map(infosModule).forEach(function (mi) {
       var st = mi.disponible ? moteur(mi.id).statut() : null;
@@ -147,7 +148,7 @@
           h('span', { class: 'carte-module-numero', text: 'Module ' + mi.numero }),
           st ? UI.badge(st) : h('span', { class: 'badge badge-a-venir', text: 'En préparation' })
         ]),
-        h('h2', { text: mi.titre }),
+        h(niveauTitre, { class: 'carte-module-titre', text: mi.titre }),
         h('p', { text: mi.objectif }),
         h('p', { class: 'carte-module-duree', text: 'Durée estimée : ' + mi.duree + ' min' }),
         st ? UI.barreProgression(st.progression, 'Progression du module ' + mi.numero) : null,
@@ -155,11 +156,31 @@
         mi.disponible ? h('div', { class: 'actions' }, lienBouton(st.completion === 'non-commence' ? 'Commencer' : 'Accéder au module', lienModule(mi.id))) : null
       ]));
     });
+    return liste;
+  }
+
+  function sectionTelechargements() {
+    var exports = config.exports || {};
+    var ids = Object.keys(exports);
+    if (!ids.length) { return null; }
+    return h('section', { class: 'carte' }, [
+      h('h2', { text: 'Packages SCORM 1.2 (administrateurs de plateforme)' }),
+      h('p', { text: 'Chaque module est disponible sous forme d\'archive à importer dans un LMS (Moodle, eCampus).' }),
+      h('ul', null, ids.map(function (id) {
+        var mod = contenu.modules[id];
+        return h('li', null, h('a', { href: exports[id], download: '' }, 'Module ' + mod.numero + ' : ' + mod.titre + ' (ZIP)'));
+      }))
+    ]);
+  }
+
+  function pageParcours() {
+    document.title = 'Parcours - ' + catalogue.titre;
     return [
       h('h1', { tabindex: '-1', text: 'Parcours de formation' }),
       h('p', { class: 'chapo', text: 'Les modules sont indépendants : tu peux les suivre dans l\'ordre proposé ou selon tes besoins.' }),
       avertissement(),
-      liste,
+      listeModules('h2'),
+      sectionTelechargements(),
       h('div', { class: 'actions actions-discretes' }, h('button', {
         type: 'button', class: 'bouton bouton-lien',
         onclick: function () {

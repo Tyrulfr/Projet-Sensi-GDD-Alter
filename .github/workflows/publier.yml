@@ -1,4 +1,8 @@
-name: Construire et publier
+name: Vérifier la formation
+
+# Le site est publié par GitHub Pages directement depuis la branche main (racine).
+# Ce workflow vérifie que les contenus sont valides et que les fichiers générés
+# (index.html, contenus/contenu.js, exports/*.zip) correspondent bien aux sources.
 
 on:
   push:
@@ -8,15 +12,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
 
 jobs:
-  construire:
+  verifier:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -25,39 +23,38 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Valider les contenus et construire
+      - name: Conserver les packages versionnés
+        run: cp -R exports /tmp/exports-versionnes
+
+      - name: Valider les contenus et reconstruire
         run: ./build.sh
 
-      - name: Assembler le site publié
+      - name: Vérifier que les fichiers générés sont à jour
         run: |
-          mkdir -p _site/exports
-          cp -R dist/site/. _site/
-          cp -R dist/scorm dist/simulateur _site/
-          cp exports/*.zip _site/exports/
-          cp -R src contenus tests _site/
-          touch _site/.nojekyll
+          python3 - <<'EOF'
+          import sys, zipfile
+          from pathlib import Path
+          ecarts = []
+          for neuf in sorted(Path("exports").glob("*.zip")):
+              ancien = Path("/tmp/exports-versionnes") / neuf.name
+              if not ancien.exists():
+                  ecarts.append(f"{neuf} absent du dépôt")
+                  continue
+              crc = lambda p: sorted((i.filename, i.CRC) for i in zipfile.ZipFile(p).infolist())
+              if crc(neuf) != crc(ancien):
+                  ecarts.append(f"{neuf} ne correspond plus aux sources")
+          for e in ecarts:
+              print("::error::" + e)
+          sys.exit(1 if ecarts else 0)
+          EOF
+          if ! git diff --quiet -- index.html contenus/contenu.js; then
+            echo "::error::index.html ou contenus/contenu.js n'est pas à jour : lancer ./build.sh puis committer."
+            git diff --stat -- index.html contenus/contenu.js
+            exit 1
+          fi
 
       - name: Conserver les packages SCORM
         uses: actions/upload-artifact@v4
         with:
           name: packages-scorm
           path: exports/*.zip
-
-      - if: github.event_name != 'pull_request'
-        uses: actions/configure-pages@v5
-
-      - if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-  deployer:
-    if: github.event_name != 'pull_request'
-    needs: construire
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deploiement.outputs.page_url }}
-    steps:
-      - id: deploiement
-        uses: actions/deploy-pages@v4

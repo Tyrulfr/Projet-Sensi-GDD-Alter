@@ -10,7 +10,7 @@ Le dossier du projet était vide : aucun code ni document de référence (analys
 ## 2. Architecture
 
 ```text
-contenus/*.json  ──►  scripts/construire.py  ──►  dist/site/        (mode web, suivi local)
+contenus/*.json  ──►  scripts/construire.py  ──►  index.html        (mode web, suivi local, publié par GitHub Pages)
  (source unique)      (validation + build)    └─►  exports/*.zip     (mode SCORM 1.2, un ZIP par module)
 
 Dans le navigateur, le même code sert les deux modes :

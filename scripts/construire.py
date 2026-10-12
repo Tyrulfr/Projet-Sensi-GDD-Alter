@@ -3,10 +3,10 @@
 
 Usage : python3 scripts/construire.py
 Produit :
-  dist/site/                  site web complet (suivi local)
-  dist/scorm/<module>/        contenu décompressé de chaque package (pour le simulateur)
-  dist/simulateur/            simulateur d'API SCORM 1.2 pour les tests
-  exports/module-XX-scorm.zip un package autonome par module disponible
+  index.html + contenus/contenu.js  site web (racine du dépôt, publiable tel quel par GitHub Pages)
+  exports/module-XX-scorm.zip       un package SCORM autonome par module disponible
+  dist/scorm/<module>/              contenu décompressé de chaque package (pour le simulateur)
+  dist/simulateur/                  simulateur d'API SCORM 1.2 pour les tests
 """
 import hashlib
 import json
@@ -49,10 +49,11 @@ def empreinte_sources():
     return h.hexdigest()[:10]
 
 
-def page_index(catalogue, config, titre, empreinte):
+def page_index(catalogue, config, titre, empreinte, base, contenu):
     gabarit = (SRC / "index.html").read_text(encoding="utf-8")
+    gabarit = gabarit.replace("{{BASE}}", base).replace("{{CONTENU}}", contenu)
     # Évite qu'un navigateur ou un LMS serve une ancienne version en cache.
-    gabarit = re.sub(r'((?:src|href)="assets/[^"]+)"', r'\1?v=' + empreinte + '"', gabarit)
+    gabarit = re.sub(r'((?:src|href)="(?!#|https?:)[^"?]+)"', r'\1?v=' + empreinte + '"', gabarit)
     valeurs = {
         "TITRE": escape(titre),
         "INSTITUTION": escape(catalogue["institution"]),
@@ -133,12 +134,19 @@ def zipper(dossier, archive):
     archive.parent.mkdir(parents=True, exist_ok=True)
     if archive.exists():
         archive.unlink()
+    # Le manifeste doit être à la racine de l'archive. Dates fixes : l'archive ne change
+    # que si son contenu change (évite des modifications inutiles dans git).
+    noms = ["imsmanifest.xml"] + [f for f in lister_fichiers(dossier) if f != "imsmanifest.xml"]
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as z:
-        # Le manifeste doit être à la racine de l'archive.
-        z.write(dossier / "imsmanifest.xml", "imsmanifest.xml")
-        for f in lister_fichiers(dossier):
-            if f != "imsmanifest.xml":
-                z.write(dossier / f, f)
+        for f in noms:
+            info = zipfile.ZipInfo(f, date_time=(2020, 1, 1, 0, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.external_attr = 0o644 << 16
+            z.writestr(info, (dossier / f).read_bytes())
+
+
+def nom_archive(module):
+    return f"module-{int(module['numero']):02d}-scorm.zip"
 
 
 def construire():
@@ -154,12 +162,12 @@ def construire():
     problemes = []
     empreinte = empreinte_sources()
 
-    print("2. Site web -> dist/site/")
-    site = DIST / "site"
-    copier_moteur(site)
-    ecrire(site / "assets" / "js" / "contenu.js", fichier_contenu(catalogue, modules))
-    ecrire(site / "index.html", page_index(catalogue, {"mode": "web"}, catalogue["titre"], empreinte))
-    problemes += [f"site : ressource manquante {m}" for m in verifier_references(site)]
+    print("2. Site web -> index.html (racine) + contenus/contenu.js")
+    ecrire(RACINE / "contenus" / "contenu.js", fichier_contenu(catalogue, modules))
+    config_web = {"mode": "web", "exports": {mid: "exports/" + nom_archive(m) for mid, m in modules.items()}}
+    ecrire(RACINE / "index.html", page_index(catalogue, config_web, catalogue["titre"], empreinte,
+                                             "src/", "contenus/contenu.js"))
+    problemes += [f"site : ressource manquante {m}" for m in verifier_references(RACINE)]
 
     print("3. Packages SCORM 1.2 -> exports/")
     EXPORTS.mkdir(exist_ok=True)
@@ -168,14 +176,15 @@ def construire():
         copier_moteur(dossier)
         ecrire(dossier / "assets" / "js" / "contenu.js", fichier_contenu(catalogue, {mid: module}))
         titre = f"Module {module['numero']} - {module['titre']}"
-        ecrire(dossier / "index.html", page_index(catalogue, {"mode": "scorm", "module": mid}, titre, empreinte))
+        ecrire(dossier / "index.html", page_index(catalogue, {"mode": "scorm", "module": mid}, titre, empreinte,
+                                                  "assets/", "assets/js/contenu.js"))
         fichiers = lister_fichiers(dossier)
         ecrire(dossier / "imsmanifest.xml", manifeste(catalogue, module, fichiers))
         ok, msg = verifier_xml(dossier / "imsmanifest.xml")
         if not ok:
             problemes.append(f"{mid} : manifeste invalide : {msg}")
         problemes += [f"{mid} : ressource manquante {m}" for m in verifier_references(dossier)]
-        archive = EXPORTS / f"module-{int(module['numero']):02d}-scorm.zip"
+        archive = EXPORTS / nom_archive(module)
         zipper(dossier, archive)
         print(f"   {archive.relative_to(RACINE)} ({len(fichiers) + 1} fichiers, {archive.stat().st_size // 1024} Ko) - {msg}")
 

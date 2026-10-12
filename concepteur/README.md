@@ -6,8 +6,11 @@ On ne touche jamais au code pour modifier un texte, une question ou une explicat
 Après chaque modification :
 
 1. lancer `./build.sh` : les contenus sont **vérifiés** avant toute génération ; en cas d'erreur, un message indique le fichier, la leçon ou l'activité concernée ;
-2. lancer `./serve.sh` et vérifier le résultat sur <http://localhost:8000/dist/site/> ;
-3. le package SCORM à jour est dans `exports/`.
+2. lancer `./serve.sh` et vérifier le résultat sur <http://localhost:8000/> ;
+3. le package SCORM à jour est dans `exports/` ;
+4. committer **aussi** les fichiers générés (`index.html`, `contenus/contenu.js`, `exports/`) : ce sont eux que GitHub Pages publie.
+
+Ne jamais modifier à la main `index.html` (racine) ni `contenus/contenu.js` : ils sont réécrits à chaque `./build.sh`.
 
 Conseil : utiliser un éditeur qui signale les erreurs JSON (Cursor, VS Code). Les erreurs les plus fréquentes sont une virgule manquante ou en trop, et un guillemet `"` non échappé dans un texte (utiliser les guillemets français « » dans les textes).
 

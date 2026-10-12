@@ -123,7 +123,7 @@ h3 { font-size: 1.1rem; margin: 0 0 .5rem; }
 /* ---------- Parcours ---------- */
 
 .liste-modules { list-style: none; padding: 0; margin: 0; }
-.carte-module h2 { margin: .5rem 0; }
+.carte-module-titre { margin: .5rem 0; font-size: 1.3rem; }
 .carte-module-entete { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .carte-module-numero { font-weight: 700; color: var(--couleur-primaire); text-transform: uppercase; font-size: .85rem; letter-spacing: .05em; }
 .carte-module-duree, .carte-module-score { color: var(--couleur-texte-doux); font-size: .95rem; margin: .25rem 0; }
