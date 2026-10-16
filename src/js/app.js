@@ -327,7 +327,7 @@
         var enCoursSim = !dejaVue && i === nb - 1;
         var etatSim = etat.simulateur[cleSim] || (etat.simulateur[cleSim] = { i: 0, choix: {}, termine: !enCoursSim });
         if (!enCoursSim) { etatSim.termine = true; }
-        if (!etatSim.termine) { bloque = 'Traite toutes les situations du simulateur pour continuer.'; }
+        if (!etatSim.termine) { bloque = 'Traite toutes les situations de l\'activité pour continuer.'; }
         el = UI.simulateur(b, {
           etat: etatSim,
           prefixeId: 'sim-' + cleSim,

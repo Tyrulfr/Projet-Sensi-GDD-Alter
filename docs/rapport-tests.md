@@ -271,3 +271,58 @@ Modifications communes justifiées : la grille des leçons (`.lecon-blocs`) emp�
 - **Aucune validation juridique** : contenus et corrections à faire relire par le DPO et les référents (`docs/validation-metier-module-04.md`).
 - **Rien n'a été testé dans un vrai LMS** (import, statut `completed` sans seuil, score, reprise, 4 interactions).
 - Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge. Les icônes des décisions (↗, 🔍, ✋) sont décoratives et peuvent s'afficher différemment selon le système.
+
+## 10. Module 5 « Qui organise les données ? »
+
+### Ce qui a été développé
+
+- Contenu `contenus/modules/module-05.json` : 4 leçons, 4 activités formatives (3 questions et un classement gouvernance / gestion opérationnelle de 6 actions), schéma des 5 familles de rôles, mémo « Si je… » (6 contributions), jeu « Qui fait quoi avec les données ? » (5 situations), défi de 4 questions (réponses B, A, C, A), synthèse de 5 messages, 6 objectifs couverts. Sans seuil.
+- **Aucun nouveau moteur** : le jeu des rôles réutilise le simulateur du module 4, rendu paramétrable (libellés, fiche libre, rubrique « Qui fait quoi », issues communes facultatives). Sans paramètre, il se comporte exactement comme avant.
+- Schéma à 5 cibles : deux lignes centrées (3 + 2), toutes au même niveau ; une colonne sur mobile.
+- Archive : `module-05-qui-organise-les-donnees-scorm12.zip` (12 fichiers, déterministe, sans `masteryscore`).
+- Validateur : simulateur sans `decisions`, `fiche`, `roles`, `libelles` contrôlés ; 7 erreurs injectées volontairement, toutes signalées.
+- Tableau des points à valider : `docs/validation-metier-module-05.md` (modèle générique / organisation réelle).
+
+### Tests automatisés
+
+**55 / 55** (dont 9 nouveaux pour le module 5) : réponses attendues, classement 3 + 3, cinq familles et disposition à 5 cibles, rôle du DPO non surévalué, légende « pas l'organigramme officiel », 5 situations expliquant chacune plusieurs rôles, défi 1/4 → `completed` 25 sans seuil, reprise SCORM, rendu du jeu (libellés propres, aucune étiquette d'issue, pas de rubriques « À vérifier » ni « Risque », focus sur la correction, bilan « 4 bonnes réponses sur 5 »).
+
+### Site web (piloté dans le navigateur, Chrome intégré à Cursor)
+
+| Scénario | Résultat |
+|---|---|
+| Module 5 dans le parcours (« Non commencé », 8 min, puis « Terminé » et meilleur score) | **OK** |
+| 5.1 : situation, exemple « DS », cadre de gouvernance, question B, à retenir | **OK** |
+| 5.2 : définitions, tableau à 5 lignes avec nuance ; classement avec une erreur volontaire (« signaler » en gouvernance) : correction élément par élément et message de nuance | **OK** |
+| 5.3 : schéma 3 + 2 centré, détail au clic (DPO : informe, conseille, contrôle, n'autorise pas chaque partage), légende ; question B | **OK** |
+| 5.4 : mémo des 6 « Si je… » ; question B ; « Continuer » bloqué tant que le jeu n'est pas terminé | **OK** |
+| Jeu : question « Qui doit principalement intervenir à ce stade ? », correction « Réponse attendue », « Qui fait quoi » (rôles), « À retenir » ; focus sur la correction puis sur le bilan ; bilan 4/5 et « Recommencer le jeu » | **OK** |
+| Défi 3/4 : « 3 / 4 bonnes réponses (75 %) », message, statut « Terminé », synthèse de 5 messages ; Recommencer, Retour au parcours ; **pas** de bouton Module 6 | **OK** |
+| Fin du module 4 : bouton « Module 5 : Qui organise les données ? → » | **OK** |
+| Mobile 375 px : aucune largeur excédentaire sur les 5 pages ; rôles du jeu sur une colonne | **OK** |
+
+### SCORM 1.2 dans le simulateur
+
+| Scénario | Résultat |
+|---|---|
+| Session 1 (leçons 5.1 et 5.2 faites) : `incomplete`, `lesson_location` = `m05-l2`, sortie `suspend`, 1 `LMSInitialize`, 1 `LMSFinish` | **OK** |
+| Session 2 : « Reprendre où j'en étais » → leçon 5.2 ; fin du parcours, défi 3/4 → `completed`, score 75 (0–100), 4 interactions (q4 `wrong`), sortie finale `""`, 243 / 4096 caractères | **OK** |
+| Parcours complet sur le package final (après allègement des textes) : `completed`, 100, 4 interactions, 245 / 4096 caractères, 0 erreur | **OK** |
+| Le jeu des rôles, formatif, n'est pas transmis au LMS | **OK** |
+
+### Non-régression des modules 1 à 4
+
+| Scénario | Résultat |
+|---|---|
+| Tests unitaires des modules 1 à 4 (46 tests existants) | **OK** |
+| Simulateur du module 4 sur le site : « ⚖ Simulateur », « Quelle conduite adopter ? », 3 étiquettes d'issue, fiche demandeur / finalité / données, correction complète (Pourquoi, À vérifier, Risque, Le bon réflexe) | **OK** |
+| Schéma du module 2 (4 cibles) : aucune règle de mise en page ajoutée pour 4 cibles, rendu inchangé | **OK** |
+
+Seul changement visible hors module 5 : le message de blocage du simulateur devient « Traite toutes les situations de l'activité pour continuer » (au lieu de « … du simulateur … »), pour convenir aux deux usages.
+
+### Limites et points à valider
+
+- **Durée** : environ 2 200 mots lus sur un parcours (corrections comprises), volume proche du module 4. Estimation : 10 à 12 minutes, au-delà de la cible de 6 à 8 minutes. À mesurer ; pistes dans `docs/conception.md` (décision 20).
+- **Rôles génériques** : à confronter à l'organisation réelle (`docs/validation-metier-module-05.md`).
+- Progression dans le jeu non mémorisée après rechargement (comme le simulateur du module 4).
+- **Rien n'a été testé dans un vrai LMS**. Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge.

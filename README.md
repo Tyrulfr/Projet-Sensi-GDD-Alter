@@ -7,7 +7,7 @@ Une **source unique** de contenus pédagogiques produit deux diffusions :
 - **un site web** (essais, démonstrations, validation pédagogique), avec une progression enregistrée dans le navigateur ;
 - **un package SCORM 1.2 par module**, autonome, à importer dans un LMS (Moodle / eCampus).
 
-> État : prototype. Les **modules 1 à 4** sont complets ; les modules 5 à 7 sont déclarés « en préparation ».
+> État : prototype. Les **modules 1 à 5** sont complets ; les modules 6 et 7 sont déclarés « en préparation ».
 > Les contenus sont une **proposition à valider**. La compatibilité eCampus **n'est pas encore vérifiée** (voir `docs/rapport-tests.md`).
 
 ## Prérequis
@@ -43,6 +43,7 @@ Adresses publiées :
   - module 2 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-02-une-donnee-plusieurs-usages-scorm12.zip>
   - module 3 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-03-qualite-structuration-scorm12.zip>
   - module 4 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-04-partager-sans-perdre-controle-scorm12.zip>
+  - module 5 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-05-qui-organise-les-donnees-scorm12.zip>
 
 Le simulateur SCORM n'est disponible qu'en local (`./serve.sh`).
 
@@ -56,6 +57,7 @@ contenus/                 SOURCE PÉDAGOGIQUE UNIQUE (à modifier pour faire év
   modules/module-02.json  idem pour le module 2 (schéma de circulation, chronologie, défi final)
   modules/module-03.json  idem pour le module 3 (comparateur de tableaux, association, défi final)
   modules/module-04.json  idem pour le module 4 (simulateur de décisions, mémo, défi final)
+  modules/module-05.json  idem pour le module 5 (schéma des rôles, jeu des rôles, défi final)
   contenu.js              version compilée des contenus (GÉNÉRÉ)
 exports/                  packages SCORM 1.2, un ZIP par module (GÉNÉRÉ)
 src/
@@ -82,4 +84,5 @@ dist/                     fichiers de test générés (non versionnés)
 - `docs/conception.md` : architecture, modèle de progression, règles SCORM, décisions à valider.
 - `docs/rapport-tests.md` : tests réalisés, résultats, limites.
 - `docs/validation-metier-module-04.md` : notions et situations du module 4 à faire valider par le DPO et les référents.
+- `docs/validation-metier-module-05.md` : rôles et situations du module 5 à confronter à l'organisation réelle de l'université.
 - `concepteur/README.md` : comment modifier un texte, ajouter une leçon ou une question.

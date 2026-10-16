@@ -47,9 +47,9 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `exemple` | `titre` (facultatif), `texte`, `etiquette` (facultatif, « Exemple » par défaut ; ex. « Point de vigilance ») |
 | `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes), `legende` (facultatif, ex. « Données fictives ») |
 | `comparateur` | comparaison « avant / après » (module 3, voir ci-dessous) |
-| `schema` | schéma cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `libelle`, `usage`, `detail` ; 3 cibles s'affichent sur une ligne), `legende` (ex. « Exemple illustratif »), `annonce` (facultatif : phrase lue par les lecteurs d'écran avant les cibles, « Cette information peut servir à N services : » par défaut ; module 4 : « Trois critères à examiner : ») |
-| `memo` | repères numérotés (module 4 : les quatre réflexes) : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `legende` (facultatif) |
-| `simulateur` | simulateur de décisions (module 4, voir ci-dessous) |
+| `schema` | schéma cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `libelle`, `usage`, `detail` ; 3 cibles s'affichent sur une ligne, 5 cibles sur deux lignes centrées 3 + 2, sans hiérarchie), `legende` (ex. « Exemple illustratif »), `annonce` (facultatif : phrase lue par les lecteurs d'écran avant les cibles, « Cette information peut servir à N services : » par défaut ; module 4 : « Trois critères à examiner : ») |
+| `memo` | repères numérotés (module 4 : les quatre réflexes ; module 5 : « Si je… ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `legende` (facultatif) |
+| `simulateur` | simulateur de situations : décisions (module 4) ou jeu des rôles (module 5), voir ci-dessous |
 | `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
 | `activite` | `ref` : identifiant d'une activité définie dans `activites` |
 | `aretenir` | `texte` |
@@ -120,9 +120,38 @@ Une série de demandes présentées une à une, sous forme de carte (demandeur, 
 - **Ajouter une situation** : copier un scénario, lui donner un `id` nouveau (lettres, chiffres, tirets), adapter les textes. **Modifier une correction** : éditer `correction`, ou le `feedback` du choix concerné.
 - Les situations et leurs corrections sont **à faire valider** par les personnes compétentes (DPO notamment) avant diffusion : voir `docs/validation-metier-module-04.md`.
 
+### Variante « jeu des rôles » (module 5)
+
+Le même composant sert au jeu « Qui fait quoi avec les données ? ». Différences :
+
+- **pas de `decisions`** : chaque choix n'a qu'un `texte` (aucune étiquette d'issue n'est affichée) ;
+- `fiche` remplace demandeur / finalité / données : liste de `{ "libelle": "Étape", "valeur": "Définir une règle commune" }` ;
+- la correction comporte `pourquoi`, `roles` (liste de `{ "role", "contribution" }`, affichée sous « Qui fait quoi ») et `reflexe` ; `aVerifier` et `risque` deviennent facultatifs ;
+- `libelles` adapte les textes de l'interface (clés : `etiquette`, `icone`, `iconeCarte`, `question`, `juste`, `faux`, `choixJuste`, `choixAttendu`, `choixFaux`, `attendu`, `manque`, `valider`, `reflexe`, `bilan` au format « singulier|pluriel », `recommencer`). Une clé absente garde le libellé du module 4.
+
+```json
+{
+  "type": "simulateur",
+  "titre": "Qui fait quoi avec les données ?",
+  "libelles": { "etiquette": "Jeu des rôles", "question": "Qui doit principalement intervenir à ce stade ?", "juste": "Bonne réponse", "faux": "À revoir", "reflexe": "À retenir", "bilan": "bonne réponse|bonnes réponses", "recommencer": "Recommencer le jeu" },
+  "scenarios": [
+    {
+      "id": "regle", "objectif": "os5-3", "titre": "Définir une règle", "contexte": "…",
+      "fiche": [{ "libelle": "Étape", "valeur": "Définir une règle commune" }],
+      "choix": [{ "id": "a", "texte": "…", "feedback": "…" }, { "id": "b", "texte": "…", "feedback": "…" }],
+      "reponse": "b",
+      "correction": { "pourquoi": "…", "roles": [{ "role": "Responsables métiers", "contribution": "expriment les besoins." }], "reflexe": "…" }
+    }
+  ]
+}
+```
+
+- Quand plusieurs acteurs interviennent, la question porte sur **qui intervient principalement à ce stade** ; `roles` explique la part de chacun. Éviter les réponses artificiellement exclusives.
+- Les rôles sont **génériques** : à faire confirmer avec les équipes chargées de la gouvernance (`docs/validation-metier-module-05.md`).
+
 ## Associer des situations à des catégories
 
-C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité), le module 4 avec 3 (donnée non personnelle, personnelle, catégorie particulière). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
+C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité), le module 4 avec 3 (donnée non personnelle, personnelle, catégorie particulière), le module 5 avec 2 (gouvernance, gestion opérationnelle). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
 
 ## Le quiz ou le défi
 

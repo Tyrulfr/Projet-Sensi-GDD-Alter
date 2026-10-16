@@ -42,10 +42,8 @@
     {
       "id": "m05",
       "numero": 5,
-      "etat": "a-venir",
-      "titre": "Qui organise les données ?",
-      "duree": 7,
-      "objectif": "Comprendre la gouvernance et la distinguer de la gestion opérationnelle."
+      "etat": "disponible",
+      "fichier": "module-05.json"
     },
     {
       "id": "m06",

@@ -156,8 +156,10 @@ def valider_simulateur(b, lieu, objectifs, r):
     """Renvoie les objectifs couverts par les scénarios."""
     decisions = b.get("decisions") or []
     ids_dec = [d.get("id") for d in decisions]
-    if len(decisions) < 2 or len(set(ids_dec)) != len(ids_dec):
-        r.erreur(lieu, "au moins deux « decisions » aux identifiants distincts sont nécessaires")
+    if "decisions" in b and (len(decisions) < 2 or len(set(ids_dec)) != len(ids_dec)):
+        r.erreur(lieu, "« decisions » (facultatif) : au moins deux issues aux identifiants distincts")
+    if not isinstance(b.get("libelles", {}), dict):
+        r.erreur(lieu, "« libelles » doit être un objet { clé: texte }")
     for d in decisions:
         if not texte_present(d, "libelle"):
             r.erreur(lieu, f"décision « {d.get('id')} » : « libelle » manquant")
@@ -172,9 +174,18 @@ def valider_simulateur(b, lieu, objectifs, r):
         slieu = f"{lieu}, scénario « {s.get('id')} »"
         if not RE_ID.match(str(s.get("id") or "")):
             r.erreur(slieu, "identifiant manquant ou invalide")
-        for cle in ("titre", "contexte", "demandeur", "finalite", "donnees"):
+        for cle in ("titre", "contexte"):
             if not texte_present(s, cle):
                 r.erreur(slieu, f"« {cle} » manquant")
+        if "fiche" in s:
+            fiche = s.get("fiche")
+            if not isinstance(fiche, list) or not fiche or not all(
+                    isinstance(f, dict) and texte_present(f, "libelle") and texte_present(f, "valeur") for f in fiche):
+                r.erreur(slieu, "« fiche » : liste de { « libelle », « valeur » }")
+        else:
+            for cle in ("demandeur", "finalite", "donnees"):
+                if not texte_present(s, cle):
+                    r.erreur(slieu, f"« {cle} » manquant (ou utiliser « fiche »)")
         if s.get("objectif") not in objectifs:
             r.erreur(slieu, f"objectif « {s.get('objectif')} » absent des objectifsSpecifiques du module")
         couverts.add(s.get("objectif"))
@@ -183,15 +194,21 @@ def valider_simulateur(b, lieu, objectifs, r):
         if len(choix) < 2 or len(set(ids_ch)) != len(ids_ch):
             r.erreur(slieu, "au moins deux choix aux identifiants distincts sont nécessaires")
         for c in choix:
-            if c.get("decision") not in ids_dec:
+            if (decisions or "decision" in c) and c.get("decision") not in ids_dec:
                 r.erreur(slieu, f"choix « {c.get('id')} » : décision « {c.get('decision')} » inconnue")
             if not (texte_present(c, "texte") and texte_present(c, "feedback")):
                 r.erreur(slieu, f"choix « {c.get('id')} » : « texte » et « feedback » sont obligatoires")
         if s.get("reponse") not in ids_ch:
             r.erreur(slieu, "« reponse » doit correspondre à un identifiant de choix")
         corr = s.get("correction") or {}
-        if not all(texte_present(corr, k) for k in ("pourquoi", "risque", "reflexe")) or not corr.get("aVerifier"):
-            r.erreur(slieu, "« correction » : « pourquoi », « aVerifier » (liste), « risque » et « reflexe » sont obligatoires")
+        if not (texte_present(corr, "pourquoi") and texte_present(corr, "reflexe")):
+            r.erreur(slieu, "« correction » : « pourquoi » et « reflexe » sont obligatoires")
+        for cle in ("aVerifier", "roles"):
+            if cle in corr and (not isinstance(corr[cle], list) or not corr[cle]):
+                r.erreur(slieu, f"« correction.{cle} » doit être une liste non vide")
+        for role in corr.get("roles") or []:
+            if not (isinstance(role, dict) and texte_present(role, "role") and texte_present(role, "contribution")):
+                r.erreur(slieu, "« correction.roles » : chaque élément a un « role » et une « contribution »")
     if not texte_present(b, "avertissement"):
         r.avertir(lieu, "pas d'« avertissement » : préciser qu'il s'agit d'un exercice, pas d'un outil de validation réelle")
     return couverts

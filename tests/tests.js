@@ -548,6 +548,126 @@
     });
   }
 
+  function lancerModule5(module) {
+    var idEval = module.validation.evaluation;
+    var lecons = module.lecons.filter(function (l) { return l.type === 'lecon'; });
+    var jeu = lecons[3].blocs.filter(function (b) { return b.type === 'simulateur'; })[0];
+
+    test('M5 : chaque activité accepte sa réponse attendue', function () {
+      Object.keys(module.activites).forEach(function (id) {
+        var act = module.activites[id];
+        vrai(A.corriger(act, A.reponseAttendue(act)).correct, id);
+      });
+    });
+
+    test('M5 : bonnes réponses du défi conformes au scénario (B, A, C, A)', function () {
+      egal(bonnesReponses(module, idEval), { 'm05-q1': 'b', 'm05-q2': 'a', 'm05-q3': 'c', 'm05-q4': 'a' });
+    });
+
+    test('M5 : classement gouvernance / gestion opérationnelle (3 + 3)', function () {
+      var act = module.activites['m05-a2'];
+      var parId = {};
+      act.elements.forEach(function (e) { parId[e.texte.split(' ').slice(0, 2).join(' ')] = e.categorie; });
+      egal([parId['Définir une'], parId['Définir qui'], parId['Déterminer les']], ['g', 'g', 'g']);
+      egal([parId['Corriger une'], parId['Saisir une'], parId['Signaler une']], ['o', 'o', 'o']);
+      var r = A.corriger(act, '1.g,2.g,3.o,4.g,5.o,6.g');
+      vrai(!r.correct); egal(r.details['2'], false); egal(r.details['1'], true);
+    });
+
+    test('M5 : schéma des rôles - cinq familles, aucune hiérarchie de rendu', function () {
+      var schema = lecons[2].blocs.filter(function (b) { return b.type === 'schema'; })[0];
+      egal(schema.cibles.map(function (c) { return c.libelle; }),
+        ['Décider et coordonner', 'Apporter l\'expertise métier', 'Accompagner la qualité', 'Produire et utiliser', 'Sécuriser et soutenir les usages']);
+      var el = GDD.ui.bloc(schema);
+      vrai(el.querySelector('.schema-cibles.schema-cibles-5'), 'disposition à cinq cibles');
+      vrai(/n'autorise pas lui-même chaque partage/.test(JSON.stringify(schema)), 'rôle du DPO non surévalué');
+      vrai(/pas l'organigramme officiel/.test(schema.legende), 'modèle pédagogique annoncé');
+    });
+
+    test('M5 : jeu des rôles - 5 situations, sans issues communes, rôles expliqués', function () {
+      egal(jeu.scenarios.map(function (s) { return s.id; }), ['regle', 'application', 'anomalie', 'technique', 'arbitrage']);
+      vrai(!jeu.decisions, 'pas de décisions communes');
+      jeu.scenarios.forEach(function (s) {
+        vrai(s.correction.roles.length >= 2, s.id + ' : plusieurs rôles expliqués');
+        vrai(s.fiche && s.fiche.length, s.id + ' : fiche');
+      });
+    });
+
+    test('M5 : 4 leçons, défi verrouillé, 1/4 -> completed 25 sans seuil', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      egal(lecons.length, 4);
+      lecons.slice(0, 3).forEach(function (l) { m.marquerVue(l.id); });
+      vrai(!m.estAccessible(4), 'défi verrouillé');
+      m.marquerVue(lecons[3].id);
+      vrai(m.estAccessible(4), 'défi ouvert');
+      var codes = bonnesReponses(module, idEval); codes['m05-q1'] = 'a'; codes['m05-q2'] = 'b'; codes['m05-q3'] = 'a';
+      var r = m.soumettreEvaluation(idEval, codes);
+      egal([r.bonnes, r.total, r.score], [1, 4, 25]);
+      egal(m.statut().seuil, null);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+    });
+
+    test('M5 : adaptateur SCORM 1.2 -> reprise, completed, score 100, 4 interactions', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = new GDD.Moteur(module, new GDD.TraceurScorm12()); m.demarrer();
+      m.marquerVue(lecons[0].id); m.marquerVue(lecons[1].id); m.repondre('m05-a2', '1.g,2.o,3.o,4.g,5.o,6.g'); m.definirPosition(2);
+      m.terminer();
+      egal([api.d['cmi.core.exit'], api.d['cmi.core.lesson_location'], api.d['cmi.core.lesson_status']], ['suspend', 'm05-l3', 'incomplete']);
+      var api2 = new FausseApi({ 'cmi.core.lesson_status': 'incomplete', 'cmi.core.entry': 'resume', 'cmi.core.lesson_mode': 'normal', 'cmi.suspend_data': api.d['cmi.suspend_data'] });
+      window.API = api2;
+      var m2 = new GDD.Moteur(module, new GDD.TraceurScorm12()); m2.demarrer();
+      egal(m2.etat.p, 2); egal(m2.reponseEnregistree('m05-a2'), '1.g,2.o,3.o,4.g,5.o,6.g');
+      lecons.forEach(function (l) { m2.marquerVue(l.id); });
+      m2.soumettreEvaluation(idEval, bonnesReponses(module, idEval));
+      egal(api2.d['cmi.core.lesson_status'], 'completed');
+      egal(api2.d['cmi.core.score.raw'], '100');
+      egal(api2.d['cmi.interactions.3.id'], 'm05-q4');
+      m2.terminer();
+      egal(api2.d['cmi.core.exit'], '');
+      delete window.API;
+    });
+
+    function repondre(el, idChoix) {
+      el.querySelector('.option-decision input[value="' + idChoix + '"]').checked = true;
+      el.querySelector('.simulateur-zone .actions button').click();
+    }
+
+    test('Jeu des rôles : libellés propres, rôles affichés, bilan', function () {
+      var etat = { i: 0, choix: {}, termine: false };
+      var fins = 0;
+      var el = GDD.ui.simulateur(jeu, { etat: etat, prefixeId: 'r1', surTermine: function () { fins++; } });
+      document.body.appendChild(el);
+      vrai(/Jeu des rôles/.test(el.querySelector('.bloc-etiquette').textContent));
+      vrai(/Qui doit principalement intervenir/.test(el.querySelector('legend').textContent));
+      egal(el.querySelectorAll('.simulateur-decision').length, 0, 'pas d\'étiquette de décision');
+      el.querySelector('.simulateur-zone .actions button').click();
+      vrai(/Choisis une réponse/.test(el.querySelector('.activite-message').textContent));
+      repondre(el, 'c');
+      var fb = el.querySelector('.activite-message').textContent;
+      vrai(/À revoir/.test(fb) && /Réponse attendue/.test(fb) && /Qui fait quoi/.test(fb) && /À retenir/.test(fb), 'correction du jeu');
+      vrai(!/À vérifier|Risque/.test(fb), 'pas de rubriques du module 4');
+      egal(el.querySelectorAll('.simulateur-roles dt').length, 3);
+      egal(document.activeElement && document.activeElement.id, 'r1-retour');
+      el.querySelector('.simulateur-zone .actions button').click();
+      jeu.scenarios.slice(1).forEach(function (s) {
+        repondre(el, s.reponse);
+        el.querySelector('.simulateur-zone .actions button').click();
+      });
+      egal([etat.i, etat.termine, fins], [5, true, 1]);
+      var el2 = GDD.ui.simulateur(jeu, { etat: etat, prefixeId: 'r2' });
+      vrai(/Bilan : 4 bonnes réponses sur 5/.test(el2.textContent), el2.querySelector('h4').textContent);
+      vrai(/à revoir, réponse attendue : Les responsables métiers/.test(el2.querySelector('.simulateur-recap').textContent));
+      vrai(el2.querySelector('.simulateur-bilan button').textContent === 'Recommencer le jeu');
+      document.body.removeChild(el);
+    });
+
+    test('Mémo M5 : six contributions', function () {
+      var memo = lecons[3].blocs.filter(function (b) { return b.type === 'memo'; })[0];
+      egal(GDD.ui.memo(memo).querySelectorAll('.memo-etape').length, 6);
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -567,7 +687,7 @@
   function charger(fichier) {
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
-  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); afficher(); })
+  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

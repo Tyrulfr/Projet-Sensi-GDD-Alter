@@ -1,0 +1,806 @@
+{
+  "id": "m05",
+  "numero": 5,
+  "titre": "Qui organise les données ?",
+  "sousTitre": "Comprendre la gouvernance, la gestion des données et les responsabilités de chacun.",
+  "slugArchive": "qui-organise-les-donnees",
+  "duree": 8,
+  "statutContenu": "proposition - à valider (rôles à confirmer avec les équipes chargées de la gouvernance de la donnée)",
+  "objectif": "Comprendre que la gouvernance de la donnée repose sur des règles, des décisions, une organisation et des responsabilités partagées, et la distinguer de la gestion des données au quotidien.",
+  "objectifsSpecifiques": [
+    {
+      "id": "os5-1",
+      "texte": "Expliquer simplement ce qu'est la gouvernance de la donnée."
+    },
+    {
+      "id": "os5-2",
+      "texte": "Distinguer gouvernance et gestion opérationnelle des données."
+    },
+    {
+      "id": "os5-3",
+      "texte": "Reconnaître les principales catégories d'acteurs intervenant dans la gestion des données."
+    },
+    {
+      "id": "os5-4",
+      "texte": "Comprendre pourquoi les responsabilités doivent être identifiées."
+    },
+    {
+      "id": "os5-5",
+      "texte": "Reconnaître le rôle des services métiers, de l'encadrement et des services techniques."
+    },
+    {
+      "id": "os5-6",
+      "texte": "Comprendre que chacun contribue à la qualité et à l'utilisation responsable des données."
+    }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m05-defi"
+  },
+  "lecons": [
+    {
+      "id": "m05-l1",
+      "type": "lecon",
+      "titre": "Pourquoi faut-il des règles communes ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Le service RH gère les informations sur les personnels, la scolarité celles sur les étudiants et les formations, le patrimoine celles sur les bâtiments et les équipements. Chacun utilise des outils et des procédures adaptés à ses missions, et c'est légitime.\n\nMais certaines informations doivent aussi être comprises ou réutilisées par d'autres services."
+        },
+        {
+          "type": "exemple",
+          "titre": "« Département Sciences », « Dept. Sciences » ou « DS » ?",
+          "texte": "Trois fichiers désignent une structure de ces trois façons. S'agit-il de la même structure ? Pas forcément. Sans règle ni référentiel commun, il est difficile de rapprocher les informations."
+        },
+        {
+          "type": "texte",
+          "titre": "Ce que fait la gouvernance",
+          "texte": "La gouvernance définit un **cadre partagé** : objectifs, règles communes, responsabilités, modalités de décision, principes de qualité, conditions de partage, façons de faire évoluer les règles.\n\nElle n'impose pas à tous les services les mêmes outils ou les mêmes procédures : elle cherche une cohérence adaptée aux besoins collectifs."
+        },
+        {
+          "type": "activite",
+          "ref": "m05-a1"
+        },
+        {
+          "type": "aretenir",
+          "texte": "La gouvernance permet de définir des règles communes pour mieux travailler ensemble."
+        }
+      ]
+    },
+    {
+      "id": "m05-l2",
+      "type": "lecon",
+      "titre": "Gouvernance et gestion des données : quelle différence ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "L'université veut des informations plus fiables sur ses bâtiments. Deux types d'actions sont nécessaires :\n\n- décider qui valide les informations, quelles règles respecter et comment traiter les incohérences ;\n- mettre à jour l'application, contrôler les enregistrements et signaler les anomalies.\n\nCes actions sont complémentaires, mais elles ne se situent pas au même niveau."
+        },
+        {
+          "type": "definition",
+          "terme": "Gouvernance de la donnée",
+          "texte": "L'organisation des décisions, des règles, des responsabilités et du contrôle concernant les données. Elle répond à : pourquoi gérons-nous ces données ? Quelles règles communes ? Qui décide ? Qui est responsable de quoi ? Comment arbitrer ?"
+        },
+        {
+          "type": "definition",
+          "terme": "Gestion opérationnelle",
+          "texte": "Les activités concrètes qui permettent de créer, saisir, contrôler, mettre à jour, utiliser, partager, archiver ou supprimer les données, **selon les règles applicables**."
+        },
+        {
+          "type": "tableau",
+          "titre": "Deux niveaux complémentaires",
+          "colonnes": [
+            "Gouvernance",
+            "Gestion opérationnelle"
+          ],
+          "lignes": [
+            [
+              "Définir une règle de qualité",
+              "Appliquer cette règle lors de la saisie"
+            ],
+            [
+              "Attribuer des responsabilités",
+              "Effectuer les contrôles prévus"
+            ],
+            [
+              "Définir les principes d'accès",
+              "Accorder les accès selon la procédure"
+            ],
+            [
+              "Fixer les principes d'actualisation",
+              "Mettre à jour les informations"
+            ],
+            [
+              "Organiser les arbitrages",
+              "Signaler et traiter les anomalies"
+            ]
+          ],
+          "legende": "Distinction simplifiée : dans la réalité, responsables métiers et équipes opérationnelles contribuent souvent aux deux."
+        },
+        {
+          "type": "activite",
+          "ref": "m05-a2"
+        },
+        {
+          "type": "aretenir",
+          "texte": "La gouvernance organise les règles et les responsabilités ; la gestion opérationnelle les traduit en actions concrètes."
+        }
+      ]
+    },
+    {
+      "id": "m05-l3",
+      "type": "lecon",
+      "titre": "Qui intervient dans la gouvernance des données ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Une erreur est découverte dans une information utilisée par plusieurs services. Un agent la constate ; un responsable de service doit décider comment la traiter ; un référent métier aide à comprendre la donnée ; une équipe technique intervient si l'application est en cause.\n\nQui est responsable ? Cela dépend des rôles et des procédures définis : d'où l'intérêt de savoir qui intervient, et pourquoi."
+        },
+        {
+          "type": "schema",
+          "titre": "Cinq familles de rôles qui collaborent",
+          "source": {
+            "libelle": "Les données de l'université",
+            "detail": "Un bien commun, utile à tous les services"
+          },
+          "flux": "mobilisent des rôles complémentaires",
+          "annonce": "Cinq familles de rôles, présentées au même niveau :",
+          "consigne": "Sélectionne une famille de rôles pour découvrir sa contribution.",
+          "cibles": [
+            {
+              "libelle": "Décider et coordonner",
+              "usage": "Décideurs et instances de gouvernance",
+              "detail": "Ils définissent ou valident les orientations, les priorités et les règles qui relèvent de leur responsabilité.\n\n- Exemples : fixer des principes communs, arbitrer entre plusieurs besoins, organiser la coordination.\n- Travaillent avec : les responsables métiers, qui expriment les besoins."
+            },
+            {
+              "libelle": "Apporter l'expertise métier",
+              "usage": "Responsables métiers",
+              "detail": "Ils connaissent les activités et contribuent aux décisions sur les données de leur domaine.\n\n- Exemples : responsable RH, de scolarité, du patrimoine, de bibliothèque.\n- Travaillent avec : les agents de leur service et les décideurs."
+            },
+            {
+              "libelle": "Accompagner la qualité",
+              "usage": "Référents ou gestionnaires de données",
+              "detail": "Selon l'organisation retenue, ils contribuent à définir, documenter et suivre les règles relatives à certaines données. Leur nom et leur périmètre varient selon les établissements.\n\n- Exemples : documenter une règle de saisie, suivre des indicateurs de qualité.\n- Travaillent avec : les responsables métiers, les agents et les équipes techniques."
+            },
+            {
+              "libelle": "Produire et utiliser",
+              "usage": "Agents producteurs et utilisateurs",
+              "detail": "Ils manipulent les informations au quotidien : leur expérience du terrain est essentielle.\n\n- Exemples : saisir, contrôler, consulter, mettre à jour, réutiliser, signaler une anomalie.\n- Travaillent avec : leur responsable et les référents, à qui ils font remonter les difficultés."
+            },
+            {
+              "libelle": "Sécuriser et soutenir les usages",
+              "usage": "Acteurs techniques et spécialisés",
+              "detail": "Ils accompagnent les usages et la sécurisation des données selon leurs compétences.\n\n- Exemples : services informatiques, responsable de la sécurité des systèmes d'information, équipes des applications métiers, délégué à la protection des données (DPO).\n- Le DPO informe, conseille et contrôle le respect des règles de protection des données personnelles ; il n'autorise pas lui-même chaque partage."
+            }
+          ],
+          "legende": "Modèle pédagogique : ces familles ne décrivent pas l'organigramme officiel de l'Université Paris-Saclay. Aucune ne fonctionne seule."
+        },
+        {
+          "type": "activite",
+          "ref": "m05-a3"
+        },
+        {
+          "type": "aretenir",
+          "texte": "La gouvernance repose sur plusieurs acteurs complémentaires, pas uniquement sur les informaticiens."
+        }
+      ]
+    },
+    {
+      "id": "m05-l4",
+      "type": "lecon",
+      "titre": "Et moi, quel est mon rôle ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles dans un service administratif. Tu ne participes pas forcément aux décisions stratégiques, tu ne définis pas les règles de gestion des données et tu n'es pas informaticien.\n\nCela veut-il dire que tu n'as aucun rôle à jouer ? **Non.**"
+        },
+        {
+          "type": "memo",
+          "titre": "Ma contribution, au quotidien",
+          "etapes": [
+            {
+              "titre": "Je saisis",
+              "texte": "Je respecte les consignes, les formats et les règles disponibles."
+            },
+            {
+              "titre": "Je consulte",
+              "texte": "Je vérifie, si nécessaire, que l'information convient à l'usage prévu."
+            },
+            {
+              "titre": "Je réutilise",
+              "texte": "Je cherche la bonne source et j'évite de multiplier les copies."
+            },
+            {
+              "titre": "Je partage",
+              "texte": "Je respecte les conditions d'accès et les procédures."
+            },
+            {
+              "titre": "Je constate une anomalie",
+              "texte": "Je la signale ou la fais vérifier par les personnes compétentes."
+            },
+            {
+              "titre": "Je suis responsable de service",
+              "texte": "J'organise le travail, je veille à l'application des règles et je fais remonter les difficultés et les besoins."
+            }
+          ]
+        },
+        {
+          "type": "activite",
+          "ref": "m05-a4"
+        },
+        {
+          "type": "simulateur",
+          "titre": "Qui fait quoi avec les données ?",
+          "consigne": "Cinq situations : pour chacune, choisis qui intervient principalement, puis découvre le rôle de chacun.",
+          "avertissement": "Rôles génériques, pour la réflexion : ils ne décrivent pas l'organisation officielle de l'université. En situation réelle, suis les procédures de ton service.",
+          "libelles": {
+            "etiquette": "Jeu des rôles",
+            "icone": "👥",
+            "iconeCarte": "📌",
+            "question": "Qui doit principalement intervenir à ce stade ?",
+            "juste": "Bonne réponse",
+            "faux": "À revoir",
+            "choixJuste": "✓ Ta réponse, correcte",
+            "choixAttendu": "→ Réponse attendue",
+            "choixFaux": "✗ Ta réponse, à revoir",
+            "attendu": "Réponse attendue",
+            "manque": "Choisis une réponse avant de valider.",
+            "valider": "Valider ma réponse",
+            "reflexe": "À retenir",
+            "bilan": "bonne réponse|bonnes réponses",
+            "recommencer": "Recommencer le jeu"
+          },
+          "scenarios": [
+            {
+              "id": "regle",
+              "objectif": "os5-3",
+              "titre": "Définir une règle",
+              "contexte": "Le patrimoine, la scolarité et la logistique codent les bâtiments différemment. Il faut une règle commune.",
+              "fiche": [
+                {
+                  "libelle": "Étape",
+                  "valeur": "Définir une règle commune"
+                }
+              ],
+              "choix": [
+                {
+                  "id": "a",
+                  "texte": "Chaque agent, en choisissant le code qui lui paraît le plus clair.",
+                  "feedback": "Des choix individuels multiplieraient les variantes."
+                },
+                {
+                  "id": "b",
+                  "texte": "Les responsables métiers concernés et l'instance de gouvernance compétente, selon l'organisation établie.",
+                  "feedback": "Oui : ceux qui connaissent les usages préparent la règle, ceux qui en ont l'autorité la valident."
+                },
+                {
+                  "id": "c",
+                  "texte": "Le service informatique seul, puisque les codes sont dans les applications.",
+                  "feedback": "Les équipes techniques mettent la règle en œuvre dans les outils, mais le sens des codes relève des métiers."
+                }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Une règle commune engage plusieurs services : elle se construit avec eux et se valide par ceux qui en ont l'autorité.",
+                "roles": [
+                  {
+                    "role": "Responsables métiers",
+                    "contribution": "expriment les besoins et proposent la règle."
+                  },
+                  {
+                    "role": "Instance de gouvernance",
+                    "contribution": "valide la règle."
+                  },
+                  {
+                    "role": "Équipes techniques",
+                    "contribution": "l'intègrent dans les outils."
+                  }
+                ],
+                "reflexe": "Définir une règle commune est une décision collective, pas individuelle."
+              }
+            },
+            {
+              "id": "application",
+              "objectif": "os5-6",
+              "titre": "Appliquer une règle",
+              "contexte": "Une procédure prévoit d'écrire les dates au format AAAA-MM-JJ. Tu saisis une date.",
+              "fiche": [
+                {
+                  "libelle": "Étape",
+                  "valeur": "Saisir une information"
+                }
+              ],
+              "choix": [
+                {
+                  "id": "a",
+                  "texte": "Toi, l'agent chargé de la saisie : tu appliques le format prévu.",
+                  "feedback": "Oui : la règle existe, l'appliquer fait partie de la saisie."
+                },
+                {
+                  "id": "b",
+                  "texte": "Ton responsable, qui doit valider chaque saisie.",
+                  "feedback": "La règle est fixée : l'appliquer ne demande pas de validation au cas par cas."
+                },
+                {
+                  "id": "c",
+                  "texte": "Le DPO, qui contrôle la qualité des données.",
+                  "feedback": "Le DPO veille à la protection des données personnelles, pas à chaque saisie."
+                }
+              ],
+              "reponse": "a",
+              "correction": {
+                "pourquoi": "La gouvernance a fixé la règle ; la gestion opérationnelle l'applique. Ici, c'est toi qui agis.",
+                "roles": [
+                  {
+                    "role": "Agent",
+                    "contribution": "applique le format prévu."
+                  },
+                  {
+                    "role": "Responsable ou référent",
+                    "contribution": "fait connaître la règle et répond aux questions."
+                  }
+                ],
+                "reflexe": "Quand la règle existe, je l'applique ; en cas de doute, je demande."
+              }
+            },
+            {
+              "id": "anomalie",
+              "objectif": "os5-4",
+              "titre": "Une anomalie détectée",
+              "contexte": "Une gestionnaire de bibliothèque repère deux dates d'acquisition différentes pour un même document, dans deux fichiers.",
+              "fiche": [
+                {
+                  "libelle": "Étape",
+                  "valeur": "Une incohérence est repérée"
+                }
+              ],
+              "choix": [
+                {
+                  "id": "a",
+                  "texte": "La gestionnaire : elle signale l'anomalie ou demande une vérification selon la procédure.",
+                  "feedback": "Oui : repérer et signaler, c'est déjà contribuer à la qualité."
+                },
+                {
+                  "id": "b",
+                  "texte": "La gestionnaire : elle choisit la date qui lui semble juste et corrige les deux fichiers.",
+                  "feedback": "Corriger sans vérifier peut remplacer une erreur par une autre."
+                },
+                {
+                  "id": "c",
+                  "texte": "Personne : ce n'est pas son fichier.",
+                  "feedback": "Sans signalement, l'erreur continuera de circuler."
+                }
+              ],
+              "reponse": "a",
+              "correction": {
+                "pourquoi": "Le traitement dépend des responsabilités définies ; le premier pas, c'est le signalement.",
+                "roles": [
+                  {
+                    "role": "Gestionnaire",
+                    "contribution": "signale l'anomalie et la décrit précisément."
+                  },
+                  {
+                    "role": "Responsable du fichier ou référent",
+                    "contribution": "vérifie la source et corrige."
+                  }
+                ],
+                "reflexe": "Je signale ce que je repère ; je ne corrige que ce qui relève de mon périmètre."
+              }
+            },
+            {
+              "id": "technique",
+              "objectif": "os5-5",
+              "titre": "Un problème technique",
+              "contexte": "L'application refuse d'enregistrer un code de structure pourtant prévu dans le référentiel.",
+              "fiche": [
+                {
+                  "libelle": "Étape",
+                  "valeur": "L'outil bloque une saisie conforme à la règle"
+                }
+              ],
+              "choix": [
+                {
+                  "id": "a",
+                  "texte": "Le service informatique seul : c'est un problème de logiciel.",
+                  "feedback": "Les équipes techniques analysent l'outil, mais le service métier doit confirmer ce qui est attendu."
+                },
+                {
+                  "id": "b",
+                  "texte": "Le service métier concerné et les équipes techniques compétentes, chacun selon ses responsabilités.",
+                  "feedback": "Oui : le métier confirme la règle, la technique analyse et corrige l'outil."
+                },
+                {
+                  "id": "c",
+                  "texte": "L'agent qui saisit, en choisissant un code proche que l'application accepte.",
+                  "feedback": "Un code de contournement créerait une incohérence de plus."
+                }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Un problème technique a souvent une part métier : que doit contenir la donnée, et pourquoi l'outil la refuse-t-il ?",
+                "roles": [
+                  {
+                    "role": "Agent",
+                    "contribution": "signale le blocage avec un exemple précis."
+                  },
+                  {
+                    "role": "Service métier",
+                    "contribution": "confirme la règle attendue."
+                  },
+                  {
+                    "role": "Équipes techniques",
+                    "contribution": "analysent et corrigent l'application."
+                  }
+                ],
+                "reflexe": "Problème d'outil : métier et technique travaillent ensemble."
+              }
+            },
+            {
+              "id": "arbitrage",
+              "objectif": "os5-4",
+              "titre": "Des besoins qui divergent",
+              "contexte": "Pour nommer les formations, un service veut des libellés courts, un autre des libellés détaillés.",
+              "fiche": [
+                {
+                  "libelle": "Étape",
+                  "valeur": "Arbitrer entre deux besoins légitimes"
+                }
+              ],
+              "choix": [
+                {
+                  "id": "a",
+                  "texte": "Le service qui a créé son fichier en premier.",
+                  "feedback": "L'ancienneté d'un fichier ne donne pas d'autorité pour décider."
+                },
+                {
+                  "id": "b",
+                  "texte": "Les responsables ou instances qui ont l'autorité d'arbitrage définie par la gouvernance.",
+                  "feedback": "Oui : arbitrer fait partie du rôle de la gouvernance."
+                },
+                {
+                  "id": "c",
+                  "texte": "Personne : chaque service garde sa version.",
+                  "feedback": "Sans arbitrage, deux règles coexistent et les données ne se rapprochent plus."
+                }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Quand des besoins légitimes s'opposent, il faut savoir à l'avance qui tranche.",
+                "roles": [
+                  {
+                    "role": "Services concernés",
+                    "contribution": "exposent leurs besoins."
+                  },
+                  {
+                    "role": "Responsables ou instance d'arbitrage",
+                    "contribution": "décident (par exemple : un libellé de référence et une correspondance) et expliquent leur choix."
+                  },
+                  {
+                    "role": "Tous",
+                    "contribution": "appliquent la décision."
+                  }
+                ],
+                "reflexe": "Quand des besoins divergent, on fait arbitrer ; on ne tranche pas seul."
+              }
+            }
+          ],
+          "conclusion": "La gouvernance est collective : chacun y a un rôle, à son niveau, et les rôles se complètent."
+        },
+        {
+          "type": "aretenir",
+          "texte": "Je contribue à la gouvernance des données à mon niveau, par mes pratiques et par mon expertise métier."
+        }
+      ]
+    },
+    {
+      "id": "m05-defi",
+      "type": "evaluation",
+      "titre": "Le défi du module",
+      "surtitre": "Défi final",
+      "libelleAcces": "Relever le défi",
+      "libelleRecommencer": "Recommencer le défi",
+      "presentation": "une-par-une",
+      "introduction": "Quatre questions, une à la fois. Tu découvres la correction après chaque réponse, et tu peux recommencer le défi autant de fois que tu le souhaites.",
+      "activites": [
+        "m05-q1",
+        "m05-q2",
+        "m05-q3",
+        "m05-q4"
+      ],
+      "messagesResultat": [
+        {
+          "min": 100,
+          "texte": "Bravo ! Tu as compris que la gouvernance est une organisation collective, et que tu y contribues à ton niveau."
+        },
+        {
+          "min": 75,
+          "texte": "Très bien. Relis la correction de la question à revoir : elle reprend une idée clé du module."
+        },
+        {
+          "min": 50,
+          "texte": "C'est un bon début. Les corrections t'aideront à distinguer gouvernance et gestion, et à repérer le rôle de chacun."
+        },
+        {
+          "min": 0,
+          "texte": "Ces notions sont nouvelles pour beaucoup de personnes. Prends le temps de relire les corrections, puis recommence le défi quand tu le souhaites."
+        }
+      ]
+    }
+  ],
+  "activites": {
+    "m05-a1": {
+      "type": "choix-unique",
+      "objectif": "os5-1",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Plusieurs services utilisent des codes différents pour désigner une même catégorie de locaux. Quelle démarche favorise une meilleure cohérence ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Imposer immédiatement à tous les services de supprimer leurs fichiers.",
+          "feedback": "Supprimer des fichiers utiles ne crée pas de règle commune, et ferait perdre des informations."
+        },
+        {
+          "id": "b",
+          "texte": "Définir collectivement une règle ou une correspondance de référence adaptée.",
+          "feedback": "C'est la démarche de la gouvernance : une référence commune, construite avec les services concernés."
+        },
+        {
+          "id": "c",
+          "texte": "Laisser chacun créer de nouveaux codes sans coordination.",
+          "feedback": "De nouveaux codes ajouteraient des variantes, sans rapprocher les informations."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "La gouvernance aide à établir des règles communes ou des correspondances lorsque plusieurs services doivent utiliser ou rapprocher leurs données.",
+        "incorrect": "La bonne réponse est la deuxième. La gouvernance aide à établir des règles communes ou des correspondances lorsque plusieurs services doivent utiliser ou rapprocher leurs données."
+      }
+    },
+    "m05-a2": {
+      "type": "classement",
+      "objectif": "os5-2",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Gouvernance ou gestion opérationnelle ? Pour chaque action, choisis le niveau principalement concerné.",
+      "categories": [
+        {
+          "id": "g",
+          "texte": "Gouvernance"
+        },
+        {
+          "id": "o",
+          "texte": "Gestion opérationnelle"
+        }
+      ],
+      "elements": [
+        {
+          "id": "1",
+          "texte": "Définir une règle commune de nommage des bâtiments.",
+          "categorie": "g",
+          "explication": "Fixer une règle commune relève du cadre."
+        },
+        {
+          "id": "2",
+          "texte": "Corriger une date erronée dans un fichier.",
+          "categorie": "o",
+          "explication": "C'est une action concrète sur la donnée."
+        },
+        {
+          "id": "3",
+          "texte": "Saisir une nouvelle inscription étudiante.",
+          "categorie": "o",
+          "explication": "La saisie applique les règles prévues."
+        },
+        {
+          "id": "4",
+          "texte": "Définir qui valide les informations de référence.",
+          "categorie": "g",
+          "explication": "Attribuer une responsabilité relève de la gouvernance."
+        },
+        {
+          "id": "5",
+          "texte": "Signaler une incohérence entre deux applications.",
+          "categorie": "o",
+          "explication": "Signaler fait partie des gestes du quotidien… et alimente la gouvernance."
+        },
+        {
+          "id": "6",
+          "texte": "Déterminer les conditions générales d'attribution des accès.",
+          "categorie": "g",
+          "explication": "Fixer des principes d'accès relève du cadre ; les accorder relève ensuite de la gestion."
+        }
+      ],
+      "explication": {
+        "correct": "Bravo. La gouvernance organise le cadre commun ; la gestion opérationnelle correspond à son application quotidienne. Les deux sont nécessaires, et certaines actions se situent à l'interface.",
+        "incorrect": "Certaines réponses sont à revoir : les explications ci-dessus précisent le niveau principalement concerné. La gouvernance organise le cadre commun ; la gestion opérationnelle l'applique au quotidien. La frontière n'est pas toujours nette."
+      }
+    },
+    "m05-a3": {
+      "type": "choix-unique",
+      "objectif": "os5-6",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Un agent constate qu'un code de formation semble incorrect dans une application. Quel est son premier réflexe ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Modifier immédiatement tous les fichiers de l'université.",
+          "feedback": "Il n'a ni les droits ni la certitude nécessaires : une correction en masse pourrait propager une erreur."
+        },
+        {
+          "id": "b",
+          "texte": "Signaler ou faire vérifier l'anomalie selon la procédure prévue.",
+          "feedback": "C'est le bon réflexe : signaler permet aux personnes compétentes de vérifier et de corriger."
+        },
+        {
+          "id": "c",
+          "texte": "Ignorer l'erreur, car la qualité relève uniquement du service informatique.",
+          "feedback": "La qualité n'est pas l'affaire du seul service informatique : ceux qui utilisent la donnée sont souvent les premiers à voir l'erreur."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Les agents contribuent à la qualité des données en identifiant et en signalant les anomalies. Leur traitement dépend ensuite des responsabilités et des procédures établies.",
+        "incorrect": "La bonne réponse est la deuxième. Les agents contribuent à la qualité des données en identifiant et en signalant les anomalies. Leur traitement dépend ensuite des responsabilités et des procédures établies."
+      }
+    },
+    "m05-a4": {
+      "type": "choix-unique",
+      "objectif": "os5-6",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Un agent constate que plusieurs collègues utilisent des tableaux locaux aux informations contradictoires. Quelle attitude est la plus utile ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Imposer seul un nouveau fichier à l'ensemble des services.",
+          "feedback": "Un fichier de plus, imposé sans concertation, risque d'ajouter une version au lieu d'en supprimer."
+        },
+        {
+          "id": "b",
+          "texte": "Signaler la difficulté et rechercher, avec les personnes compétentes, la source de référence et les règles communes.",
+          "feedback": "C'est la démarche la plus utile : faire remonter le problème pour qu'il soit traité à la source."
+        },
+        {
+          "id": "c",
+          "texte": "Continuer sans rien signaler, car la gouvernance relève exclusivement de la direction.",
+          "feedback": "La direction ne peut pas traiter ce qu'elle ne connaît pas : les remontées du terrain sont indispensables."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "La gouvernance est collective. Les agents contribuent à son efficacité en faisant remonter les besoins et les difficultés rencontrées sur le terrain.",
+        "incorrect": "La bonne réponse est la deuxième. La gouvernance est collective. Les agents contribuent à son efficacité en faisant remonter les besoins et les difficultés rencontrées sur le terrain."
+      }
+    },
+    "m05-q1": {
+      "type": "choix-unique",
+      "objectif": "os5-1",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "À quoi sert principalement la gouvernance de la donnée ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "À remplacer tous les logiciels existants."
+        },
+        {
+          "id": "b",
+          "texte": "À organiser les règles, les responsabilités et les décisions concernant les données."
+        },
+        {
+          "id": "c",
+          "texte": "À confier toutes les données au seul service informatique."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "La gouvernance définit un cadre commun pour organiser la gestion et l'utilisation des données. Les outils informatiques contribuent à son application, mais n'en constituent pas l'unique objet.",
+        "incorrect": "La bonne réponse est la deuxième. La gouvernance définit un cadre commun pour organiser la gestion et l'utilisation des données. Les outils informatiques contribuent à son application, mais n'en constituent pas l'unique objet."
+      }
+    },
+    "m05-q2": {
+      "type": "choix-unique",
+      "objectif": "os5-2",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Une université définit une règle commune pour identifier ses bâtiments. Cette action relève principalement :",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "De la gouvernance."
+        },
+        {
+          "id": "b",
+          "texte": "De la saisie quotidienne."
+        },
+        {
+          "id": "c",
+          "texte": "De la maintenance informatique."
+        }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Définir une règle commune relève du cadre de gouvernance. La renseigner et l'appliquer dans les outils relève ensuite de la gestion opérationnelle.",
+        "incorrect": "La bonne réponse est la gouvernance. Définir une règle commune relève du cadre de gouvernance. La renseigner et l'appliquer dans les outils relève ensuite de la gestion opérationnelle."
+      }
+    },
+    "m05-q3": {
+      "type": "choix-unique",
+      "objectif": "os5-4",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Un agent constate une incohérence dans une donnée qu'il utilise. Quelle démarche est la plus appropriée ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Ignorer le problème."
+        },
+        {
+          "id": "b",
+          "texte": "Supprimer toutes les données concernées."
+        },
+        {
+          "id": "c",
+          "texte": "Signaler ou faire vérifier l'anomalie selon les procédures applicables."
+        }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "La qualité des données est une responsabilité collective. Signaler une difficulté permet aux personnes compétentes de la traiter.",
+        "incorrect": "La bonne réponse est la troisième. La qualité des données est une responsabilité collective. Signaler une difficulté permet aux personnes compétentes de la traiter."
+      }
+    },
+    "m05-q4": {
+      "type": "choix-unique",
+      "objectif": "os5-5",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Pourquoi les services métiers doivent-ils participer à la gouvernance des données ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Parce qu'ils connaissent les activités, les besoins et les usages des données."
+        },
+        {
+          "id": "b",
+          "texte": "Parce qu'ils doivent tous devenir informaticiens."
+        },
+        {
+          "id": "c",
+          "texte": "Parce qu'ils doivent pouvoir décider seuls de toutes les règles."
+        }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "L'expertise métier est indispensable pour définir des règles adaptées aux réalités du terrain et aux besoins collectifs.",
+        "incorrect": "La bonne réponse est la première. L'expertise métier est indispensable pour définir des règles adaptées aux réalités du terrain et aux besoins collectifs."
+      }
+    }
+  },
+  "synthese": [
+    "La gouvernance ne se limite pas à l'informatique.",
+    "Elle définit des règles, des responsabilités et des modalités de décision.",
+    "La gestion opérationnelle applique ces règles au quotidien.",
+    "Les services métiers participent à la définition des besoins et des règles.",
+    "Chaque agent contribue à la qualité et à l'utilisation responsable des données."
+  ]
+}

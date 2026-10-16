@@ -274,6 +274,9 @@ tbody th { font-weight: 700; }
 
 @media (min-width: 40rem) {
   .schema-cibles-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .schema-cibles-5 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+  .schema-cibles-5 > li { grid-column: span 2; }
+  .schema-cibles-5 > li:nth-child(4) { grid-column: 2 / span 2; }
 }
 
 /* Mémo */
@@ -325,6 +328,13 @@ tbody th { font-weight: 700; }
 .simulateur-criteres { margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--couleur-bordure); }
 .simulateur-criteres p { margin: .35rem 0; }
 .simulateur-criteres ul { margin: .2rem 0 .5rem; padding-left: 1.25rem; }
+.simulateur-roles { display: grid; grid-template-columns: max-content 1fr; gap: .3rem .8rem; margin: .2rem 0 .6rem; }
+.simulateur-roles dt { font-weight: 700; color: var(--couleur-primaire); }
+.simulateur-roles dd { margin: 0; }
+@media (max-width: 36rem) {
+  .simulateur-roles { grid-template-columns: 1fr; gap: .05rem; }
+  .simulateur-roles dd { margin-bottom: .35rem; }
+}
 .simulateur-reflexe { padding: .4rem .6rem; border-radius: var(--rayon); background: var(--couleur-succes-clair); }
 .simulateur-bilan { margin-top: .75rem; }
 .simulateur-bilan h4 { margin: 0 0 .5rem; font-size: 1.1rem; }
