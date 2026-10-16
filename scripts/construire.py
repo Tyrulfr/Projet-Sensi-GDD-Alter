@@ -4,6 +4,7 @@
 Usage : python3 scripts/construire.py
 Produit :
   index.html + contenus/contenu.js  site web (racine du dépôt, publiable tel quel par GitHub Pages)
+  fiches/fiche-memo-module-XX.html  fiche mémo imprimable des modules qui en définissent une
   exports/module-XX-<titre>-scorm12.zip  un package SCORM autonome par module disponible
   dist/scorm/<module>/              contenu décompressé de chaque package (pour le simulateur)
   dist/simulateur/                  simulateur d'API SCORM 1.2 pour les tests
@@ -116,6 +117,63 @@ def manifeste(catalogue, module, fichiers):
 """
 
 
+def nom_fiche(module):
+    return f"fiche-memo-module-{int(module['numero']):02d}.html"
+
+
+def texte_fiche(texte):
+    return re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", escape(texte))
+
+
+def page_fiche(catalogue, module):
+    """Fiche mémo autonome (HTML imprimable), générée depuis module["fiche"]."""
+    f = module["fiche"]
+    items = "\n".join(
+        f"""    <li>
+      <h2><span class="icone" aria-hidden="true">{escape(r.get("icone", ""))}</span> {texte_fiche(r["titre"])}</h2>
+      <p>{texte_fiche(r["texte"])}</p>
+      <p class="question"><strong>Ma question :</strong> {texte_fiche(r["question"])}</p>
+    </li>""" for r in f["reflexes"])
+    return f"""<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{escape(f["titre"])} - Module {module["numero"]}</title>
+<style>
+  body {{ font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; color: #1f1f1f; line-height: 1.5; margin: 0; background: #fff; }}
+  main {{ max-width: 46rem; margin: 0 auto; padding: 1.5rem 1.25rem 2rem; }}
+  .surtitre {{ color: #63003c; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; font-size: .85rem; margin: 0; }}
+  h1 {{ color: #63003c; font-size: 1.7rem; margin: .2rem 0 .6rem; }}
+  ol {{ list-style: none; padding: 0; margin: 1.2rem 0; display: grid; gap: .7rem; counter-reset: r; }}
+  li {{ border: 2px solid #63003c; border-radius: .6rem; padding: .7rem 1rem; break-inside: avoid; }}
+  h2 {{ font-size: 1.15rem; margin: 0 0 .3rem; color: #63003c; }}
+  li p {{ margin: .2rem 0; }}
+  .question {{ background: #f7eef3; border-radius: .4rem; padding: .35rem .6rem; }}
+  .rappel {{ border-left: 4px solid #005a70; padding: .5rem .9rem; background: #eef6f8; font-weight: 600; }}
+  footer {{ color: #555; font-size: .85rem; margin-top: 1.5rem; }}
+  button {{ font: inherit; font-weight: 700; color: #fff; background: #63003c; border: 0; border-radius: .4rem; padding: .6rem 1.1rem; cursor: pointer; }}
+  button:focus-visible {{ outline: 3px solid #005a70; outline-offset: 2px; }}
+  @media print {{ .ecran {{ display: none; }} main {{ padding: 0; }} @page {{ margin: 1.5cm; }} }}
+</style>
+</head>
+<body>
+<main>
+  <p class="surtitre">{escape(catalogue["titre"])} · Module {module["numero"]}</p>
+  <h1>{escape(f["titre"])}</h1>
+  <p>{texte_fiche(f["introduction"])}</p>
+  <p class="ecran"><button type="button" onclick="window.print()">Imprimer ou enregistrer en PDF</button></p>
+  <ol>
+{items}
+  </ol>
+  <p class="rappel">{texte_fiche(f["rappel"])}</p>
+  <footer>{escape(catalogue["institution"])} · {escape(catalogue["sousTitre"])} · version {escape(catalogue["version"])}</footer>
+</main>
+</body>
+</html>
+"""
+
+
 def lister_fichiers(dossier):
     return sorted(p.relative_to(dossier).as_posix() for p in dossier.rglob("*") if p.is_file())
 
@@ -173,6 +231,15 @@ def construire():
     ecrire(RACINE / "index.html", page_index(catalogue, config_web, catalogue["titre"], empreinte,
                                              "src/", "contenus/contenu.js"))
     problemes += [f"site : ressource manquante {m}" for m in verifier_references(RACINE)]
+    fiches = RACINE / "fiches"
+    attendues = {nom_fiche(m) for m in modules.values() if m.get("fiche")}
+    for perimee in fiches.glob("*.html") if fiches.exists() else []:
+        if perimee.name not in attendues:
+            perimee.unlink()
+    for module in modules.values():
+        if module.get("fiche"):
+            ecrire(fiches / nom_fiche(module), page_fiche(catalogue, module))
+            print(f"   fiches/{nom_fiche(module)}")
 
     print("3. Packages SCORM 1.2 -> exports/")
     EXPORTS.mkdir(exist_ok=True)
@@ -188,6 +255,8 @@ def construire():
         titre = f"Module {module['numero']} - {module['titre']}"
         ecrire(dossier / "index.html", page_index(catalogue, {"mode": "scorm", "module": mid}, titre, empreinte,
                                                   "assets/", "assets/js/contenu.js"))
+        if module.get("fiche"):
+            ecrire(dossier / nom_fiche(module), page_fiche(catalogue, module))
         fichiers = lister_fichiers(dossier)
         ecrire(dossier / "imsmanifest.xml", manifeste(catalogue, module, fichiers))
         ok, msg = verifier_xml(dossier / "imsmanifest.xml")

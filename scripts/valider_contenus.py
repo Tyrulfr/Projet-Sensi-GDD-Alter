@@ -13,7 +13,7 @@ RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_CONTENUS = RACINE / "contenus"
 
 TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "comparateur",
-               "simulateur", "memo", "activite", "aretenir"}
+               "simulateur", "memo", "fiche", "activite", "aretenir"}
 RE_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PRESENTATIONS = {"toutes", "une-par-une"}
 TYPES_ACTIVITES = {"choix-unique", "choix-multiple", "vrai-faux", "classement"}
@@ -128,6 +128,8 @@ def valider_tableau_simple(t, lieu, r):
 
 def valider_comparateur(b, lieu, r):
     avant, apres = b.get("avant") or {}, b.get("apres") or {}
+    if not isinstance(b.get("libelles", {}), dict):
+        r.erreur(lieu, "« libelles » doit être un objet { clé: texte }")
     valider_tableau_simple(avant, f"{lieu}, tableau « avant »", r)
     valider_tableau_simple(apres, f"{lieu}, tableau « après »", r)
     problemes = b.get("problemes") or []
@@ -177,6 +179,8 @@ def valider_simulateur(b, lieu, objectifs, r):
         for cle in ("titre", "contexte"):
             if not texte_present(s, cle):
                 r.erreur(slieu, f"« {cle} » manquant")
+        if "heure" in s and not texte_present(s, "heure"):
+            r.erreur(slieu, "« heure » (facultatif) doit être un texte, par exemple « 9 h »")
         if "fiche" in s:
             fiche = s.get("fiche")
             if not isinstance(fiche, list) or not fiche or not all(
@@ -214,8 +218,22 @@ def valider_simulateur(b, lieu, objectifs, r):
     return couverts
 
 
+def valider_fiche(f, lieu, r):
+    if not isinstance(f, dict) or not all(texte_present(f, k) for k in ("titre", "introduction", "rappel")):
+        r.erreur(lieu, "« fiche » : « titre », « introduction » et « rappel » sont obligatoires")
+        return
+    reflexes = f.get("reflexes") or []
+    if len(reflexes) < 2:
+        r.erreur(lieu, "« fiche.reflexes » : au moins deux réflexes")
+    for j, x in enumerate(reflexes, 1):
+        if not all(texte_present(x, k) for k in ("titre", "texte", "question")):
+            r.erreur(lieu, f"« fiche.reflexes » {j} : « titre », « texte » et « question » sont obligatoires")
+
+
 def valider_module(mod, entree, r, ids_globaux):
     lieu = f"module {entree.get('id')}"
+    if "fiche" in mod:
+        valider_fiche(mod["fiche"], lieu, r)
     if "slugArchive" in mod and not RE_SLUG.match(str(mod["slugArchive"])):
         r.erreur(lieu, "« slugArchive » : lettres minuscules sans accent, chiffres et tirets uniquement")
     if mod.get("id") != entree.get("id"):
@@ -291,7 +309,13 @@ def valider_module(mod, entree, r, ids_globaux):
                     valider_comparateur(b, blieu, r)
                 elif bt == "simulateur":
                     couverts_blocs |= valider_simulateur(b, blieu, objectifs, r)
+                elif bt == "fiche":
+                    if not mod.get("fiche"):
+                        r.erreur(blieu, "bloc « fiche » : le module doit définir « fiche » (titre, introduction, reflexes, rappel)")
+                    continue
                 elif bt in ("chronologie", "memo"):
+                    if b.get("disposition", "enchainement") != "enchainement":
+                        r.erreur(blieu, "« disposition » (facultatif) : seule la valeur « enchainement » est prévue")
                     etapes = b.get("etapes") or []
                     if len(etapes) < 2:
                         r.erreur(blieu, "au moins deux étapes sont nécessaires")

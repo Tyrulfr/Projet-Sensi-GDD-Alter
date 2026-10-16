@@ -48,10 +48,8 @@
     {
       "id": "m06",
       "numero": 6,
-      "etat": "a-venir",
-      "titre": "Les bons réflexes professionnels",
-      "duree": 7,
-      "objectif": "Reconnaître les pratiques favorisant une bonne gestion collective."
+      "etat": "disponible",
+      "fichier": "module-06.json"
     },
     {
       "id": "m07",

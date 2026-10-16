@@ -1,0 +1,449 @@
+{
+  "id": "m06",
+  "numero": 6,
+  "titre": "Les bons réflexes professionnels",
+  "sousTitre": "Adopter les bons réflexes pour rechercher, saisir, contrôler, utiliser et partager les données.",
+  "slugArchive": "bons-reflexes-professionnels",
+  "duree": 10,
+  "statutContenu": "proposition - à valider (procédures et interlocuteurs à confirmer avec les services)",
+  "objectif": "Reconnaître les bonnes pratiques de gestion des données et comprendre comment les appliquer au quotidien, selon son rôle et les procédures de l'établissement.",
+  "objectifsSpecifiques": [
+    { "id": "os6-1", "texte": "Identifier le bon réflexe avant de créer un nouveau fichier." },
+    { "id": "os6-2", "texte": "Reconnaître l'intérêt de rechercher une source de référence." },
+    { "id": "os6-3", "texte": "Comprendre l'importance des règles de saisie et de structuration." },
+    { "id": "os6-4", "texte": "Identifier la conduite à adopter lorsqu'une information semble incorrecte ou incomplète." },
+    { "id": "os6-5", "texte": "Reconnaître les précautions nécessaires avant de partager une donnée." },
+    { "id": "os6-6", "texte": "Comprendre l'importance de documenter certaines informations et de signaler les anomalies." },
+    { "id": "os6-7", "texte": "Identifier sa propre contribution à la gestion collective des données." }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m06-defi"
+  },
+  "lecons": [
+    {
+      "id": "m06-l1",
+      "type": "lecon",
+      "titre": "Avant de créer, je vérifie ce qui existe",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Ton responsable te demande la liste des agents rattachés à plusieurs structures de l'université. Premier réflexe : « Je crée un nouveau fichier Excel. » C'est rapide… mais d'autres services disposent peut-être déjà de ces informations."
+        },
+        {
+          "type": "texte",
+          "titre": "Si chaque service crée son propre fichier",
+          "texte": "- les copies se multiplient et ne sont plus synchronisées ;\n- les mêmes mises à jour sont faites plusieurs fois ;\n- on risque d'utiliser une version ancienne ;\n- on ne sait plus quelle source est fiable ;\n- on perd du temps à rapprocher les fichiers.\n\nUn fichier local n'est pas mauvais en soi : il peut répondre à un besoin précis ou temporaire. Le problème naît quand il devient une **source parallèle** que personne ne maîtrise."
+        },
+        {
+          "type": "memo",
+          "etiquette": "Arbre de décision",
+          "titre": "Avant de créer un fichier",
+          "disposition": "enchainement",
+          "etapes": [
+            { "titre": "J'ai besoin d'une information", "texte": "Ai-je réellement besoin d'un nouveau fichier ?" },
+            { "titre": "Je vérifie si elle existe", "texte": "Cette donnée existe-t-elle déjà ?" },
+            { "titre": "J'identifie la source", "texte": "Existe-t-il une source ou un référentiel approprié ? Qui peut m'orienter ?" },
+            { "titre": "Je vérifie les conditions d'utilisation", "texte": "Puis-je l'utiliser pour mon besoin, dans les conditions prévues ?" },
+            { "titre": "J'utilise l'existant… ou je justifie un nouveau support", "texte": "Si rien ne convient, je crée un fichier en sachant pourquoi, et d'où viennent les données." }
+          ]
+        },
+        { "type": "activite", "ref": "m06-a1" },
+        {
+          "type": "aretenir",
+          "texte": "Avant de recréer une donnée, je vérifie si elle existe déjà et comment y accéder correctement."
+        }
+      ]
+    },
+    {
+      "id": "m06-l2",
+      "type": "lecon",
+      "titre": "Je saisis, contrôle et actualise avec rigueur",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles au service de scolarité. Tu enregistres une inscription : le formulaire demande un code de formation et une date d'inscription. Certaines informations reçues sont ambiguës. Que faire ?"
+        },
+        {
+          "type": "texte",
+          "titre": "Six réflexes de saisie",
+          "texte": "- **Respecter les formats** : le format de date prévu par l'application.\n- **Utiliser les valeurs de référence** : le code de formation du référentiel.\n- **Vérifier** : contrôler un identifiant quand une incohérence apparaît.\n- **Ne pas inventer** : pas de date approximative pour remplir un champ obligatoire.\n- **Actualiser, quand cela relève de ta mission** : modifier un statut qui a changé, si la procédure le prévoit.\n- **Signaler** : prévenir l'interlocuteur compétent quand une donnée semble contradictoire."
+        },
+        {
+          "type": "comparateur",
+          "titre": "Deux façons de remplir le même formulaire",
+          "consigne": "Sélectionne une valeur du formulaire A, ou une difficulté de la liste, pour comprendre ce qui pose problème. Examine les quatre difficultés.",
+          "libelles": {
+            "avant": "Avant : le formulaire rempli", "difficultes": "Les difficultés à repérer",
+            "aide": "Examine les {n} difficultés pour découvrir le formulaire rempli avec rigueur.",
+            "voirApres": "Voir le formulaire rempli avec rigueur", "apres": "Après : une saisie rigoureuse",
+            "atouts": "Ce que cette saisie apporte :"
+          },
+          "avant": {
+            "titre": "Formulaire A : saisie rapide",
+            "colonnes": ["Champ", "Valeur saisie"],
+            "lignes": [
+              ["Code de formation", "licence info 3"],
+              ["Date d'inscription", "début septembre"],
+              ["Numéro étudiant", "2026 0453"],
+              ["Régime d'inscription", "?"]
+            ],
+            "legende": "Formulaire fictif."
+          },
+          "problemes": [
+            { "id": "code-libre", "libelle": "Un code saisi librement", "explication": "Écrit à la main, le code ne correspond à aucune valeur du **référentiel** : la formation ne sera pas reconnue dans les comptages.", "cellules": [[0, 1]] },
+            { "id": "date-approx", "libelle": "Une date approximative", "explication": "« Début septembre » n'est pas une date : impossible de trier, de calculer un délai ou de vérifier une échéance.", "cellules": [[1, 1]] },
+            { "id": "non-verifie", "libelle": "Une information non vérifiée", "explication": "Le numéro a été recopié sans contrôle : une erreur d'un chiffre rattacherait l'inscription à un autre étudiant.", "cellules": [[2, 1]] },
+            { "id": "ambigu", "libelle": "Un champ laissé ambigu", "explication": "Un « ? » sera lu comme une valeur. Mieux vaut un champ clairement non renseigné, et signalé.", "cellules": [[3, 1]] }
+          ],
+          "apres": {
+            "titre": "Formulaire B : bonnes pratiques",
+            "colonnes": ["Champ", "Valeur saisie"],
+            "lignes": [
+              ["Code de formation", "Sélectionné dans la liste de référence"],
+              ["Date d'inscription", "Date exacte, vérifiée sur le document source, au format prévu"],
+              ["Numéro étudiant", "Contrôlé dans l'application"],
+              ["Régime d'inscription", "Non renseigné : information demandée au service compétent"]
+            ],
+            "legende": "Formulaire fictif.",
+            "atouts": ["Valeurs cohérentes avec le référentiel", "Informations vérifiées", "Ce qui manque est signalé, pas deviné"],
+            "avertissement": "Le formulaire B ne corrige rien par supposition : une information qu'on ne peut pas vérifier est signalée, jamais inventée."
+          }
+        },
+        { "type": "activite", "ref": "m06-a2" },
+        {
+          "type": "aretenir",
+          "texte": "Je contribue à la qualité des données en respectant les règles de saisie, en vérifiant les informations et en signalant les anomalies."
+        }
+      ]
+    },
+    {
+      "id": "m06-l3",
+      "type": "lecon",
+      "titre": "Je partage, documente et signale",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu tiens un tableau de suivi utilisé par plusieurs collègues, et tu dois le transmettre à un autre service. Trois questions se posent :\n\n- Ces données peuvent-elles être transmises ?\n- Le collègue saura-t-il les comprendre ?\n- Resteront-elles utilisables après ton départ ou ton changement de poste ?"
+        },
+        {
+          "type": "texte",
+          "titre": "Partager de manière responsable",
+          "texte": "Comme vu au module 4 : comprendre le besoin, vérifier les conditions d'accès, limiter les données au nécessaire, utiliser un moyen de transmission adapté."
+        },
+        {
+          "type": "definition",
+          "terme": "Métadonnée",
+          "texte": "Information qui décrit une donnée ou un ensemble de données : signification des colonnes, origine, date de dernière mise à jour, unité, sens des codes, limites connues."
+        },
+        {
+          "type": "exemple",
+          "titre": "Une précision qui change tout",
+          "texte": "Dans un tableau d'effectifs, indiquer : « étudiants inscrits administrativement au 15 octobre ». Sans cette mention, deux services peuvent comparer des chiffres qui ne mesurent pas la même chose.\n\nTout ne doit pas être documenté par chacun : ce qui est utile dépend des usages, des règles et de ton rôle."
+        },
+        {
+          "type": "texte",
+          "titre": "Signaler, sans forcément tout corriger",
+          "texte": "Une information incohérente, un doublon possible, une donnée manquante, un écart entre deux sources, une procédure peu claire : tu n'as pas à tout corriger toi-même. **Signaler** le problème aux personnes compétentes est souvent la bonne démarche."
+        },
+        { "type": "activite", "ref": "m06-a3" },
+        {
+          "type": "aretenir",
+          "texte": "Une donnée utile doit pouvoir être comprise, utilisée dans les bonnes conditions et corrigée lorsqu'un problème est détecté."
+        }
+      ]
+    },
+    {
+      "id": "m06-l4",
+      "type": "lecon",
+      "titre": "Simulation : une journée avec les données",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu es agent administratif. Au fil d'une journée, cinq situations se présentent, dans différents services. Pour chacune, choisis ce que tu fais. Prends ton temps : il n'y a pas de chronomètre, les horaires servent seulement à raconter la journée."
+        },
+        {
+          "type": "simulateur",
+          "titre": "Une journée avec les données",
+          "consigne": "Cinq situations, une à la fois. Après chaque choix, découvre l'explication et le réflexe associé.",
+          "avertissement": "Situations fictives, pour s'entraîner. En situation réelle, suis les procédures de ton service et demande conseil en cas de doute.",
+          "bilanReflexes": true,
+          "libelles": {
+            "etiquette": "Simulation", "icone": "📅", "iconeCarte": "",
+            "question": "Que fais-tu ?",
+            "juste": "Bon réflexe", "faux": "À revoir",
+            "choixJuste": "✓ Ton choix, bon réflexe", "choixAttendu": "→ Réponse attendue", "choixFaux": "✗ Ton choix, à revoir",
+            "attendu": "Réponse attendue", "manque": "Choisis une réponse avant de valider.",
+            "valider": "Valider mon choix", "reflexe": "Réflexe associé",
+            "bilan": "bon réflexe|bons réflexes", "recommencer": "Recommencer la journée", "revoir": "Revoir les situations"
+          },
+          "scenarios": [
+            {
+              "id": "nouveau-tableau",
+              "heure": "9 h",
+              "objectif": "os6-1",
+              "titre": "Un nouveau tableau à créer",
+              "contexte": "Tu dois préparer une liste de bâtiments pour organiser une intervention de maintenance. Un collègue t'indique qu'un inventaire institutionnel existe déjà.",
+              "fiche": [{ "libelle": "Service", "valeur": "Patrimoine et maintenance" }],
+              "choix": [
+                { "id": "a", "texte": "Je crée immédiatement une nouvelle liste, sans consulter l'inventaire.", "feedback": "Une liste de plus, qui risque de diverger de l'inventaire dès la prochaine mise à jour." },
+                { "id": "b", "texte": "Je vérifie si l'inventaire existant répond au besoin et si je peux l'utiliser.", "feedback": "Oui : c'est la démarche de l'arbre de décision." },
+                { "id": "c", "texte": "Je reprends un ancien tableau trouvé dans un dossier personnel, sans vérifier sa date.", "feedback": "Un ancien tableau peut contenir des bâtiments fermés ou oublier les nouveaux." }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Avant de créer un fichier, il est utile de rechercher les données existantes : on limite les versions parallèles et on utilise des informations mieux maîtrisées.",
+                "reflexe": "Rechercher avant de recréer."
+              }
+            },
+            {
+              "id": "contradiction",
+              "heure": "10 h",
+              "objectif": "os6-4",
+              "titre": "Une information contradictoire",
+              "contexte": "Tu prépares une liste d'agents. Deux documents indiquent des affectations différentes pour la même personne.",
+              "fiche": [{ "libelle": "Service", "valeur": "Ressources humaines" }],
+              "choix": [
+                { "id": "a", "texte": "Je choisis l'affectation qui semble la plus probable.", "feedback": "Une supposition peut devenir une erreur, puis être reprise par d'autres." },
+                { "id": "b", "texte": "Je vérifie l'information auprès de la source ou du service compétent.", "feedback": "Oui : on lève le doute à la source avant d'utiliser la donnée." },
+                { "id": "c", "texte": "Je garde les deux informations sans signaler la contradiction.", "feedback": "L'écart restera, et chaque utilisateur devra le découvrir à son tour." }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Quand une information semble contradictoire, on recherche la source appropriée et on fait vérifier l'écart avant de réutiliser la donnée.",
+                "reflexe": "Vérifier avant d'utiliser."
+              }
+            },
+            {
+              "id": "date-manquante",
+              "heure": "11 h",
+              "objectif": "os6-3",
+              "titre": "Une date manquante",
+              "contexte": "Tu dois enregistrer la date d'une intervention sur un équipement. Elle ne figure pas dans le document transmis.",
+              "fiche": [{ "libelle": "Service", "valeur": "Maintenance des équipements" }],
+              "choix": [
+                { "id": "a", "texte": "Je renseigne une date approximative.", "feedback": "Une date approximative sera lue comme exacte, par exemple pour planifier la prochaine intervention." },
+                { "id": "b", "texte": "Je copie la date de la dernière intervention sur un équipement voisin.", "feedback": "C'est la date d'un autre équipement : l'historique de celui-ci deviendrait faux." },
+                { "id": "c", "texte": "Je recherche l'information ou je signale son absence selon la procédure prévue.", "feedback": "Oui : un champ manquant et signalé vaut mieux qu'une valeur inventée." }
+              ],
+              "reponse": "c",
+              "correction": {
+                "pourquoi": "Une donnée non vérifiée ne doit pas être inventée : une information incorrecte peut être réutilisée et créer d'autres difficultés.",
+                "reflexe": "Ne pas inventer une donnée."
+              }
+            },
+            {
+              "id": "demande-partage",
+              "heure": "14 h",
+              "objectif": "os6-5",
+              "titre": "Une demande de partage",
+              "contexte": "Un collègue d'un autre service demande une extraction contenant des informations individuelles sur des agents. Il ne précise pas son besoin.",
+              "fiche": [{ "libelle": "Service", "valeur": "Administration générale" }],
+              "choix": [
+                { "id": "a", "texte": "Je transmets le fichier tout de suite : il travaille dans la même université.", "feedback": "Travailler dans le même établissement ne donne pas accès à toutes les données." },
+                { "id": "b", "texte": "Je vérifie la finalité de la demande, les autorisations et les règles applicables.", "feedback": "Oui : on comprend le besoin avant de transmettre, et seulement ce qui est nécessaire." },
+                { "id": "c", "texte": "Je diffuse le fichier à l'ensemble des services, par transparence.", "feedback": "Des informations individuelles seraient exposées à des personnes qui n'en ont pas besoin." }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Le partage responsable demande de comprendre le besoin, de vérifier les autorisations et de limiter la transmission au nécessaire.",
+                "reflexe": "Partager dans les bonnes conditions."
+              }
+            },
+            {
+              "id": "tableau-documente",
+              "heure": "16 h",
+              "objectif": "os6-6",
+              "titre": "Un tableau à transmettre",
+              "contexte": "Tu transmets un tableau des effectifs étudiants par formation. Les chiffres sont justes, mais rien n'indique la date de référence ni la façon dont ils ont été calculés.",
+              "fiche": [{ "libelle": "Service", "valeur": "Scolarité, pour le service finances et pilotage" }],
+              "choix": [
+                { "id": "a", "texte": "Je transmets sans précision : les chiffres suffisent.", "feedback": "Sans date ni périmètre, le destinataire peut les comparer à des chiffres calculés autrement." },
+                { "id": "b", "texte": "J'ajoute ce qu'il faut pour les interpréter, notamment la date et le périmètre du calcul.", "feedback": "Oui : deux lignes suffisent souvent à éviter un contresens." },
+                { "id": "c", "texte": "Je supprime les intitulés de colonnes pour alléger le fichier.", "feedback": "Sans intitulés, le tableau devient illisible pour tout autre que toi." }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Documenter l'essentiel permet aux autres utilisateurs de comprendre les données et de les réutiliser sans ambiguïté.",
+                "reflexe": "Documenter pour faciliter la réutilisation."
+              }
+            }
+          ],
+          "conclusion": "Cinq situations, cinq réflexes simples. Aucun ne demande d'outil complexe : ils s'adaptent à ton métier et aux règles de l'établissement. Et en cas de doute, demander conseil fait aussi partie des bons réflexes."
+        },
+        { "type": "fiche" },
+        {
+          "type": "aretenir",
+          "texte": "Bien gérer les données commence par des réflexes simples, adaptés à mon métier et aux règles de l'établissement."
+        }
+      ]
+    },
+    {
+      "id": "m06-defi",
+      "type": "evaluation",
+      "titre": "Le défi du module",
+      "surtitre": "Défi final",
+      "libelleAcces": "Relever le défi",
+      "libelleRecommencer": "Recommencer le défi",
+      "presentation": "une-par-une",
+      "introduction": "Cinq questions, une à la fois. Tu découvres la correction après chaque réponse, et tu peux recommencer le défi autant de fois que tu le souhaites.",
+      "activites": ["m06-q1", "m06-q2", "m06-q3", "m06-q4", "m06-q5"],
+      "messagesResultat": [
+        { "min": 100, "texte": "Bravo ! Tu as les bons réflexes pour rechercher, vérifier, respecter les règles, partager et documenter." },
+        { "min": 80, "texte": "Très bien. Relis la correction de la question à revoir : elle correspond à l'un des cinq réflexes." },
+        { "min": 60, "texte": "C'est un bon début. Les corrections et la fiche mémo t'aideront à fixer les réflexes à revoir." },
+        { "min": 0, "texte": "Ces réflexes s'acquièrent avec la pratique. Relis les corrections, garde la fiche mémo sous la main, puis recommence le défi quand tu le souhaites." }
+      ]
+    }
+  ],
+  "activites": {
+    "m06-a1": {
+      "type": "choix-unique",
+      "objectif": "os6-2",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Tu dois préparer un tableau d'effectifs. Un collègue t'indique qu'une source institutionnelle existe déjà. Quelle démarche privilégier ?",
+      "choix": [
+        { "id": "a", "texte": "Créer immédiatement ton propre fichier, sans vérifier.", "feedback": "Un fichier de plus, qui risque de s'écarter de la source institutionnelle." },
+        { "id": "b", "texte": "Vérifier si la source existante répond à ton besoin et si tu es autorisé à l'utiliser.", "feedback": "C'est le bon réflexe." },
+        { "id": "c", "texte": "Copier plusieurs anciens tableaux et choisir le plus complet.", "feedback": "Le plus complet n'est pas forcément le plus juste, ni le plus récent." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Rechercher les informations existantes permet de limiter les copies inutiles, les écarts de version et les corrections répétées.",
+        "incorrect": "La bonne réponse est la deuxième. Rechercher les informations existantes permet de limiter les copies inutiles, les écarts de version et les corrections répétées."
+      }
+    },
+    "m06-a2": {
+      "type": "choix-unique",
+      "objectif": "os6-7",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Un formulaire demande une date, mais le document source contient une information contradictoire. Que fais-tu ?",
+      "choix": [
+        { "id": "a", "texte": "Je saisis la date qui paraît la plus vraisemblable.", "feedback": "Une date « vraisemblable » sera ensuite considérée comme exacte." },
+        { "id": "b", "texte": "Je vérifie la source ou je signale l'incohérence selon la procédure prévue.", "feedback": "C'est ta contribution à la qualité : vérifier ou signaler." },
+        { "id": "c", "texte": "Je copie la date d'un autre dossier.", "feedback": "La date d'un autre dossier n'a aucune raison d'être la bonne." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Une information incertaine doit être vérifiée ou signalée. Une valeur inventée pourrait ensuite être considérée comme exacte et réutilisée dans d'autres traitements.",
+        "incorrect": "La bonne réponse est la deuxième. Une information incertaine doit être vérifiée ou signalée. Une valeur inventée pourrait ensuite être considérée comme exacte et réutilisée dans d'autres traitements."
+      }
+    },
+    "m06-a3": {
+      "type": "choix-unique",
+      "objectif": "os6-6",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Tu transmets un tableau d'effectifs à un service autorisé. Quelle information complémentaire peut faciliter son interprétation ?",
+      "choix": [
+        { "id": "a", "texte": "La date de référence et la définition des effectifs comptabilisés.", "feedback": "Exactement : ce sont des métadonnées utiles." },
+        { "id": "b", "texte": "Le nombre de fois où tu as ouvert le tableur.", "feedback": "Cette information n'aide pas à comprendre les chiffres." },
+        { "id": "c", "texte": "La couleur préférée de la personne qui a créé le tableau.", "feedback": "Cette information n'aide pas à comprendre les chiffres." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "La date de référence et les règles de calcul permettent de comprendre ce que représentent réellement les chiffres. Ce sont des informations utiles pour interpréter et réutiliser les données.",
+        "incorrect": "La bonne réponse est la première. La date de référence et les règles de calcul permettent de comprendre ce que représentent réellement les chiffres."
+      }
+    },
+    "m06-q1": {
+      "type": "choix-unique",
+      "objectif": "os6-1",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Avant de créer un nouveau tableau de suivi, quelle démarche est préférable ?",
+      "choix": [
+        { "id": "a", "texte": "Vérifier si les données existent déjà dans une source appropriée." },
+        { "id": "b", "texte": "Créer systématiquement une copie indépendante." },
+        { "id": "c", "texte": "Rassembler tous les anciens fichiers sans vérification." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Rechercher les données existantes permet de limiter les fichiers parallèles et les risques de divergence.",
+        "incorrect": "La bonne réponse est la première. Rechercher les données existantes permet de limiter les fichiers parallèles et les risques de divergence."
+      }
+    },
+    "m06-q2": {
+      "type": "choix-unique",
+      "objectif": "os6-4",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Une information te semble incorrecte. Que fais-tu ?",
+      "choix": [
+        { "id": "a", "texte": "Je la modifie au hasard." },
+        { "id": "b", "texte": "Je la vérifie ou je signale l'anomalie selon la procédure prévue." },
+        { "id": "c", "texte": "Je la copie dans un nouveau fichier." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Vérifier ou signaler une anomalie contribue à maintenir la fiabilité des données.",
+        "incorrect": "La bonne réponse est la deuxième. Vérifier ou signaler une anomalie contribue à maintenir la fiabilité des données."
+      }
+    },
+    "m06-q3": {
+      "type": "choix-unique",
+      "objectif": "os6-3",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Deux fichiers utilisent des codes différents pour une même catégorie de formation. Quel est le bon réflexe ?",
+      "choix": [
+        { "id": "a", "texte": "Choisir le code le plus court." },
+        { "id": "b", "texte": "Inventer un troisième code." },
+        { "id": "c", "texte": "Vérifier le référentiel ou la nomenclature applicable." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Un référentiel commun permet d'utiliser des désignations cohérentes et de faciliter le rapprochement des données.",
+        "incorrect": "La bonne réponse est la troisième. Un référentiel commun permet d'utiliser des désignations cohérentes et de faciliter le rapprochement des données."
+      }
+    },
+    "m06-q4": {
+      "type": "choix-unique",
+      "objectif": "os6-5",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un service demande des informations individuelles sans expliquer leur utilisation. Quelle attitude est préférable ?",
+      "choix": [
+        { "id": "a", "texte": "Envoyer immédiatement le fichier." },
+        { "id": "b", "texte": "Vérifier le besoin, les autorisations et les règles de partage." },
+        { "id": "c", "texte": "Publier les informations sur un espace accessible à tous." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "La transmission doit répondre à une finalité appropriée et respecter les conditions d'accès applicables.",
+        "incorrect": "La bonne réponse est la deuxième. La transmission doit répondre à une finalité appropriée et respecter les conditions d'accès applicables."
+      }
+    },
+    "m06-q5": {
+      "type": "choix-unique",
+      "objectif": "os6-6",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Pourquoi préciser la date de référence d'un tableau d'effectifs ?",
+      "choix": [
+        { "id": "a", "texte": "Pour rendre le fichier plus volumineux." },
+        { "id": "b", "texte": "Pour remplacer toutes les procédures." },
+        { "id": "c", "texte": "Pour permettre aux utilisateurs de comprendre à quelle période correspondent les chiffres." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "La date de référence fait partie des informations qui aident à interpréter correctement un ensemble de données.",
+        "incorrect": "La bonne réponse est la troisième. La date de référence fait partie des informations qui aident à interpréter correctement un ensemble de données."
+      }
+    }
+  },
+  "synthese": [
+    "**Rechercher** : avant de créer une donnée ou un fichier, vérifier ce qui existe déjà.",
+    "**Vérifier** : contrôler les informations nécessaires et utiliser les sources appropriées.",
+    "**Respecter** : utiliser les formats, identifiants, référentiels et procédures applicables.",
+    "**Partager** : transmettre les données dans un cadre autorisé et adapté aux besoins.",
+    "**Documenter et signaler** : faciliter la compréhension des informations et faire remonter les anomalies."
+  ],
+  "fiche": {
+    "titre": "Les 5 réflexes pour bien gérer les données",
+    "introduction": "Bien gérer les données ne demande pas de maîtriser des outils complexes : cela commence par des réflexes simples, adaptés à ton métier et aux règles de l'établissement.",
+    "reflexes": [
+      { "icone": "🔎", "titre": "1. Rechercher", "texte": "Avant de créer une donnée ou un fichier, je vérifie ce qui existe déjà.", "question": "Cette information existe-t-elle déjà dans une source appropriée ?" },
+      { "icone": "✔", "titre": "2. Vérifier", "texte": "Je contrôle les informations nécessaires et j'utilise les sources appropriées.", "question": "Ma source est-elle fiable et à jour ?" },
+      { "icone": "📏", "titre": "3. Respecter", "texte": "J'utilise les formats, identifiants, référentiels et procédures applicables.", "question": "Ma saisie suit-elle le format et les valeurs de référence prévus ?" },
+      { "icone": "🔐", "titre": "4. Partager", "texte": "Je transmets les données dans un cadre autorisé et adapté au besoin.", "question": "Le destinataire en a-t-il besoin, et en a-t-il le droit ?" },
+      { "icone": "📝", "titre": "5. Documenter et signaler", "texte": "Je facilite la compréhension des informations et je fais remonter les anomalies.", "question": "Un collègue comprendrait-il ces données sans moi ? Ai-je signalé ce qui ne va pas ?" }
+    ],
+    "rappel": "En cas de doute, je consulte les procédures et les interlocuteurs compétents."
+  }
+}

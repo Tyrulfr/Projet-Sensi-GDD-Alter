@@ -70,6 +70,20 @@
     if (root.location.hash === lien) { afficher(); } else { root.location.hash = lien; }
   }
 
+  function lienFiche(mod) {
+    var nom = 'fiche-memo-module-' + (mod.numero < 10 ? '0' : '') + mod.numero + '.html';
+    return modeScorm ? nom : 'fiches/' + nom;
+  }
+
+  function blocFiche(mod) {
+    return h('div', { class: 'bloc bloc-fiche' }, [
+      h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '📄 ' }), 'Fiche mémo']),
+      h('h3', { text: mod.fiche.titre }),
+      h('p', { text: 'À garder sous la main : les réflexes du module sur une page, à imprimer ou à enregistrer en PDF.' }),
+      h('a', { class: 'bouton bouton-secondaire', href: lienFiche(mod), target: '_blank', rel: 'noopener' }, 'Ouvrir la fiche (nouvel onglet)')
+    ]);
+  }
+
   function lienBouton(texte, href, classe) {
     return h('a', { class: 'bouton ' + (classe || 'bouton-principal'), href: href }, texte);
   }
@@ -311,7 +325,7 @@
         var enCoursComp = !dejaVue && i === nb - 1;
         var etatComp = etat.comparateur[cleComp] || (etat.comparateur[cleComp] = { explores: {}, apres: !enCoursComp });
         if (!enCoursComp) { etatComp.apres = true; }
-        if (!etatComp.apres) { bloque = 'Examine les difficultés du tableau, puis affiche le tableau mieux structuré pour continuer.'; }
+        if (!etatComp.apres) { bloque = 'Examine toutes les difficultés, puis affiche la version améliorée pour continuer.'; }
         el = UI.comparateur(b, {
           etat: etatComp,
           prefixeId: 'comp-' + cleComp,
@@ -360,6 +374,8 @@
             }
           }).element
         ]);
+      } else if (b.type === 'fiche') {
+        el = blocFiche(m.module);
       } else {
         el = UI.bloc(b);
       }
@@ -584,8 +600,9 @@
         : h('div', null, [h('h2', { text: 'Correction' }), corrections]),
       mod.synthese ? h('section', { class: 'bloc bloc-aretenir' }, [
         h('h2', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '★ ' }), 'L\'essentiel du module']),
-        h('ul', null, mod.synthese.map(function (s) { return h('li', { text: s }); }))
+        h('ul', null, mod.synthese.map(function (s) { return h('li', { html: GDD.util.inlineText(s) }); }))
       ]) : null,
+      mod.fiche ? blocFiche(mod) : null,
       actions
     ];
   }

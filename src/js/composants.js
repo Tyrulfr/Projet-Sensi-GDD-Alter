@@ -178,11 +178,23 @@
   /*
    * Comparateur de tableaux : repérer les difficultés d'un tableau peu structuré,
    * puis découvrir un tableau mieux structuré.
+   * Les libellés se règlent dans bloc.libelles ({n} = nombre de difficultés dans « aide »).
    * options : etat ({ explores: {}, apres: bool }, conservé par l'appelant),
    *           afficherApres (function), prefixeId.
    */
+  var LIBELLES_COMPARATEUR = {
+    avant: 'Avant : le tableau reçu', difficultes: 'Les difficultés à repérer',
+    aide: 'Examine les {n} difficultés pour découvrir un tableau mieux structuré.',
+    voirApres: 'Voir le tableau mieux structuré', apres: 'Après : une structure plus claire',
+    atouts: 'Ce que cette structure apporte :'
+  };
+
   UI.comparateur = function (bloc, options) {
     var o = options || {};
+    var L = {};
+    Object.keys(LIBELLES_COMPARATEUR).forEach(function (k) {
+      L[k] = bloc.libelles && typeof bloc.libelles[k] === 'string' ? bloc.libelles[k] : LIBELLES_COMPARATEUR[k];
+    });
     var etat = o.etat || { explores: {}, apres: true };
     var prefixe = o.prefixeId || uid('comp');
     var problemes = bloc.problemes;
@@ -215,9 +227,9 @@
       zoneSuite.innerHTML = '';
       if (etat.apres) { return; }
       zoneSuite.appendChild(n < problemes.length
-        ? h('p', { class: 'aide', text: 'Examine les ' + problemes.length + ' difficultés pour découvrir un tableau mieux structuré.' })
+        ? h('p', { class: 'aide', text: L.aide.replace('{n}', problemes.length) })
         : h('div', { class: 'actions' }, h('button', { type: 'button', class: 'bouton bouton-principal', onclick: o.afficherApres },
-          'Voir le tableau mieux structuré')));
+          L.voirApres)));
     }
 
     function selectionner(p) {
@@ -256,7 +268,7 @@
     }
 
     var idTitreAvant = prefixe + '-avant';
-    var tableAvant = h('table', { class: 'tableau-comparateur' }, [
+    var tableAvant = h('table', { class: 'tableau-comparateur' + (cols.length < 3 ? ' tableau-etroit' : '') }, [
       h('caption', { id: idTitreAvant, text: bloc.avant.titre }),
       h('thead', null, h('tr', null, cols.map(function (c) { return h('th', { scope: 'col', text: c }); }))),
       h('tbody', null, bloc.avant.lignes.map(function (ligne, l) {
@@ -290,7 +302,7 @@
     var apres = null;
     if (etat.apres) {
       var idTitreApres = prefixe + '-apres';
-      var tableApres = h('table', { class: 'tableau-comparateur' }, [
+      var tableApres = h('table', { class: 'tableau-comparateur' + (bloc.apres.colonnes.length < 3 ? ' tableau-etroit' : '') }, [
         h('caption', { id: idTitreApres, text: bloc.apres.titre }),
         h('thead', null, h('tr', null, bloc.apres.colonnes.map(function (c) { return h('th', { scope: 'col', text: c }); }))),
         h('tbody', null, bloc.apres.lignes.map(function (ligne) {
@@ -298,12 +310,12 @@
         }))
       ]);
       apres = h('div', { class: 'comparateur-apres', id: prefixe + '-apres-zone', tabindex: '-1' }, [
-        h('p', { class: 'comparateur-etiquette comparateur-etiquette-apres', text: 'Après : une structure plus claire' }),
+        h('p', { class: 'comparateur-etiquette comparateur-etiquette-apres', text: L.apres }),
         h('div', { class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': idTitreApres }, tableApres),
         h('p', { class: 'tableau-indice', 'aria-hidden': 'true', text: '↔ Fais glisser le tableau pour voir toutes les colonnes.' }),
         bloc.apres.legende ? h('p', { class: 'bloc-legende', text: bloc.apres.legende }) : null,
         bloc.apres.atouts ? h('div', { class: 'comparateur-atouts' }, [
-          h('p', null, h('strong', { text: 'Ce que cette structure apporte :' })),
+          h('p', null, h('strong', { text: L.atouts })),
           h('ul', null, bloc.apres.atouts.map(function (a) { return h('li', { text: a }); }))
         ]) : null,
         bloc.apres.avertissement ? h('div', { class: 'note note-alerte', html: U.richText(bloc.apres.avertissement) }) : null
@@ -314,11 +326,11 @@
       h('p', { class: 'bloc-etiquette', text: 'Comparaison' }),
       bloc.titre ? h('h3', { text: bloc.titre }) : null,
       bloc.consigne ? h('p', { text: bloc.consigne }) : null,
-      h('p', { class: 'comparateur-etiquette', text: 'Avant : le tableau reçu' }),
+      h('p', { class: 'comparateur-etiquette', text: L.avant }),
       h('div', { class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': idTitreAvant }, tableAvant),
       h('p', { class: 'tableau-indice', 'aria-hidden': 'true', text: '↔ Fais glisser le tableau pour voir toutes les colonnes.' }),
       bloc.avant.legende ? h('p', { class: 'bloc-legende', text: bloc.avant.legende }) : null,
-      h('p', { class: 'comparateur-sous-titre', text: 'Les difficultés à repérer' }),
+      h('p', { class: 'comparateur-sous-titre', text: L.difficultes }),
       liste,
       compteur,
       detail,
@@ -332,9 +344,9 @@
   /* Mémo : quelques repères numérotés à garder en tête. */
   UI.memo = function (bloc) {
     return h('div', { class: 'bloc bloc-memo' }, [
-      h('p', { class: 'bloc-etiquette', text: 'Mémo' }),
+      h('p', { class: 'bloc-etiquette', text: bloc.etiquette || 'Mémo' }),
       bloc.titre ? h('h3', { text: bloc.titre }) : null,
-      h('ol', { class: 'memo-etapes' }, bloc.etapes.map(function (e, i) {
+      h('ol', { class: 'memo-etapes' + (bloc.disposition === 'enchainement' ? ' memo-enchainement' : '') }, bloc.etapes.map(function (e, i) {
         return h('li', { class: 'memo-etape' }, [
           h('span', { class: 'memo-numero', 'aria-hidden': 'true', text: String(i + 1) }),
           h('div', null, [
@@ -350,8 +362,10 @@
   /*
    * Simulateur de situations : une série de situations, un choix à faire pour chacune,
    * puis une correction détaillée et un bilan. Exercice formatif, non noté.
-   * Sert au simulateur de décisions (module 4) et au jeu des rôles (module 5) :
-   * les libellés se règlent dans bloc.libelles, les issues communes (bloc.decisions) sont facultatives.
+   * Sert au simulateur de décisions (module 4), au jeu des rôles (module 5) et à la journée du module 6 :
+   * les libellés se règlent dans bloc.libelles, les issues communes (bloc.decisions) sont facultatives,
+   * une heure indicative (scenario.heure) transforme la progression en frise horaire,
+   * bloc.bilanReflexes résume chaque situation par son réflexe, libelles.revoir ajoute « revoir sans effacer ».
    * options : etat ({ i, choix: { idScenario: idChoix }, termine }, conservé par l'appelant),
    *           surTermine (function (idFocus)) appelée à l'affichage du bilan, prefixeId.
    */
@@ -362,7 +376,7 @@
     choixJuste: '✓ Ton choix, adapté', choixAttendu: '→ Conduite attendue', choixFaux: '✗ Ton choix, à revoir',
     attendu: 'Conduite attendue', manque: 'Choisis une conduite avant de valider.',
     valider: 'Valider ma décision', reflexe: 'Le bon réflexe',
-    bilan: 'réflexe adapté|réflexes adaptés', recommencer: 'Recommencer le simulateur'
+    bilan: 'réflexe adapté|réflexes adaptés', recommencer: 'Recommencer le simulateur', revoir: ''
   };
 
   UI.simulateur = function (bloc, options) {
@@ -370,9 +384,12 @@
     var etat = o.etat || { i: 0, choix: {}, termine: false };
     var prefixe = o.prefixeId || uid('sim');
     var L = {};
-    Object.keys(LIBELLES_SIMULATEUR).forEach(function (k) { L[k] = (bloc.libelles && bloc.libelles[k]) || LIBELLES_SIMULATEUR[k]; });
+    Object.keys(LIBELLES_SIMULATEUR).forEach(function (k) {
+      L[k] = bloc.libelles && typeof bloc.libelles[k] === 'string' ? bloc.libelles[k] : LIBELLES_SIMULATEUR[k];
+    });
     var scenarios = bloc.scenarios;
     var n = scenarios.length;
+    var horaires = scenarios.every(function (s) { return s.heure; });
     var decisions = {};
     (bloc.decisions || []).forEach(function (d) { decisions[d.id] = d; });
 
@@ -502,11 +519,12 @@
       return h('div', null, [
         h('div', { class: 'simulateur-progression' }, [
           h('p', { class: 'activite-numero', text: 'Situation ' + (i + 1) + ' sur ' + n }),
-          h('ol', { class: 'simulateur-points', 'aria-hidden': 'true' }, scenarios.map(function (x, j) {
-            return h('li', { class: j < i ? 'est-fait' : (j === i ? 'est-courant' : null) });
+          h('ol', { class: 'simulateur-points' + (horaires ? ' simulateur-horaires' : ''), 'aria-hidden': 'true' }, scenarios.map(function (x, j) {
+            return h('li', { class: j < i ? 'est-fait' : (j === i ? 'est-courant' : null), text: horaires ? x.heure : null });
           }))
         ]),
         h('article', { class: 'simulateur-carte', id: prefixe + '-carte', tabindex: '-1', 'aria-labelledby': idTitre }, [
+          s.heure ? h('p', { class: 'simulateur-heure' }, [h('span', { 'aria-hidden': 'true', text: '🕘 ' }), s.heure]) : null,
           h('h4', { id: idTitre, class: 'simulateur-titre' }, [L.iconeCarte ? h('span', { 'aria-hidden': 'true', text: L.iconeCarte + ' ' }) : null, s.titre]),
           h('p', { html: U.inlineText(s.contexte) }),
           fiche
@@ -526,6 +544,14 @@
           var juste = estAdapte(s);
           var attendu = choixDe(s, s.reponse);
           var resume = decisions[attendu.decision] ? decisions[attendu.decision].libelle.toLowerCase() : attendu.texte;
+          if (bloc.bilanReflexes) {
+            return h('li', { class: juste ? 'est-juste' : 'est-faux' }, [
+              h('span', { 'aria-hidden': 'true', text: juste ? '✓ ' : '✗ ' }),
+              h('strong', { text: (s.heure ? s.heure + ' · ' : '') + s.titre }), ' — ',
+              h('span', { class: 'simulateur-recap-reflexe', html: U.inlineText(s.correction.reflexe) }),
+              ' (' + (juste ? L.juste.toLowerCase() : 'à revoir') + ')'
+            ]);
+          }
           return h('li', { class: juste ? 'est-juste' : 'est-faux' }, [
             h('span', { 'aria-hidden': 'true', text: juste ? '✓ ' : '✗ ' }),
             h('strong', { text: s.titre }), ' — ',
@@ -533,10 +559,16 @@
           ]);
         })),
         bloc.conclusion ? h('div', { class: 'simulateur-conclusion', html: U.richText(bloc.conclusion) }) : null,
-        h('div', { class: 'actions' }, h('button', {
-          type: 'button', class: 'bouton bouton-secondaire',
-          onclick: function () { etat.i = 0; etat.choix = {}; rendre(prefixe + '-carte'); }
-        }, L.recommencer))
+        h('div', { class: 'actions' }, [
+          L.revoir ? h('button', {
+            type: 'button', class: 'bouton bouton-secondaire',
+            onclick: function () { etat.i = 0; rendre(prefixe + '-carte'); }
+          }, L.revoir) : null,
+          h('button', {
+            type: 'button', class: 'bouton bouton-secondaire',
+            onclick: function () { etat.i = 0; etat.choix = {}; rendre(prefixe + '-carte'); }
+          }, L.recommencer)
+        ])
       ]);
     }
 

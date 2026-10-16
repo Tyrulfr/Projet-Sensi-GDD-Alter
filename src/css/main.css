@@ -242,6 +242,7 @@ tbody th { font-weight: 700; }
 .bloc-comparateur .tableau-defilant { border: 1px solid var(--couleur-bordure); border-radius: var(--rayon); }
 .bloc-comparateur .tableau-defilant:focus-visible { outline: 3px solid var(--couleur-focus); outline-offset: 2px; }
 .tableau-comparateur { min-width: 32rem; }
+.tableau-comparateur.tableau-etroit { min-width: 0; }
 .tableau-comparateur caption { padding: .75rem 1rem .5rem; }
 .tableau-comparateur td.td-bouton { padding: .25rem; }
 .cellule-bouton {
@@ -295,6 +296,16 @@ tbody th { font-weight: 700; }
 }
 .memo-titre { margin: .2rem 0; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--couleur-primaire); }
 .memo-texte { margin: 0; }
+.memo-enchainement { grid-template-columns: minmax(0, 36rem); gap: 1.5rem; }
+.memo-enchainement .memo-etape { position: relative; padding: .5rem .8rem; }
+.memo-enchainement .memo-etape:not(:last-child)::after {
+  content: "↓"; position: absolute; left: 1.55rem; bottom: -1.45rem;
+  font-weight: 700; font-size: 1.1rem; line-height: 1.4rem; color: var(--couleur-primaire);
+}
+.memo-enchainement .memo-titre { text-transform: none; letter-spacing: 0; }
+
+.bloc-fiche { border-left: 5px solid var(--couleur-accent); }
+.bloc-fiche .bouton { margin-top: .25rem; }
 
 /* Simulateur de décisions */
 .bloc-simulateur { border: 2px solid var(--couleur-primaire); }
@@ -304,6 +315,14 @@ tbody th { font-weight: 700; }
 .simulateur-points li { width: .8rem; height: .8rem; border-radius: 50%; border: 2px solid var(--couleur-primaire); }
 .simulateur-points li.est-fait { background: var(--couleur-primaire); }
 .simulateur-points li.est-courant { border-color: var(--couleur-accent); background: var(--couleur-accent); transform: scale(1.3); }
+.simulateur-horaires { flex-wrap: wrap; gap: .3rem; }
+.simulateur-horaires li {
+  width: auto; height: auto; border-radius: 1rem; padding: .05rem .55rem;
+  font-size: .8rem; font-weight: 700; color: var(--couleur-primaire); white-space: nowrap;
+}
+.simulateur-horaires li.est-fait { color: #fff; }
+.simulateur-horaires li.est-courant { color: #fff; transform: none; }
+.simulateur-heure { margin: 0 0 .2rem; font-weight: 700; color: var(--couleur-accent); }
 .simulateur-carte {
   margin: .6rem 0 1rem; padding: 1rem 1.1rem; border-radius: var(--rayon);
   background: var(--couleur-primaire-clair); border: 1px solid #e2c9d7;

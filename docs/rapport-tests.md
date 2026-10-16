@@ -326,3 +326,65 @@ Seul changement visible hors module 5 : le message de blocage du simulateur devi
 - **Rôles génériques** : à confronter à l'organisation réelle (`docs/validation-metier-module-05.md`).
 - Progression dans le jeu non mémorisée après rechargement (comme le simulateur du module 4).
 - **Rien n'a été testé dans un vrai LMS**. Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge.
+
+## 11. Module 6 « Les bons réflexes professionnels »
+
+### Ce qui a été développé
+
+- Contenu `contenus/modules/module-06.json` : 3 leçons (fichiers locaux et arbre de décision en 5 étapes ; six réflexes de saisie et formulaire A / B ; partager, documenter, signaler), une leçon « Simulation : une journée avec les données » (5 situations de 9 h à 16 h, réponses B, B, C, B, B, services variés), 3 questions formatives (B, B, A), défi de 5 questions (A, B, C, B, C), synthèse des 5 réflexes, 7 objectifs couverts. Sans seuil.
+- **Aucun nouveau moteur** : options ajoutées au simulateur (frise horaire, bilan des réflexes, « Revoir les situations »), au comparateur (libellés) et au mémo (disposition en enchaînement). Le formulaire B ne complète pas l'information manquante : « Non renseigné : information demandée au service compétent ».
+- Fiche mémo « Les 5 réflexes pour bien gérer les données » : page HTML générée (`fiches/fiche-memo-module-06.html`), bouton « Imprimer ou enregistrer en PDF », copiée dans le package SCORM ; lien en fin de leçon 6.4 et sur la page de résultat.
+- Archive : `module-06-bons-reflexes-professionnels-scorm12.zip` (13 fichiers dont la fiche, listée dans le manifeste ; déterministe ; sans `masteryscore`).
+- Validateur : bloc `fiche`, fiche du module, `heure`, `disposition`, `libelles` du comparateur contrôlés ; 6 erreurs injectées volontairement, toutes signalées. Construction : 0 erreur, 0 avertissement.
+- Le workflow de publication vérifie aussi que `fiches/` est à jour.
+
+### Tests automatisés
+
+**65 / 65** (dont 10 nouveaux pour le module 6) : réponses attendues, réponses conformes au scénario, journée (5 situations datées, B B C B B, cinq réflexes, services variés), formulaire B sans valeur inventée, simulation obligatoire et défi 3/5 → `completed` 60 sans seuil, **seuil configurable** (avec `seuilReussite` : `passed` / `failed`), reprise SCORM avec 5 interactions, rendu de la journée (frise, « Réflexe associé », bilan, revoir sans effacer), arbre en 5 étapes, fiche (5 réflexes avec question, rappel, aucun contact). Relancés après les dernières modifications du comparateur et des styles.
+
+### Site web (piloté dans le navigateur, Chrome intégré à Cursor)
+
+| Scénario | Résultat |
+|---|---|
+| 6.1 : arbre de décision en une colonne avec flèches ; question B | **OK** |
+| 6.2 : formulaire A, 4 difficultés, libellés « formulaire » ; « Continuer » bloqué tant que tout n'est pas examiné ; question (mauvaise réponse puis nouvel essai) | **OK** |
+| 6.3 : définition de la métadonnée, exemple du 15 octobre ; question A | **OK** |
+| 6.4 : « Continuer » bloqué tant que la journée n'est pas terminée ; frise 9 h → 16 h, « Situation x sur 5 » ; correction avec « Réflexe associé » ; focus sur la correction puis sur le bilan ; bilan 4/5 avec les 5 réflexes ; « Revoir les situations » et « Recommencer la journée » | **OK** |
+| Fiche mémo : ouverture dans un nouvel onglet, rendu ; en mode impression, le bouton est masqué | **OK** |
+| Défi 4/5 : « 80 % », message, statut « Terminé », synthèse en gras, lien vers la fiche ; Recommencer, Retour au parcours ; **pas** de bouton Module 7 | **OK** |
+| Fin du module 5 : bouton vers le module 6 ; parcours : module 6 « Terminé », module 7 « En préparation » | **OK** |
+| Mobile 375 px : aucune largeur excédentaire sur les 5 pages (après correction, voir ci-dessous) | **OK** |
+| Tablette 768 px : aucune largeur excédentaire sur 6.1, 6.3, 6.4 et le défi. La page 6.2 n'a pas pu être mesurée à 768 px (l'émulation ne s'est pas appliquée) ; elle est conforme à 375 px, cas plus contraignant | **OK partiel** |
+
+### SCORM 1.2 dans le simulateur
+
+| Scénario | Résultat |
+|---|---|
+| Session 1 (leçon 6.1 et question 6.2 faites) : `incomplete`, `lesson_location` = `m06-l2`, sortie `suspend`, 1 `LMSInitialize`, 1 `LMSFinish`, 67 / 4096 caractères | **OK** |
+| Session 2 : « Reprendre où j'en étais » → leçon 6.2 ; comparateur, leçon 6.3, journée (bilan 4/5), défi 3/5 → `completed`, score 60 (0–100), 5 interactions (q3 et q5 `wrong`), sortie finale `""`, 221 / 4096 caractères | **OK** |
+| Fiche dans le package : lien relatif `fiche-memo-module-06.html`, réponse 200, titre correct ; aucune adresse externe dans le package | **OK** |
+| La journée, formative, n'est pas transmise au LMS (seules les 5 questions du défi le sont) | **OK** |
+
+### Non-régression des modules 1 à 5
+
+| Scénario | Résultat |
+|---|---|
+| Tests unitaires des modules 1 à 5 (55 tests existants) | **OK** |
+| Comparateur du module 3 : libellés d'origine, tableaux à largeur minimale inchangée (652 px) | **OK** |
+| Simulateurs des modules 4 et 5 : sans `heure` ni `bilanReflexes`, pas de frise ni de bouton « Revoir » | **OK** (tests unitaires) |
+
+Seul changement visible hors module 6 : le message de blocage du comparateur devient « Examine toutes les difficultés, puis affiche la version améliorée pour continuer. »
+
+### Anomalies rencontrées et corrigées
+
+- Une icône de carte vide (`""`) était remplacée par l'icône par défaut : les libellés vides sont désormais respectés.
+- Le formulaire comparé (2 colonnes) imposait une largeur de 32 rem et débordait à 375 px : pas de largeur minimale sous 3 colonnes.
+- Libellés « tableau » du comparateur figés dans le code : rendus paramétrables.
+- Condition du workflow de publication mal parenthésée : remplacée par un seul test `git status --porcelain`.
+
+### Limites et points à valider
+
+- **Durée** : environ 1 950 mots lus sur un parcours ; estimation de 10 à 12 minutes, au-delà de la cible de 8 à 10. À mesurer (`docs/conception.md`, décision 24).
+- **Procédures et interlocuteurs** : les textes renvoient à des « interlocuteurs compétents » sans les nommer ; à préciser après validation (`docs/validation-metier-module-06.md`).
+- Progression dans la journée non mémorisée après rechargement (comme les modules 4 et 5).
+- **Rien n'a été testé dans un vrai LMS** (import, ouverture de la fiche depuis eCampus, statut, reprise). Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge, ni d'impression papier réelle de la fiche (seul l'aperçu en mode impression a été vérifié).

@@ -668,6 +668,135 @@
     });
   }
 
+  function lancerModule6(module) {
+    var idEval = module.validation.evaluation;
+    var lecons = module.lecons.filter(function (l) { return l.type === 'lecon'; });
+    var journee = lecons[3].blocs.filter(function (b) { return b.type === 'simulateur'; })[0];
+
+    test('M6 : chaque activité accepte sa réponse attendue', function () {
+      Object.keys(module.activites).forEach(function (id) {
+        var act = module.activites[id];
+        vrai(A.corriger(act, A.reponseAttendue(act)).correct, id);
+      });
+    });
+
+    test('M6 : bonnes réponses conformes au scénario (activités B, B, A ; défi A, B, C, B, C)', function () {
+      egal(['m06-a1', 'm06-a2', 'm06-a3'].map(function (id) { return module.activites[id].reponse; }), ['b', 'b', 'a']);
+      egal(bonnesReponses(module, idEval), { 'm06-q1': 'a', 'm06-q2': 'b', 'm06-q3': 'c', 'm06-q4': 'b', 'm06-q5': 'c' });
+    });
+
+    test('M6 : journée - 5 situations datées, réponses B B C B B, cinq réflexes, services variés', function () {
+      egal(journee.scenarios.map(function (s) { return s.heure; }), ['9 h', '10 h', '11 h', '14 h', '16 h']);
+      egal(journee.scenarios.map(function (s) { return s.reponse; }).join(''), 'bbcbb');
+      egal(journee.scenarios.map(function (s) { return s.correction.reflexe; }), ['Rechercher avant de recréer.', 'Vérifier avant d\'utiliser.',
+        'Ne pas inventer une donnée.', 'Partager dans les bonnes conditions.', 'Documenter pour faciliter la réutilisation.']);
+      var services = {};
+      journee.scenarios.forEach(function (s) { services[s.fiche[0].valeur] = true; });
+      egal(Object.keys(services).length, 5);
+      journee.scenarios.forEach(function (s) { egal(s.choix.length, 3, s.id); });
+    });
+
+    test('M6 : formulaire B sans valeur inventée pour l\'information manquante', function () {
+      var comp = lecons[1].blocs.filter(function (b) { return b.type === 'comparateur'; })[0];
+      egal(comp.problemes.length, 4);
+      vrai(/Non renseigné/.test(comp.apres.lignes[3][1]), 'champ signalé, pas deviné');
+    });
+
+    test('M6 : 4 étapes obligatoires (dont la simulation), défi 3/5 -> completed 60 sans seuil', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      egal(lecons.length, 4);
+      lecons.slice(0, 3).forEach(function (l) { m.marquerVue(l.id); });
+      vrai(!m.estAccessible(4), 'défi verrouillé tant que la simulation n\'est pas faite');
+      m.marquerVue(lecons[3].id);
+      vrai(m.estAccessible(4));
+      var codes = bonnesReponses(module, idEval); codes['m06-q1'] = 'b'; codes['m06-q5'] = 'a';
+      var r = m.soumettreEvaluation(idEval, codes);
+      egal([r.bonnes, r.total, r.score], [3, 5, 60]);
+      egal(m.statut().seuil, null);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+    });
+
+    test('M6 : seuil configurable -> passed / failed si validation.seuilReussite est défini', function () {
+      var copie = JSON.parse(JSON.stringify(module)); copie.validation.seuilReussite = 80;
+      var m = new GDD.Moteur(copie, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var codes = bonnesReponses(copie, idEval); codes['m06-q1'] = 'b'; codes['m06-q2'] = 'a';
+      m.soumettreEvaluation(idEval, codes);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'failed');
+      m.soumettreEvaluation(idEval, bonnesReponses(copie, idEval));
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'passed');
+    });
+
+    test('M6 : adaptateur SCORM 1.2 -> reprise, completed, score 100, 5 interactions', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = new GDD.Moteur(module, new GDD.TraceurScorm12()); m.demarrer();
+      m.marquerVue(lecons[0].id); m.repondre('m06-a1', 'b'); m.definirPosition(1);
+      m.terminer();
+      egal([api.d['cmi.core.exit'], api.d['cmi.core.lesson_location'], api.d['cmi.core.lesson_status']], ['suspend', 'm06-l2', 'incomplete']);
+      var api2 = new FausseApi({ 'cmi.core.lesson_status': 'incomplete', 'cmi.core.entry': 'resume', 'cmi.core.lesson_mode': 'normal', 'cmi.suspend_data': api.d['cmi.suspend_data'] });
+      window.API = api2;
+      var m2 = new GDD.Moteur(module, new GDD.TraceurScorm12()); m2.demarrer();
+      egal(m2.etat.p, 1); egal(m2.reponseEnregistree('m06-a1'), 'b');
+      lecons.forEach(function (l) { m2.marquerVue(l.id); });
+      m2.soumettreEvaluation(idEval, bonnesReponses(module, idEval));
+      egal(api2.d['cmi.core.lesson_status'], 'completed');
+      egal([api2.d['cmi.core.score.raw'], api2.d['cmi.core.score.min'], api2.d['cmi.core.score.max']], ['100', '0', '100']);
+      egal(api2.d['cmi.interactions.4.id'], 'm06-q5');
+      m2.terminer();
+      egal(api2.d['cmi.core.exit'], '');
+      delete window.API;
+    });
+
+    function repondre(el, idChoix) {
+      el.querySelector('.option-decision input[value="' + idChoix + '"]').checked = true;
+      el.querySelector('.simulateur-zone .actions button').click();
+    }
+
+    test('Journée : frise horaire, réflexe associé, bilan des réflexes, revoir sans effacer', function () {
+      var etat = { i: 0, choix: {}, termine: false };
+      var el = GDD.ui.simulateur(journee, { etat: etat, prefixeId: 'j1' });
+      document.body.appendChild(el);
+      egal([].map.call(el.querySelectorAll('.simulateur-horaires li'), function (li) { return li.textContent; }).join(','), '9 h,10 h,11 h,14 h,16 h');
+      vrai(/9 h/.test(el.querySelector('.simulateur-heure').textContent));
+      vrai(!/✉/.test(el.querySelector('.simulateur-titre').textContent), 'pas d\'icône de courrier');
+      repondre(el, 'a');
+      var fb = el.querySelector('.activite-message').textContent;
+      vrai(/À revoir/.test(fb) && /Réflexe associé : Rechercher avant de recréer/.test(fb), fb);
+      el.querySelector('.simulateur-zone .actions button').click();
+      journee.scenarios.slice(1).forEach(function (s) {
+        repondre(el, s.reponse);
+        el.querySelector('.simulateur-zone .actions button').click();
+      });
+      var bilan = el.querySelector('.simulateur-bilan');
+      vrai(/Bilan : 4 bons réflexes sur 5/.test(bilan.textContent), bilan.querySelector('h4').textContent);
+      egal(bilan.querySelectorAll('.simulateur-recap-reflexe').length, 5);
+      vrai(/9 h · Un nouveau tableau à créer — Rechercher avant de recréer\. \(à revoir\)/.test(bilan.querySelector('.simulateur-recap li').textContent));
+      var boutons = bilan.querySelectorAll('button');
+      egal([boutons[0].textContent, boutons[1].textContent], ['Revoir les situations', 'Recommencer la journée']);
+      boutons[0].click();
+      egal([etat.i, Object.keys(etat.choix).length], [0, 5]);
+      vrai(el.querySelector('.option-decision input').disabled, 'correction affichée, choix conservé');
+      vrai(/Réflexe associé/.test(el.querySelector('.activite-message').textContent));
+      document.body.removeChild(el);
+    });
+
+    test('Mémo en enchaînement : arbre de décision en 5 étapes', function () {
+      var memo = lecons[0].blocs.filter(function (b) { return b.type === 'memo'; })[0];
+      var el = GDD.ui.memo(memo);
+      vrai(el.querySelector('.memo-etapes.memo-enchainement'));
+      egal(el.querySelectorAll('.memo-etape').length, 5);
+      egal(el.querySelector('.bloc-etiquette').textContent, 'Arbre de décision');
+    });
+
+    test('M6 : fiche mémo - 5 réflexes avec question, rappel, aucun contact inventé', function () {
+      egal(module.fiche.reflexes.length, 5);
+      module.fiche.reflexes.forEach(function (r) { vrai(r.question, r.titre); });
+      egal(module.fiche.rappel, 'En cas de doute, je consulte les procédures et les interlocuteurs compétents.');
+      vrai(!/@|https?:|\d{2} \d{2} \d{2}/.test(JSON.stringify(module.fiche)), 'ni adresse, ni lien, ni téléphone');
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -687,7 +816,7 @@
   function charger(fichier) {
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
-  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); afficher(); })
+  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json'), charger('module-06.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

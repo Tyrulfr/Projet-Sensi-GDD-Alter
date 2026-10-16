@@ -7,7 +7,7 @@ Une **source unique** de contenus pédagogiques produit deux diffusions :
 - **un site web** (essais, démonstrations, validation pédagogique), avec une progression enregistrée dans le navigateur ;
 - **un package SCORM 1.2 par module**, autonome, à importer dans un LMS (Moodle / eCampus).
 
-> État : prototype. Les **modules 1 à 5** sont complets ; les modules 6 et 7 sont déclarés « en préparation ».
+> État : prototype. Les **modules 1 à 6** sont complets ; le module 7 est déclaré « en préparation ».
 > Les contenus sont une **proposition à valider**. La compatibilité eCampus **n'est pas encore vérifiée** (voir `docs/rapport-tests.md`).
 
 ## Prérequis
@@ -32,7 +32,7 @@ Après `./serve.sh` :
 
 Le site est publié par GitHub Pages **directement depuis la branche `main`** (réglage : Settings → Pages → Deploy from a branch → `main` / racine). La page `index.html` à la racine du dépôt est l'accueil de la formation : elle présente les modules et permet de les suivre.
 
-Les fichiers générés publiés (`index.html`, `contenus/contenu.js`, `exports/*.zip`) sont donc versionnés. **Après toute modification des contenus ou du code : lancer `./build.sh`, puis committer.** Le workflow `.github/workflows/publier.yml` vérifie à chaque `push` que les contenus sont valides et que ces fichiers sont bien à jour ; sinon, l'exécution échoue avec un message explicite.
+Les fichiers générés publiés (`index.html`, `contenus/contenu.js`, `fiches/`, `exports/*.zip`) sont donc versionnés. **Après toute modification des contenus ou du code : lancer `./build.sh`, puis committer.** Le workflow `.github/workflows/publier.yml` vérifie à chaque `push` que les contenus sont valides et que ces fichiers sont bien à jour ; sinon, l'exécution échoue avec un message explicite.
 
 Adresses publiées :
 
@@ -44,6 +44,8 @@ Adresses publiées :
   - module 3 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-03-qualite-structuration-scorm12.zip>
   - module 4 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-04-partager-sans-perdre-controle-scorm12.zip>
   - module 5 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-05-qui-organise-les-donnees-scorm12.zip>
+  - module 6 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-06-bons-reflexes-professionnels-scorm12.zip>
+- fiche mémo du module 6 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/fiches/fiche-memo-module-06.html>
 
 Le simulateur SCORM n'est disponible qu'en local (`./serve.sh`).
 
@@ -58,7 +60,9 @@ contenus/                 SOURCE PÉDAGOGIQUE UNIQUE (à modifier pour faire év
   modules/module-03.json  idem pour le module 3 (comparateur de tableaux, association, défi final)
   modules/module-04.json  idem pour le module 4 (simulateur de décisions, mémo, défi final)
   modules/module-05.json  idem pour le module 5 (schéma des rôles, jeu des rôles, défi final)
+  modules/module-06.json  idem pour le module 6 (arbre de décision, formulaire comparé, journée simulée, fiche mémo)
   contenu.js              version compilée des contenus (GÉNÉRÉ)
+fiches/                   fiches mémo imprimables (GÉNÉRÉ)
 exports/                  packages SCORM 1.2, un ZIP par module (GÉNÉRÉ)
 src/
   index.html              gabarit commun site / SCORM
@@ -85,4 +89,5 @@ dist/                     fichiers de test générés (non versionnés)
 - `docs/rapport-tests.md` : tests réalisés, résultats, limites.
 - `docs/validation-metier-module-04.md` : notions et situations du module 4 à faire valider par le DPO et les référents.
 - `docs/validation-metier-module-05.md` : rôles et situations du module 5 à confronter à l'organisation réelle de l'université.
+- `docs/validation-metier-module-06.md` : procédures, interlocuteurs et situations du module 6 à faire confirmer.
 - `concepteur/README.md` : comment modifier un texte, ajouter une leçon ou une question.

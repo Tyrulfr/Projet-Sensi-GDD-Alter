@@ -2,7 +2,7 @@ name: Vérifier la formation
 
 # Le site est publié par GitHub Pages directement depuis la branche main (racine).
 # Ce workflow vérifie que les contenus sont valides et que les fichiers générés
-# (index.html, contenus/contenu.js, exports/*.zip) correspondent bien aux sources.
+# (index.html, contenus/contenu.js, fiches/, exports/*.zip) correspondent bien aux sources.
 
 on:
   push:
@@ -47,9 +47,9 @@ jobs:
               print("::error::" + e)
           sys.exit(1 if ecarts else 0)
           EOF
-          if ! git diff --quiet -- index.html contenus/contenu.js; then
-            echo "::error::index.html ou contenus/contenu.js n'est pas à jour : lancer ./build.sh puis committer."
-            git diff --stat -- index.html contenus/contenu.js
+          if [ -n "$(git status --porcelain -- index.html contenus/contenu.js fiches)" ]; then
+            echo "::error::index.html, contenus/contenu.js ou fiches/ n'est pas à jour : lancer ./build.sh puis committer."
+            git status --short -- index.html contenus/contenu.js fiches
             exit 1
           fi
 

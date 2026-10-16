@@ -8,7 +8,7 @@ Après chaque modification :
 1. lancer `./build.sh` : les contenus sont **vérifiés** avant toute génération ; en cas d'erreur, un message indique le fichier, la leçon ou l'activité concernée ;
 2. lancer `./serve.sh` et vérifier le résultat sur <http://localhost:8000/> ;
 3. le package SCORM à jour est dans `exports/` ;
-4. committer **aussi** les fichiers générés (`index.html`, `contenus/contenu.js`, `exports/`) : ce sont eux que GitHub Pages publie.
+4. committer **aussi** les fichiers générés (`index.html`, `contenus/contenu.js`, `fiches/`, `exports/`) : ce sont eux que GitHub Pages publie.
 
 Ne jamais modifier à la main `index.html` (racine) ni `contenus/contenu.js` : ils sont réécrits à chaque `./build.sh`.
 
@@ -32,7 +32,7 @@ Conseil : utiliser un éditeur qui signale les erreurs JSON (Cursor, VS Code). L
 - `navigation` : `sequentielle` (chaque leçon s'ouvre après la précédente) ou `libre`.
 - `seuilReussite` (facultatif) : pourcentage minimal au quiz (valeur à valider institutionnellement).
   - **avec seuil** (module 1) : statut « réussi » (`passed`) ou « à repasser » (`failed`) ;
-  - **sans seuil** (module 2) : une fois les leçons vues et le quiz fait, le module est « terminé » (`completed`), quel que soit le score ; le score est tout de même enregistré.
+  - **sans seuil** (modules 2 à 6) : une fois les leçons vues et le quiz fait, le module est « terminé » (`completed`), quel que soit le score ; le score est tout de même enregistré. Ajouter `seuilReussite` suffit pour passer à `passed` / `failed` (le `masteryscore` est alors écrit dans le manifeste SCORM).
 - Pour un module sans quiz, supprimer `evaluation` : le module sera « terminé » une fois les leçons vues.
 
 ## Une leçon
@@ -48,7 +48,8 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes), `legende` (facultatif, ex. « Données fictives ») |
 | `comparateur` | comparaison « avant / après » (module 3, voir ci-dessous) |
 | `schema` | schéma cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `libelle`, `usage`, `detail` ; 3 cibles s'affichent sur une ligne, 5 cibles sur deux lignes centrées 3 + 2, sans hiérarchie), `legende` (ex. « Exemple illustratif »), `annonce` (facultatif : phrase lue par les lecteurs d'écran avant les cibles, « Cette information peut servir à N services : » par défaut ; module 4 : « Trois critères à examiner : ») |
-| `memo` | repères numérotés (module 4 : les quatre réflexes ; module 5 : « Si je… ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `legende` (facultatif) |
+| `memo` | repères numérotés (module 4 : les quatre réflexes ; module 5 : « Si je… ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `legende` (facultatif), `etiquette` (facultatif, « Mémo » par défaut), `disposition` (facultatif : `enchainement` affiche les étapes en une colonne reliées par des flèches, pour un arbre de décision — module 6) |
+| `fiche` | encart « Fiche mémo » avec un lien vers la fiche imprimable du module (voir « La fiche mémo ») ; aucun autre champ |
 | `simulateur` | simulateur de situations : décisions (module 4) ou jeu des rôles (module 5), voir ci-dessous |
 | `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
 | `activite` | `ref` : identifiant d'une activité définie dans `activites` |
@@ -75,6 +76,8 @@ L'apprenant clique sur une cellule du tableau « avant » (ou sur une difficult�
 - `cellules` : liste de `[ligne, colonne]` du tableau « avant », **comptées à partir de 0** (`[0, 0]` = première ligne de données, première colonne). Une cellule peut appartenir à plusieurs difficultés : un deuxième clic passe à la suivante.
 - Une cellule vide (`""`) s'affiche « (non renseignée) ».
 - `avertissement` : à garder pour rappeler que le tableau « après » n'est pas une correction automatique (le validateur prévient s'il manque).
+- `libelles` (facultatif) adapte les textes de l'interface quand on compare autre chose que des tableaux (module 6 : un formulaire). Clés : `avant`, `difficultes`, `aide` (`{n}` = nombre de difficultés), `voirApres`, `apres`, `atouts`. Une clé absente garde le libellé du module 3.
+- Un tableau de moins de 3 colonnes n'impose pas de largeur minimale (pas de défilement horizontal sur mobile).
 
 ## Le simulateur de décisions
 
@@ -149,6 +152,16 @@ Le même composant sert au jeu « Qui fait quoi avec les données ? ». Différe
 - Quand plusieurs acteurs interviennent, la question porte sur **qui intervient principalement à ce stade** ; `roles` explique la part de chacun. Éviter les réponses artificiellement exclusives.
 - Les rôles sont **génériques** : à faire confirmer avec les équipes chargées de la gouvernance (`docs/validation-metier-module-05.md`).
 
+### Variante « journée » (module 6)
+
+Même composant, même structure que le jeu des rôles (`fiche`, pas de `decisions`), avec trois options :
+
+- `heure` dans chaque scénario (ex. `"9 h"`) : si **toutes** les situations en ont une, la progression devient une frise horaire et l'heure s'affiche sur la carte. Le chronomètre n'existe pas : l'heure est un repère narratif ;
+- `"bilanReflexes": true` au niveau du simulateur : le bilan rappelle, pour chaque situation, le `reflexe` de sa correction ;
+- `libelles.revoir` (ex. « Revoir les situations ») : ajoute au bilan un bouton qui revient à la première situation **sans effacer** les réponses (à la différence de `recommencer`).
+
+`libelles.iconeCarte` peut valoir `""` pour ne pas afficher d'icône sur la carte. La correction n'exige que `pourquoi` et `reflexe`.
+
 ## Associer des situations à des catégories
 
 C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité), le module 4 avec 3 (donnée non personnelle, personnelle, catégorie particulière), le module 5 avec 2 (gouvernance, gestion opérationnelle). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
@@ -165,7 +178,22 @@ Le quiz est une leçon de type `evaluation` avec une liste `activites` de questi
 | `libelleRecommencer` | bouton de nouvelle tentative (défaut « Repasser le quiz » ; module 2 : « Recommencer le défi ») |
 | `messagesResultat` | messages selon le score, en % : `[{ "min": 100, "texte": "…" }, { "min": 60, "texte": "…" }, { "min": 0, "texte": "…" }]`. Le message retenu est celui du plus grand `min` atteint. Avec 3 questions : 3/3 = 100 %, 2/3 = 67 %, 1/3 = 33 % |
 
-La page de résultat affiche aussi la `synthese` du module (« L'essentiel du module ») et, sur le site web uniquement, un bouton vers le module suivant **s'il est disponible** dans le catalogue.
+La page de résultat affiche aussi la `synthese` du module (« L'essentiel du module », `**gras**` accepté), l'encart de la fiche mémo si le module en a une et, sur le site web uniquement, un bouton vers le module suivant **s'il est disponible** dans le catalogue.
+
+## La fiche mémo
+
+Un module peut définir, à côté de `synthese`, une fiche imprimable :
+
+```json
+"fiche": {
+  "titre": "Les 5 réflexes pour bien gérer les données",
+  "introduction": "…",
+  "reflexes": [ { "icone": "🔎", "titre": "1. Rechercher", "texte": "…", "question": "…" } ],
+  "rappel": "En cas de doute, je consulte les procédures et les interlocuteurs compétents."
+}
+```
+
+`./build.sh` génère une page HTML autonome (sans dépendance, imprimable ou enregistrable en PDF depuis le navigateur) : `fiches/fiche-memo-module-0X.html` pour le site, et le même fichier à la racine du package SCORM. Le bloc `{ "type": "fiche" }` place l'encart de lien dans une leçon. Ne pas y inscrire de contact ou d'adresse non validés.
 
 ## Modifier une leçon ou une question
 
