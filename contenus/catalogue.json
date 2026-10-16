@@ -30,10 +30,8 @@
     {
       "id": "m03",
       "numero": 3,
-      "etat": "a-venir",
-      "titre": "Qualité et structuration des données",
-      "duree": 9,
-      "objectif": "Identifier ce qui rend une donnée fiable et réutilisable."
+      "etat": "disponible",
+      "fichier": "module-03.json"
     },
     {
       "id": "m04",

@@ -71,6 +71,8 @@
         return UI.schema(bloc);
       case 'chronologie':
         return UI.chronologie(bloc);
+      case 'comparateur':
+        return UI.comparateur(bloc);
       case 'aretenir':
         return h('div', { class: 'bloc bloc-aretenir' }, [
           h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '★ ' }), 'À retenir']),
@@ -163,9 +165,164 @@
         }));
       }))
     ]);
-    return h('div', { class: 'bloc bloc-tableau' }, h('div', {
-      class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': bloc.titre ? idTitre : null
-    }, table));
+    return h('div', { class: 'bloc bloc-tableau' }, [
+      h('div', { class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': bloc.titre ? idTitre : null }, table),
+      bloc.legende ? h('p', { class: 'bloc-legende tableau-legende', text: bloc.legende }) : null
+    ]);
+  };
+
+  /*
+   * Comparateur de tableaux : repérer les difficultés d'un tableau peu structuré,
+   * puis découvrir un tableau mieux structuré.
+   * options : etat ({ explores: {}, apres: bool }, conservé par l'appelant),
+   *           afficherApres (function), prefixeId.
+   */
+  UI.comparateur = function (bloc, options) {
+    var o = options || {};
+    var etat = o.etat || { explores: {}, apres: true };
+    var prefixe = o.prefixeId || uid('comp');
+    var problemes = bloc.problemes;
+    var cols = bloc.avant.colonnes;
+    var boutonsCellules = {};
+    var boutonsProblemes = {};
+
+    function cle(l, c) { return l + '-' + c; }
+    function libelleCellule(l, c) {
+      var v = bloc.avant.lignes[l][c];
+      return 'Ligne ' + (l + 1) + ', ' + cols[c] + ' : ' + (v === '' ? 'non renseignée' : v);
+    }
+    function nbExplores() { return problemes.filter(function (p) { return etat.explores[p.id]; }).length; }
+    function marquer(k, actif) {
+      var b = boutonsCellules[k];
+      b.classList.toggle('est-signalee', actif);
+      b.querySelector('.cellule-marque').textContent = actif ? '⚠' : '';
+      b.setAttribute('aria-label', b.getAttribute('data-libelle') + (actif ? ' (difficulté signalée)' : ''));
+    }
+    function effacerMarques() { Object.keys(boutonsCellules).forEach(function (k) { marquer(k, false); }); }
+
+    var compteur = h('p', { class: 'comparateur-compteur', 'aria-live': 'polite' });
+    var detail = h('div', { class: 'comparateur-detail', id: prefixe + '-detail', tabindex: '-1' },
+      h('p', { class: 'schema-invite', text: 'Sélectionne une cellule du tableau ou une difficulté de la liste.' }));
+    var zoneSuite = h('div', { class: 'comparateur-suite' });
+
+    function majSuite() {
+      var n = nbExplores();
+      compteur.textContent = n + ' difficulté' + (n > 1 ? 's' : '') + ' examinée' + (n > 1 ? 's' : '') + ' sur ' + problemes.length;
+      zoneSuite.innerHTML = '';
+      if (etat.apres) { return; }
+      zoneSuite.appendChild(n < problemes.length
+        ? h('p', { class: 'aide', text: 'Examine les ' + problemes.length + ' difficultés pour découvrir un tableau mieux structuré.' })
+        : h('div', { class: 'actions' }, h('button', { type: 'button', class: 'bouton bouton-principal', onclick: o.afficherApres },
+          'Voir le tableau mieux structuré')));
+    }
+
+    function selectionner(p) {
+      etat.explores[p.id] = true;
+      effacerMarques();
+      Object.keys(boutonsProblemes).forEach(function (id) {
+        var b = boutonsProblemes[id];
+        b.setAttribute('aria-pressed', String(id === p.id));
+        if (etat.explores[id]) { b.querySelector('.schema-cible-etat').textContent = '✓ Examinée'; }
+      });
+      var lieux = [];
+      p.cellules.forEach(function (lc) {
+        if (boutonsCellules[cle(lc[0], lc[1])]) { marquer(cle(lc[0], lc[1]), true); }
+        lieux.push(libelleCellule(lc[0], lc[1]));
+      });
+      detail.innerHTML = '';
+      detail.appendChild(h('p', { class: 'schema-detail-titre' }, [h('span', { 'aria-hidden': 'true', text: '⚠ ' }), h('strong', { text: p.libelle })]));
+      detail.appendChild(h('div', { html: U.richText(p.explication) }));
+      detail.appendChild(h('p', { class: 'comparateur-lieux' }, [h('strong', { text: 'Cellules signalées : ' }), lieux.join(' ; ') + '.']));
+      majSuite();
+    }
+
+    function cliquerCellule(l, c) {
+      var concernes = problemes.filter(function (p) {
+        return p.cellules.some(function (lc) { return lc[0] === l && lc[1] === c; });
+      });
+      if (!concernes.length) {
+        effacerMarques();
+        Object.keys(boutonsProblemes).forEach(function (id) { boutonsProblemes[id].setAttribute('aria-pressed', 'false'); });
+        detail.innerHTML = '';
+        detail.appendChild(h('p', { text: libelleCellule(l, c) + '. ' + (bloc.sansDifficulte || 'Cette cellule ne présente pas de difficulté particulière prise isolément. Essaie une autre cellule.') }));
+        return;
+      }
+      var nouveau = concernes.filter(function (p) { return !etat.explores[p.id]; })[0];
+      selectionner(nouveau || concernes[0]);
+    }
+
+    var idTitreAvant = prefixe + '-avant';
+    var tableAvant = h('table', { class: 'tableau-comparateur' }, [
+      h('caption', { id: idTitreAvant, text: bloc.avant.titre }),
+      h('thead', null, h('tr', null, cols.map(function (c) { return h('th', { scope: 'col', text: c }); }))),
+      h('tbody', null, bloc.avant.lignes.map(function (ligne, l) {
+        return h('tr', null, ligne.map(function (v, c) {
+          var b = h('button', {
+            type: 'button', class: 'cellule-bouton', 'aria-label': libelleCellule(l, c), 'data-libelle': libelleCellule(l, c),
+            onclick: function () { cliquerCellule(l, c); }
+          }, [
+            v === '' ? h('span', { class: 'cellule-vide', text: '(non renseignée)' }) : h('span', { text: v }),
+            h('span', { class: 'cellule-marque', 'aria-hidden': 'true' })
+          ]);
+          boutonsCellules[cle(l, c)] = b;
+          return h('td', { class: 'td-bouton' }, b);
+        }));
+      }))
+    ]);
+
+    var liste = h('ul', { class: 'comparateur-problemes' });
+    problemes.forEach(function (p) {
+      var b = h('button', {
+        type: 'button', class: 'schema-cible', 'aria-pressed': 'false', 'aria-controls': prefixe + '-detail',
+        onclick: function () { selectionner(p); }
+      }, [
+        h('span', { class: 'schema-cible-libelle', text: p.libelle }),
+        h('span', { class: 'schema-cible-etat', text: etat.explores[p.id] ? '✓ Examinée' : 'Examiner' })
+      ]);
+      boutonsProblemes[p.id] = b;
+      liste.appendChild(h('li', null, b));
+    });
+
+    var apres = null;
+    if (etat.apres) {
+      var idTitreApres = prefixe + '-apres';
+      var tableApres = h('table', { class: 'tableau-comparateur' }, [
+        h('caption', { id: idTitreApres, text: bloc.apres.titre }),
+        h('thead', null, h('tr', null, bloc.apres.colonnes.map(function (c) { return h('th', { scope: 'col', text: c }); }))),
+        h('tbody', null, bloc.apres.lignes.map(function (ligne) {
+          return h('tr', null, ligne.map(function (v) { return h('td', { text: v }); }));
+        }))
+      ]);
+      apres = h('div', { class: 'comparateur-apres', id: prefixe + '-apres-zone', tabindex: '-1' }, [
+        h('p', { class: 'comparateur-etiquette comparateur-etiquette-apres', text: 'Après : une structure plus claire' }),
+        h('div', { class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': idTitreApres }, tableApres),
+        h('p', { class: 'tableau-indice', 'aria-hidden': 'true', text: '↔ Fais glisser le tableau pour voir toutes les colonnes.' }),
+        bloc.apres.legende ? h('p', { class: 'bloc-legende', text: bloc.apres.legende }) : null,
+        bloc.apres.atouts ? h('div', { class: 'comparateur-atouts' }, [
+          h('p', null, h('strong', { text: 'Ce que cette structure apporte :' })),
+          h('ul', null, bloc.apres.atouts.map(function (a) { return h('li', { text: a }); }))
+        ]) : null,
+        bloc.apres.avertissement ? h('div', { class: 'note note-alerte', html: U.richText(bloc.apres.avertissement) }) : null
+      ]);
+    }
+
+    var el = h('div', { class: 'bloc bloc-comparateur' }, [
+      h('p', { class: 'bloc-etiquette', text: 'Comparaison' }),
+      bloc.titre ? h('h3', { text: bloc.titre }) : null,
+      bloc.consigne ? h('p', { text: bloc.consigne }) : null,
+      h('p', { class: 'comparateur-etiquette', text: 'Avant : le tableau reçu' }),
+      h('div', { class: 'tableau-defilant', tabindex: '0', role: 'region', 'aria-labelledby': idTitreAvant }, tableAvant),
+      h('p', { class: 'tableau-indice', 'aria-hidden': 'true', text: '↔ Fais glisser le tableau pour voir toutes les colonnes.' }),
+      bloc.avant.legende ? h('p', { class: 'bloc-legende', text: bloc.avant.legende }) : null,
+      h('p', { class: 'comparateur-sous-titre', text: 'Les difficultés à repérer' }),
+      liste,
+      compteur,
+      detail,
+      zoneSuite,
+      apres
+    ]);
+    majSuite();
+    return el;
   };
 
   /* ---------- Activités ---------- */

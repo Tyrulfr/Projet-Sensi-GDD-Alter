@@ -45,13 +45,38 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `texte` | `titre` (facultatif), `texte` |
 | `definition` | `terme`, `texte` |
 | `exemple` | `titre` (facultatif), `texte`, `etiquette` (facultatif, « Exemple » par défaut ; ex. « Point de vigilance ») |
-| `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes) |
+| `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes), `legende` (facultatif, ex. « Données fictives ») |
+| `comparateur` | comparaison « avant / après » (module 3, voir ci-dessous) |
 | `schema` | schéma de circulation cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `id`, `libelle`, `usage`, `detail`), `legende` (ex. « Exemple illustratif ») |
 | `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
 | `activite` | `ref` : identifiant d'une activité définie dans `activites` |
 | `aretenir` | `texte` |
 
 Dans les textes : `**mot**` met en gras ; une ligne vide (`\n\n`) crée un nouveau paragraphe ; un paragraphe dont **toutes** les lignes commencent par `- ` devient une liste à puces (le séparer du texte précédent par une ligne vide).
+
+## Le comparateur de tableaux
+
+L'apprenant clique sur une cellule du tableau « avant » (ou sur une difficulté de la liste, alternative accessible) ; les cellules concernées sont encadrées et marquées ⚠, l'explication s'affiche. Une fois **toutes** les difficultés examinées, il peut afficher le tableau « après » ; « Continuer » n'apparaît qu'ensuite.
+
+```json
+{
+  "type": "comparateur",
+  "titre": "…", "consigne": "…",
+  "avant": { "titre": "Tableau A : …", "colonnes": ["Agent", "Service"], "lignes": [["Martin Julie", "RH"], ["Julie Martin", ""]], "legende": "Données fictives." },
+  "problemes": [
+    { "id": "doublon", "libelle": "Un risque de doublon", "explication": "…", "cellules": [[0, 0], [1, 0]] }
+  ],
+  "apres": { "titre": "Tableau B : …", "colonnes": [ … ], "lignes": [ … ], "legende": "…", "atouts": ["…"], "avertissement": "…" }
+}
+```
+
+- `cellules` : liste de `[ligne, colonne]` du tableau « avant », **comptées à partir de 0** (`[0, 0]` = première ligne de données, première colonne). Une cellule peut appartenir à plusieurs difficultés : un deuxième clic passe à la suivante.
+- Une cellule vide (`""`) s'affiche « (non renseignée) ».
+- `avertissement` : à garder pour rappeler que le tableau « après » n'est pas une correction automatique (le validateur prévient s'il manque).
+
+## Associer des situations à des catégories
+
+C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
 
 ## Le quiz ou le défi
 
@@ -69,7 +94,7 @@ La page de résultat affiche aussi la `synthese` du module (« L'essentiel du mo
 
 ## Modifier une leçon ou une question
 
-- **Changer un texte** : ouvrir `contenus/modules/module-02.json`, trouver le texte (recherche Cmd+F), le modifier entre les guillemets.
+- **Changer un texte** : ouvrir le fichier du module (`contenus/modules/module-03.json`, par exemple), trouver le texte (recherche Cmd+F), le modifier entre les guillemets.
 - **Ajouter un bloc** : insérer un objet `{ "type": "…", … }` dans la liste `blocs` de la leçon, à la position voulue (attention aux virgules entre blocs).
 - **Modifier une question** : dans `activites`, changer `consigne`, `choix`, `reponse` et les deux `explication`. Si la bonne réponse change, mettre à jour `reponse` **et** les explications.
 - **Ajouter une question au défi** : créer l'activité (`"notation": { "formative": false, "points": 1 }`), puis ajouter son identifiant dans la liste `activites` de la leçon `evaluation`. Penser à revoir les `messagesResultat` et l'`introduction` (« Trois situations… »).
@@ -98,4 +123,4 @@ Règles imposées par SCORM 1.2 (vérifiées automatiquement) :
 1. Copier un module existant (`module-02.json` pour un module avec défi sans seuil) en `module-03.json` et adapter tous les identifiants (`m03-…`).
 2. Dans `contenus/catalogue.json`, passer le module à `"etat": "disponible"` et ajouter `"fichier": "module-03.json"` (le titre, la durée et l'objectif sont alors lus dans le fichier du module).
 3. `./build.sh` génère automatiquement `exports/module-03-<titre-du-module>-scorm12.zip` (nom calculé à partir du numéro et du titre, sans accents) et ajoute le lien de téléchargement sur la page Parcours. Le bouton « Module 3 » apparaît automatiquement à la fin du module 2.
-4. Attention : modifier le **titre** d'un module change le nom de son ZIP (l'ancien est supprimé au build).
+4. Attention : modifier le **titre** d'un module change le nom de son ZIP (l'ancien est supprimé au build). Pour un nom court et stable, ajouter `"slugArchive": "qualite-structuration"` dans le fichier du module (module 3 → `module-03-qualite-structuration-scorm12.zip`).

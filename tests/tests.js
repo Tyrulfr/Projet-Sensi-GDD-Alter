@@ -318,6 +318,110 @@
     });
   }
 
+  /* Module 3 : défi de 4 questions sans seuil, comparateur de tableaux, association à 5 catégories. */
+  function lancerModule3(module) {
+    var idEval = module.validation.evaluation;
+    var lecons = module.lecons.filter(function (l) { return l.type === 'lecon'; });
+    var comparateur = module.lecons[0].blocs.filter(function (b) { return b.type === 'comparateur'; })[0];
+
+    test('M3 : chaque activité accepte sa réponse attendue', function () {
+      Object.keys(module.activites).forEach(function (id) {
+        var act = module.activites[id];
+        vrai(A.corriger(act, A.reponseAttendue(act)).correct, id);
+      });
+    });
+
+    test('M3 : bonnes réponses du défi conformes au scénario (B, A, C, A)', function () {
+      egal(bonnesReponses(module, idEval), { 'm03-q1': 'b', 'm03-q2': 'a', 'm03-q3': 'c', 'm03-q4': 'a' });
+    });
+
+    test('M3 : association qualité / situation corrigée élément par élément', function () {
+      var act = module.activites['m03-a2'];
+      egal(A.reponseAttendue(act), '1.h,2.e,3.a,4.f,5.c');
+      var r = A.corriger(act, '1.h,2.e,3.e,4.f,5.c');
+      vrai(!r.correct); egal(r.details['3'], false); egal(r.details['1'], true);
+      egal(A.typeScorm(act), 'matching');
+    });
+
+    test('M3 : 4 leçons obligatoires, défi verrouillé avant la fin', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      egal(lecons.length, 4);
+      lecons.slice(0, 3).forEach(function (l) { m.marquerVue(l.id); });
+      vrai(!m.estAccessible(4), 'défi verrouillé');
+      m.marquerVue(lecons[3].id);
+      vrai(m.estAccessible(4), 'défi ouvert');
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'incomplete');
+    });
+
+    test('M3 : défi 3/4 -> completed, score 75 ; 0/4 -> completed, meilleur score conservé', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var codes = bonnesReponses(module, idEval); codes['m03-q4'] = 'c';
+      var r = m.soumettreEvaluation(idEval, codes);
+      egal([r.bonnes, r.total, r.score], [3, 4, 75]);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+      var r2 = m.soumettreEvaluation(idEval, { 'm03-q1': 'a', 'm03-q2': 'b', 'm03-q3': 'a', 'm03-q4': 'b' });
+      egal([r2.score, r2.meilleur], [0, 75]);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+    });
+
+    test('M3 : adaptateur SCORM 1.2 -> completed, score 75, 4 interactions, reprise', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = new GDD.Moteur(module, new GDD.TraceurScorm12()); m.demarrer();
+      m.marquerVue(lecons[0].id); m.marquerVue(lecons[1].id); m.repondre('m03-a2', '1.h,2.e,3.a,4.f,5.c'); m.definirPosition(2);
+      m.terminer();
+      egal([api.d['cmi.core.exit'], api.d['cmi.core.lesson_location']], ['suspend', 'm03-l3']);
+      var api2 = new FausseApi({ 'cmi.core.lesson_status': 'incomplete', 'cmi.core.entry': 'resume', 'cmi.core.lesson_mode': 'normal', 'cmi.suspend_data': api.d['cmi.suspend_data'] });
+      window.API = api2;
+      var m2 = new GDD.Moteur(module, new GDD.TraceurScorm12()); m2.demarrer();
+      egal(m2.etat.p, 2); egal(m2.reponseEnregistree('m03-a2'), '1.h,2.e,3.a,4.f,5.c');
+      lecons.forEach(function (l) { m2.marquerVue(l.id); });
+      var codes = bonnesReponses(module, idEval); codes['m03-q2'] = 'b';
+      m2.soumettreEvaluation(idEval, codes);
+      egal(api2.d['cmi.core.lesson_status'], 'completed');
+      egal([api2.d['cmi.core.score.raw'], api2.d['cmi.core.score.min'], api2.d['cmi.core.score.max']], ['75', '0', '100']);
+      egal(api2.d['cmi.interactions.3.id'], 'm03-q4');
+      egal(api2.d['cmi.interactions.1.result'], 'wrong');
+      m2.terminer();
+      egal(api2.d['cmi.core.exit'], '');
+      delete window.API;
+    });
+
+    test('Comparateur : une cellule signalée met en évidence sa difficulté (texte, pas seulement couleur)', function () {
+      var etat = { explores: {}, apres: false };
+      var appels = 0;
+      var el = GDD.ui.comparateur(comparateur, { etat: etat, prefixeId: 't', afficherApres: function () { appels++; } });
+      var cellules = el.querySelectorAll('.cellule-bouton');
+      egal(cellules.length, 12, 'une cellule cliquable par donnée du tableau A');
+      cellules[11].click();
+      vrai(etat.explores.manquante, 'date manquante examinée');
+      vrai(cellules[11].classList.contains('est-signalee'));
+      egal(cellules[11].querySelector('.cellule-marque').textContent, '⚠');
+      vrai(/difficulté signalée/.test(cellules[11].getAttribute('aria-label')), 'signalement annoncé');
+      vrai(/Une donnée manquante/.test(el.querySelector('.comparateur-detail').textContent));
+      vrai(!el.querySelector('.comparateur-suite button'), 'tableau B pas encore proposé');
+      [].forEach.call(el.querySelectorAll('.comparateur-problemes button'), function (b) { b.click(); });
+      egal(Object.keys(etat.explores).length, 5);
+      el.querySelector('.comparateur-suite button').click();
+      egal(appels, 1, 'tableau B demandé');
+    });
+
+    test('Comparateur : cliquer deux fois une cellule à double difficulté passe à la suivante', function () {
+      var etat = { explores: {}, apres: false };
+      var el = GDD.ui.comparateur(comparateur, { etat: etat, prefixeId: 't2' });
+      var premiere = el.querySelectorAll('.cellule-bouton')[0];
+      premiere.click(); premiere.click();
+      vrai(etat.explores['nom-prenom'] && etat.explores.doublon, 'les deux difficultés de « Martin Julie »');
+    });
+
+    test('Comparateur : tableau B et avertissement affichés une fois demandés', function () {
+      var el = GDD.ui.comparateur(comparateur, { etat: { explores: {}, apres: true }, prefixeId: 't3' });
+      egal(el.querySelectorAll('.comparateur-apres tbody tr').length, 3);
+      vrai(/structure cible/.test(el.querySelector('.comparateur-apres .note').textContent));
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -337,7 +441,7 @@
   function charger(fichier) {
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
-  Promise.all([charger('module-01.json'), charger('module-02.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); afficher(); })
+  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

@@ -18,6 +18,7 @@
     resultats: {},       /* résultat d'évaluation de la session */
     repasser: {},        /* évaluation en cours de nouvelle tentative */
     chrono: {},          /* nombre d'étapes affichées par chronologie */
+    comparateur: {},     /* difficultés examinées et tableau « après » affiché, par comparateur */
     defi: {},            /* défi « une question à la fois » en cours : { i, codes, verifie } */
     avertissement: null,
     session: null,       /* SCORM : 'terminee' après LMSFinish */
@@ -188,7 +189,7 @@
         onclick: function () {
           if (root.confirm('Effacer toute ta progression enregistrée dans ce navigateur ?')) {
             GDD.TraceurLocal.effacerTout(catalogue.id);
-            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.defi = {};
+            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.defi = {};
             afficher();
             annoncer('Progression effacée.');
           }
@@ -302,6 +303,22 @@
             etat.chrono[cle] = visibles + 1;
             etat.focus = 'chrono-' + cle + '-' + visibles;
             afficher();
+          }
+        });
+      } else if (b.type === 'comparateur') {
+        var cleComp = l.id + '-' + i;
+        var enCoursComp = !dejaVue && i === nb - 1;
+        var etatComp = etat.comparateur[cleComp] || (etat.comparateur[cleComp] = { explores: {}, apres: !enCoursComp });
+        if (!enCoursComp) { etatComp.apres = true; }
+        if (!etatComp.apres) { bloque = 'Examine les difficultés du tableau, puis affiche le tableau mieux structuré pour continuer.'; }
+        el = UI.comparateur(b, {
+          etat: etatComp,
+          prefixeId: 'comp-' + cleComp,
+          afficherApres: function () {
+            etatComp.apres = true;
+            etat.focus = 'comp-' + cleComp + '-apres-zone';
+            afficher();
+            annoncer('Tableau mieux structuré affiché.');
           }
         });
       } else if (b.type === 'activite') {

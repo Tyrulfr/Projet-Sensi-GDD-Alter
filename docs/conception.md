@@ -91,6 +91,9 @@ Navigation complète au clavier, lien d'évitement, focus déplacé sur chaque n
 9. **Module 2 sans seuil** : statut `completed` une fois le défi fait, quel que soit le score. Faut-il un seuil (et lequel : 2/3 ?) pour obtenir `passed` ?
 10. **Contenus du module 2** : exemples (RH, scolarité, bibliothèque, maintenance) présentés comme illustratifs ; formulations à faire relire, notamment « patrimoine informationnel ».
 11. **Nom des archives** : `module-XX-<titre>-scorm12.zip`. Le ZIP du module 1 a été renommé (ancienne adresse `module-01-scorm.zip` supprimée).
+12. **Module 3 sans seuil** (même règle que le module 2) et durée annoncée de **10 min** (haut de la fourchette 8–10 min : c'est le module le plus dense, environ 1 000 mots de leçons et 8 interactions).
+13. **Contenus du module 3** : tableaux et noms fictifs ; le tableau B est présenté comme une structure cible supposant des vérifications, jamais comme une correction automatique. Les 5 dimensions retenues (exactitude, complétude, cohérence, actualité, conformité au format) sont à faire valider.
+14. **Exploration du comparateur obligatoire** (les 5 difficultés) avant d'afficher le tableau B et de continuer. Alternative possible : rendre le tableau B accessible directement.
 
 ## 7. Évolutions possibles de l'espace concepteur
 

@@ -147,8 +147,9 @@ def zipper(dossier, archive):
 
 
 def nom_archive(module):
-    """module-02-une-donnee-plusieurs-usages-scorm12.zip"""
-    sans_accents = unicodedata.normalize("NFKD", module["titre"]).encode("ascii", "ignore").decode("ascii")
+    """module-02-une-donnee-plusieurs-usages-scorm12.zip (titre) ou module-03-qualite-structuration-scorm12.zip (slugArchive)"""
+    base = module.get("slugArchive") or module["titre"]
+    sans_accents = unicodedata.normalize("NFKD", base).encode("ascii", "ignore").decode("ascii")
     slug = re.sub(r"[^a-z0-9]+", "-", sans_accents.lower()).strip("-")
     return f"module-{int(module['numero']):02d}-{slug}-scorm12.zip"
 

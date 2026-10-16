@@ -12,7 +12,8 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_CONTENUS = RACINE / "contenus"
 
-TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "activite", "aretenir"}
+TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "comparateur", "activite", "aretenir"}
+RE_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PRESENTATIONS = {"toutes", "une-par-une"}
 TYPES_ACTIVITES = {"choix-unique", "choix-multiple", "vrai-faux", "classement"}
 NAVIGATIONS = {"sequentielle", "libre"}
@@ -115,8 +116,45 @@ def valider_activite(id_act, act, objectifs, r):
                 r.erreur(lieu, f"élément « {e.get('id')} » : texte manquant")
 
 
+def valider_tableau_simple(t, lieu, r):
+    cols = t.get("colonnes") or []
+    if not texte_present(t, "titre") or not cols or not t.get("lignes"):
+        r.erreur(lieu, "« titre », « colonnes » et « lignes » sont obligatoires")
+    for j, ligne in enumerate(t.get("lignes") or [], 1):
+        if len(ligne) != len(cols):
+            r.erreur(lieu, f"ligne {j} : {len(ligne)} cellules pour {len(cols)} colonnes")
+
+
+def valider_comparateur(b, lieu, r):
+    avant, apres = b.get("avant") or {}, b.get("apres") or {}
+    valider_tableau_simple(avant, f"{lieu}, tableau « avant »", r)
+    valider_tableau_simple(apres, f"{lieu}, tableau « après »", r)
+    problemes = b.get("problemes") or []
+    if not problemes:
+        r.erreur(lieu, "au moins une difficulté (« problemes ») est nécessaire")
+    ids = [p.get("id") for p in problemes]
+    if len(set(ids)) != len(ids):
+        r.erreur(lieu, "identifiants de difficultés en double")
+    nb_lignes, nb_cols = len(avant.get("lignes") or []), len(avant.get("colonnes") or [])
+    for p in problemes:
+        plieu = f"{lieu}, difficulté « {p.get('id')} »"
+        if not (texte_present(p, "libelle") and texte_present(p, "explication")):
+            r.erreur(plieu, "« libelle » et « explication » sont obligatoires")
+        cellules = p.get("cellules") or []
+        if not cellules:
+            r.erreur(plieu, "aucune cellule signalée")
+        for c in cellules:
+            if not (isinstance(c, list) and len(c) == 2 and all(isinstance(x, int) for x in c)
+                    and 0 <= c[0] < nb_lignes and 0 <= c[1] < nb_cols):
+                r.erreur(plieu, f"cellule {c} invalide : [ligne, colonne] comptées à partir de 0, dans le tableau « avant »")
+    if not texte_present(apres, "avertissement"):
+        r.avertir(lieu, "pas d'« avertissement » : préciser que le tableau « après » n'est pas une correction certaine")
+
+
 def valider_module(mod, entree, r, ids_globaux):
     lieu = f"module {entree.get('id')}"
+    if "slugArchive" in mod and not RE_SLUG.match(str(mod["slugArchive"])):
+        r.erreur(lieu, "« slugArchive » : lettres minuscules sans accent, chiffres et tirets uniquement")
     if mod.get("id") != entree.get("id"):
         r.erreur(lieu, f"l'identifiant du fichier ({mod.get('id')}) diffère de celui du catalogue")
     for cle in ("titre", "objectif"):
@@ -185,6 +223,8 @@ def valider_module(mod, entree, r, ids_globaux):
                             r.erreur(blieu, f"cible {j} : « libelle », « usage » et « detail » sont obligatoires")
                     if not texte_present(b, "legende"):
                         r.avertir(blieu, "schéma sans légende (préciser s'il s'agit d'un exemple illustratif)")
+                elif bt == "comparateur":
+                    valider_comparateur(b, blieu, r)
                 elif bt == "chronologie":
                     etapes = b.get("etapes") or []
                     if len(etapes) < 2:

@@ -7,7 +7,7 @@ Une **source unique** de contenus pédagogiques produit deux diffusions :
 - **un site web** (essais, démonstrations, validation pédagogique), avec une progression enregistrée dans le navigateur ;
 - **un package SCORM 1.2 par module**, autonome, à importer dans un LMS (Moodle / eCampus).
 
-> État : prototype. Les **modules 1 et 2** sont complets ; les modules 3 à 7 sont déclarés « en préparation ».
+> État : prototype. Les **modules 1 à 3** sont complets ; les modules 4 à 7 sont déclarés « en préparation ».
 > Les contenus sont une **proposition à valider**. La compatibilité eCampus **n'est pas encore vérifiée** (voir `docs/rapport-tests.md`).
 
 ## Prérequis
@@ -18,7 +18,7 @@ Uniquement Python 3 (déjà présent sur macOS) et un navigateur. Aucune dépend
 
 | Commande | Effet |
 |---|---|
-| `./build.sh` | Valide les contenus, puis génère `index.html` + `contenus/contenu.js` (site web), `exports/module-XX-<titre>-scorm12.zip` (packages SCORM) et, pour les tests locaux, `dist/scorm/` et `dist/simulateur/` |
+| `./build.sh` | Valide les contenus, puis génère `index.html` + `contenus/contenu.js` (site web), `exports/module-XX-<titre ou slugArchive>-scorm12.zip` (packages SCORM) et, pour les tests locaux, `dist/scorm/` et `dist/simulateur/` |
 | `./serve.sh` | Sert le projet sur `http://localhost:8000` (site, simulateur SCORM, tests) |
 | `python3 scripts/valider_contenus.py` | Valide uniquement les contenus |
 
@@ -41,6 +41,7 @@ Adresses publiées :
 - packages SCORM (aussi accessibles depuis la page Parcours) :
   - module 1 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-01-la-donnee-dans-mon-quotidien-scorm12.zip>
   - module 2 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-02-une-donnee-plusieurs-usages-scorm12.zip>
+  - module 3 : <https://tyrulfr.github.io/Projet-Sensi-GDD-Alter/exports/module-03-qualite-structuration-scorm12.zip>
 
 Le simulateur SCORM n'est disponible qu'en local (`./serve.sh`).
 
@@ -52,6 +53,7 @@ contenus/                 SOURCE PÉDAGOGIQUE UNIQUE (à modifier pour faire év
   catalogue.json          formation, objectifs, liste des 7 modules
   modules/module-01.json  leçons, blocs, activités, quiz, synthèse du module 1
   modules/module-02.json  idem pour le module 2 (schéma de circulation, chronologie, défi final)
+  modules/module-03.json  idem pour le module 3 (comparateur de tableaux, association, défi final)
   contenu.js              version compilée des contenus (GÉNÉRÉ)
 exports/                  packages SCORM 1.2, un ZIP par module (GÉNÉRÉ)
 src/

@@ -1,0 +1,374 @@
+{
+  "id": "m03",
+  "numero": 3,
+  "titre": "La qualité et la structuration des données",
+  "sousTitre": "Pourquoi certaines données sont faciles à utiliser et d'autres beaucoup moins.",
+  "slugArchive": "qualite-structuration",
+  "duree": 10,
+  "statutContenu": "proposition - à valider",
+  "objectif": "Comprendre pourquoi la manière de saisir, organiser et actualiser les données influence directement leur fiabilité, leur compréhension et leur réutilisation.",
+  "objectifsSpecifiques": [
+    { "id": "os3-1", "texte": "Reconnaître les principales caractéristiques d'une donnée de qualité." },
+    { "id": "os3-2", "texte": "Comprendre pourquoi des données structurées sont plus facilement exploitables." },
+    { "id": "os3-3", "texte": "Identifier les difficultés créées par des formats ou des nomenclatures incohérents." },
+    { "id": "os3-4", "texte": "Comprendre l'utilité d'un identifiant stable." },
+    { "id": "os3-5", "texte": "Reconnaître le rôle d'un référentiel commun." },
+    { "id": "os3-6", "texte": "Identifier les bons réflexes face à une information incomplète, ambiguë ou incorrecte." }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m03-defi"
+  },
+  "lecons": [
+    {
+      "id": "m03-l1",
+      "type": "lecon",
+      "titre": "Deux tableaux, deux conséquences",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles dans un service administratif de l'université. On te demande de préparer la liste des agents inscrits à une session de formation.\n\nUn collègue te transmet un tableau. À première vue, tout y est… mais au moment de trier les inscriptions par date, plusieurs choses coincent."
+        },
+        {
+          "type": "comparateur",
+          "titre": "Qu'est-ce qui rend ce tableau difficile à utiliser ?",
+          "consigne": "Sélectionne une cellule du tableau, ou une difficulté de la liste, pour comprendre ce qui pose problème. Examine les cinq difficultés.",
+          "avant": {
+            "titre": "Tableau A : inscriptions reçues",
+            "colonnes": ["Agent", "Service", "Date inscription"],
+            "lignes": [
+              ["Martin Julie", "RH", "12/03/26"],
+              ["Karim Bernard", "Ress. Humaines", "2026-03-12"],
+              ["Sophie Petit", "DRH", "13 mars 2026"],
+              ["Julie Martin", "RH", ""]
+            ],
+            "legende": "Données fictives."
+          },
+          "problemes": [
+            {
+              "id": "dates",
+              "libelle": "Formats de date hétérogènes",
+              "explication": "Trois écritures pour une même information : un tri par date sera faux. Et « 12/03/26 » peut se lire 12 mars… ou 3 décembre.",
+              "cellules": [[0, 2], [1, 2], [2, 2]]
+            },
+            {
+              "id": "nom-prenom",
+              "libelle": "Nom et prénom réunis",
+              "explication": "Une seule colonne, et pas toujours le même ordre : « Martin Julie », mais « Karim Bernard ». Impossible de trier par nom, ni d'être sûr de savoir lequel est le prénom.",
+              "cellules": [[0, 0], [1, 0], [2, 0], [3, 0]]
+            },
+            {
+              "id": "nomenclature",
+              "libelle": "Services désignés différemment",
+              "explication": "« RH », « Ress. Humaines », « DRH » : la même structure, ou pas ? Un comptage par service sera faux dans les deux cas si l'on se trompe. Seul le **référentiel des structures** permet de le savoir.",
+              "cellules": [[0, 1], [1, 1], [2, 1], [3, 1]]
+            },
+            {
+              "id": "manquante",
+              "libelle": "Une donnée manquante",
+              "explication": "La dernière date n'est pas renseignée. On ne l'invente pas : on la retrouve à la bonne source, ou on signale qu'elle manque.",
+              "cellules": [[3, 2]]
+            },
+            {
+              "id": "doublon",
+              "libelle": "Un risque de doublon",
+              "explication": "« Martin Julie » et « Julie Martin » : une personne inscrite deux fois, ou deux homonymes ? Sans identifiant, impossible de trancher. On vérifie avant de fusionner ou de supprimer une ligne.",
+              "cellules": [[0, 0], [3, 0]]
+            }
+          ],
+          "apres": {
+            "titre": "Tableau B : la même liste, mieux structurée",
+            "colonnes": ["Identifiant", "Nom", "Prénom", "Service", "Date inscription"],
+            "lignes": [
+              ["AG001", "Martin", "Julie", "RH", "2026-03-12"],
+              ["AG002", "Bernard", "Karim", "RH", "2026-03-12"],
+              ["AG003", "Petit", "Sophie", "RH", "2026-03-13"]
+            ],
+            "legende": "Identifiants et données fictifs.",
+            "atouts": [
+              "chaque information dans sa propre colonne ;",
+              "un seul format de date ;",
+              "un même libellé de service, issu d'une liste commune ;",
+              "un identifiant qui distingue chaque personne ;",
+              "des données plus simples à trier, filtrer et comparer."
+            ],
+            "avertissement": "**Attention :** le tableau B est une structure cible, pas une correction automatique du tableau A. Il suppose des vérifications faites à la bonne source (même service, doublon confirmé). Sans elles, on n'invente pas de date, on n'attribue pas d'identifiant et on ne fusionne pas deux personnes."
+          }
+        },
+        {
+          "type": "aretenir",
+          "texte": "Une donnée bien structurée est plus facile à comprendre, à vérifier et à réutiliser."
+        }
+      ]
+    },
+    {
+      "id": "m03-l2",
+      "type": "lecon",
+      "titre": "Qu'est-ce qu'une donnée de qualité ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Un gestionnaire de scolarité prépare la liste des étudiants inscrits à une formation. Il constate que certaines informations manquent, que d'autres se contredisent, et que plusieurs coordonnées ne semblent plus à jour."
+        },
+        { "type": "activite", "ref": "m03-a1" },
+        {
+          "type": "tableau",
+          "titre": "Cinq dimensions de la qualité",
+          "colonnes": ["Dimension", "La donnée…", "Exemple"],
+          "lignes": [
+            ["Exactitude", "correspond à la réalité qu'elle représente.", "La date de prise de fonction enregistrée est la bonne."],
+            ["Complétude", "comporte les informations nécessaires à l'usage prévu.", "Une inscription dispose de tous les champs indispensables à son traitement."],
+            ["Cohérence", "ne se contredit pas et respecte les règles définies.", "Un même code de formation est utilisé partout de la même façon."],
+            ["Actualité", "est suffisamment récente pour l'usage attendu.", "L'affectation d'un agent a été mise à jour après son changement de service."],
+            ["Conformité au format", "respecte les conventions nécessaires à son exploitation.", "Les dates suivent le format défini dans l'application."]
+          ]
+        },
+        {
+          "type": "exemple",
+          "etiquette": "Nuance",
+          "titre": "Un champ vide n'est pas toujours une erreur",
+          "texte": "Certaines informations sont facultatives ou sans objet dans une situation donnée. La complétude se juge toujours **par rapport à l'usage** : une donnée peut suffire pour un besoin et pas pour un autre."
+        },
+        { "type": "activite", "ref": "m03-a2" },
+        {
+          "type": "aretenir",
+          "texte": "La qualité d'une donnée dépend de sa fiabilité, de sa cohérence et de son adéquation avec l'usage prévu."
+        }
+      ]
+    },
+    {
+      "id": "m03-l3",
+      "type": "lecon",
+      "titre": "Pourquoi utiliser des identifiants et des référentiels ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Un service reçoit plusieurs listes concernant les mêmes agents. Il y trouve :\n\n- Julie Martin ;\n- MARTIN Julie ;\n- J. Martin ;\n- Julie MARTIN.\n\nQuatre personnes, ou une seule ? Impossible de le savoir avec certitude à partir de ces seuls libellés."
+        },
+        {
+          "type": "definition",
+          "terme": "Identifiant",
+          "texte": "Un code qui distingue de façon fiable chaque enregistrement **au sein d'un système défini** : identifiant étudiant, identifiant agent, numéro d'équipement, identifiant d'exemplaire. Il n'est pas forcément universel : deux applications peuvent attribuer des identifiants différents à la même personne."
+        },
+        {
+          "type": "tableau",
+          "titre": "Liste 1 : sans identifiant",
+          "colonnes": ["Nom", "Prénom"],
+          "lignes": [["Martin", "Julie"], ["Martin", "Julie"]],
+          "legende": "Une seule personne inscrite deux fois, ou deux homonymes ? On ne peut pas le savoir."
+        },
+        {
+          "type": "tableau",
+          "titre": "Liste 2 : avec identifiant",
+          "colonnes": ["Identifiant fictif", "Nom", "Prénom"],
+          "lignes": [["AG104", "Martin", "Julie"], ["AG287", "Martin", "Julie"]],
+          "legende": "Deux identifiants différents : il s'agit de deux personnes distinctes, qui portent les mêmes nom et prénom."
+        },
+        {
+          "type": "definition",
+          "terme": "Référentiel",
+          "texte": "Un ensemble organisé de données de référence, utilisé comme point commun pour identifier, décrire ou classer des éléments de façon cohérente : référentiel des structures, des formations, des bâtiments, des types d'équipements…"
+        },
+        {
+          "type": "definition",
+          "terme": "Nomenclature",
+          "texte": "Un système organisé de catégories, de codes ou de libellés, utilisés selon des règles communes."
+        },
+        {
+          "type": "exemple",
+          "titre": "« RH », « DRH » ou « Ressources humaines » ?",
+          "texte": "Un service ne devrait pas être désigné indifféremment par l'un ou l'autre de ces termes. Attention : des libellés proches ne sont pas forcément équivalents. C'est le référentiel qui permet de le vérifier."
+        },
+        { "type": "activite", "ref": "m03-a3" },
+        {
+          "type": "aretenir",
+          "texte": "Les identifiants et les référentiels permettent de parler des mêmes éléments de manière cohérente."
+        }
+      ]
+    },
+    {
+      "id": "m03-l4",
+      "type": "lecon",
+      "titre": "La qualité commence dans les pratiques quotidiennes",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles dans un service de maintenance. Tu dois renseigner la date de la dernière intervention sur un équipement. Le formulaire prévoit une date… mais tu ne disposes pas de l'information vérifiée. Que fais-tu ?"
+        },
+        { "type": "activite", "ref": "m03-a4" },
+        {
+          "type": "texte",
+          "titre": "Des gestes simples",
+          "texte": "La qualité des données repose sur des pratiques simples :\n\n- vérifier une information lorsqu'un doute existe ;\n- utiliser les formats prévus ;\n- respecter les nomenclatures applicables ;\n- ne pas inventer une valeur pour remplir un champ ;\n- signaler une anomalie ;\n- utiliser les sources appropriées ;\n- corriger une information selon les procédures autorisées."
+        },
+        {
+          "type": "exemple",
+          "etiquette": "Bon à savoir",
+          "titre": "Tu n'as pas à tout corriger seul",
+          "texte": "Repérer une erreur ne veut pas dire la corriger soi-même. Selon ta mission et tes droits dans l'application, le bon geste peut être de la signaler au service compétent, qui saura vérifier et corriger à la source."
+        },
+        {
+          "type": "aretenir",
+          "texte": "Je contribue à la qualité des données en saisissant, vérifiant et signalant les informations avec rigueur."
+        }
+      ]
+    },
+    {
+      "id": "m03-defi",
+      "type": "evaluation",
+      "titre": "Le défi du module",
+      "surtitre": "Défi final",
+      "libelleAcces": "Relever le défi",
+      "libelleRecommencer": "Recommencer le défi",
+      "presentation": "une-par-une",
+      "introduction": "Quatre situations, une question à la fois. Tu découvres la correction après chaque réponse, et tu peux recommencer le défi autant de fois que tu le souhaites.",
+      "activites": ["m03-q1", "m03-q2", "m03-q3", "m03-q4"],
+      "messagesResultat": [
+        { "min": 100, "texte": "Bravo ! Tu sais reconnaître ce qui rend une donnée fiable, structurée et réutilisable." },
+        { "min": 75, "texte": "Très bien. Relis la correction de la question à revoir : elle reprend une notion clé du module." },
+        { "min": 50, "texte": "C'est un bon début. Les corrections et les points à retenir t'aideront à consolider les notions de structure, d'identifiant et de référentiel." },
+        { "min": 0, "texte": "Ces notions sont nouvelles pour beaucoup de personnes. Prends le temps de relire les corrections, puis recommence le défi quand tu le souhaites." }
+      ]
+    }
+  ],
+  "activites": {
+    "m03-a1": {
+      "type": "vrai-faux",
+      "objectif": "os3-1",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Vrai ou faux : toutes les données enregistrées dans un logiciel sont nécessairement fiables.",
+      "reponse": false,
+      "explication": {
+        "correct": "C'est bien faux. Un logiciel peut contenir des informations incomplètes, obsolètes ou incorrectes : il conserve ce qu'on y a saisi, sans pouvoir toujours le vérifier. D'où l'intérêt de connaître les dimensions de la qualité.",
+        "incorrect": "En réalité, c'est faux. Un logiciel peut contenir des informations incomplètes, obsolètes ou incorrectes : il conserve ce qu'on y a saisi, sans pouvoir toujours le vérifier."
+      }
+    },
+    "m03-a2": {
+      "type": "classement",
+      "objectif": "os3-1",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Pour chaque situation, choisis la dimension de qualité principalement concernée.",
+      "categories": [
+        { "id": "e", "texte": "Exactitude" },
+        { "id": "c", "texte": "Complétude" },
+        { "id": "h", "texte": "Cohérence" },
+        { "id": "a", "texte": "Actualité" },
+        { "id": "f", "texte": "Conformité au format" }
+      ],
+      "elements": [
+        { "id": "1", "texte": "Scolarité : deux codes différents sont utilisés pour la même formation.", "categorie": "h", "explication": "Les données se contredisent : c'est un problème de cohérence." },
+        { "id": "2", "texte": "Maintenance : la date de contrôle enregistrée ne correspond pas à la date réelle du contrôle.", "categorie": "e", "explication": "La donnée ne correspond pas à la réalité : c'est un problème d'exactitude." },
+        { "id": "3", "texte": "RH : l'ancienne affectation d'un agent est toujours affichée.", "categorie": "a", "explication": "L'information était juste, mais elle n'a pas été mise à jour : c'est un problème d'actualité." },
+        { "id": "4", "texte": "Finances : les dates d'un tableau de suivi sont saisies dans plusieurs formats, différents du format attendu.", "categorie": "f", "explication": "Les conventions de saisie ne sont pas respectées : c'est un problème de conformité au format." },
+        { "id": "5", "texte": "Inscription : un champ obligatoire du dossier n'est pas renseigné.", "categorie": "c", "explication": "Une information indispensable manque : c'est un problème de complétude." }
+      ],
+      "explication": {
+        "correct": "Bravo, tes associations sont justes. Dans la réalité, une même situation peut toucher plusieurs dimensions à la fois : des formats de date différents posent aussi un problème de cohérence, par exemple.",
+        "incorrect": "Certaines associations sont à revoir : les explications ci-dessus précisent la dimension principalement concernée. Pas d'inquiétude : une même situation peut souvent toucher plusieurs dimensions à la fois."
+      }
+    },
+    "m03-a3": {
+      "type": "choix-unique",
+      "objectif": "os3-3",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Deux fichiers utilisent des noms différents pour désigner une structure. Quel est le meilleur réflexe ?",
+      "choix": [
+        { "id": "a", "texte": "Choisir le libellé le plus court.", "feedback": "Un libellé court est pratique, mais rien ne garantit qu'il désigne la bonne structure, ni que les deux libellés renvoient à la même entité." },
+        { "id": "b", "texte": "Consulter le référentiel ou la source de référence applicable.", "feedback": "Le référentiel permet de vérifier s'il s'agit de la même structure et d'utiliser la désignation commune." },
+        { "id": "c", "texte": "Créer un nouveau code local.", "feedback": "Un code de plus ajouterait une variante supplémentaire, que les autres services ne connaîtront pas." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Oui. Le référentiel sert justement de point commun : il permet de vérifier si deux libellés désignent la même structure et de les rapprocher sans se tromper.",
+        "incorrect": "Le meilleur réflexe est de consulter le référentiel ou la source de référence applicable : il permet de vérifier si deux libellés désignent la même structure, sans le supposer."
+      }
+    },
+    "m03-a4": {
+      "type": "choix-unique",
+      "objectif": "os3-6",
+      "notation": { "formative": true, "points": 1 },
+      "consigne": "Une date de contrôle est inconnue, mais le champ de saisie semble obligatoire. Quelle attitude adopter ?",
+      "choix": [
+        { "id": "a", "texte": "Indiquer une date approximative pour terminer rapidement.", "feedback": "Une date approximative serait ensuite lue comme une date réelle, et pourrait fausser le suivi des contrôles." },
+        { "id": "b", "texte": "Copier la date de l'équipement voisin.", "feedback": "La date d'un autre équipement ne dit rien de celui-ci : ce serait une information inventée." },
+        { "id": "c", "texte": "Vérifier la source disponible ou signaler l'information manquante selon la procédure prévue.", "feedback": "C'est le bon réflexe : chercher l'information vérifiée, ou signaler qu'elle manque." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Une donnée manquante est préférable à une information inventée qui pourrait ensuite être considérée comme fiable. La conduite concrète dépend de la procédure métier et des possibilités de l'outil.",
+        "incorrect": "La bonne attitude est de vérifier la source disponible ou de signaler l'information manquante. Une donnée manquante est préférable à une information inventée qui pourrait ensuite être considérée comme fiable. La conduite concrète dépend de la procédure métier et des possibilités de l'outil."
+      }
+    },
+    "m03-q1": {
+      "type": "choix-unique",
+      "objectif": "os3-2",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un fichier contient une colonne unique « Nom Prénom ». Pourquoi peut-elle compliquer le traitement des informations ?",
+      "choix": [
+        { "id": "a", "texte": "Parce qu'Excel interdit ce type de colonne." },
+        { "id": "b", "texte": "Parce qu'il peut être difficile de distinguer automatiquement le nom du prénom." },
+        { "id": "c", "texte": "Parce qu'un tableau ne peut contenir que des nombres." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Des champs séparés et clairement définis facilitent les opérations de tri, de recherche et de réutilisation.",
+        "incorrect": "La bonne réponse est la deuxième : il devient difficile de distinguer le nom du prénom. Des champs séparés et clairement définis facilitent les opérations de tri, de recherche et de réutilisation."
+      }
+    },
+    "m03-q2": {
+      "type": "choix-unique",
+      "objectif": "os3-1",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Dans une application de gestion, l'affectation d'un agent n'a pas été mise à jour depuis son changement de service. Quelle dimension de qualité est principalement concernée ?",
+      "choix": [
+        { "id": "a", "texte": "L'actualité de la donnée." },
+        { "id": "b", "texte": "Sa taille informatique." },
+        { "id": "c", "texte": "Son apparence graphique." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Une information peut avoir été exacte lors de son enregistrement et devenir obsolète. Sa mise à jour est importante pour les usages qui en dépendent.",
+        "incorrect": "La dimension concernée est l'actualité. Une information peut avoir été exacte lors de son enregistrement et devenir obsolète. Sa mise à jour est importante pour les usages qui en dépendent."
+      }
+    },
+    "m03-q3": {
+      "type": "choix-unique",
+      "objectif": "os3-4",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Deux étudiants portent le même nom et le même prénom. Quelle information permet généralement de les distinguer le plus fiablement dans le système de scolarité ?",
+      "choix": [
+        { "id": "a", "texte": "Leur ordre d'apparition dans le tableau." },
+        { "id": "b", "texte": "Leur prénom écrit en majuscules." },
+        { "id": "c", "texte": "Leur identifiant étudiant individuel." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Un identifiant unique dans un périmètre défini permet de distinguer des enregistrements qui présentent des informations similaires.",
+        "incorrect": "La bonne réponse est l'identifiant étudiant individuel. Un identifiant unique dans un périmètre défini permet de distinguer des enregistrements qui présentent des informations similaires."
+      }
+    },
+    "m03-q4": {
+      "type": "choix-unique",
+      "objectif": "os3-5",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Deux services utilisent des libellés différents pour désigner une même catégorie d'équipement. Quelle démarche favorise la cohérence ?",
+      "choix": [
+        { "id": "a", "texte": "Utiliser un référentiel ou une nomenclature commune adaptée." },
+        { "id": "b", "texte": "Conserver des libellés différents sans aucune correspondance." },
+        { "id": "c", "texte": "Ajouter autant de variantes que possible." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Des règles de désignation communes facilitent la compréhension, le rapprochement et la réutilisation des données entre services.",
+        "incorrect": "La démarche à privilégier est d'utiliser un référentiel ou une nomenclature commune adaptée. Des règles de désignation communes facilitent la compréhension, le rapprochement et la réutilisation des données entre services."
+      }
+    }
+  },
+  "synthese": [
+    "Une donnée bien structurée (une information par colonne, des formats homogènes, des libellés communs) est plus facile à comprendre, à vérifier et à réutiliser.",
+    "Une donnée de qualité est exacte, complète, cohérente, actualisée et conforme au format attendu, toujours au regard de l'usage prévu.",
+    "Les identifiants distinguent les enregistrements dans un système donné ; les référentiels et les nomenclatures permettent de désigner les mêmes éléments de la même façon.",
+    "Au quotidien : vérifier en cas de doute, ne pas inventer une valeur, signaler une anomalie et corriger selon les procédures prévues."
+  ]
+}

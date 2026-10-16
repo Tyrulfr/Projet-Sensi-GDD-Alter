@@ -141,7 +141,7 @@ h3 { font-size: 1.1rem; margin: 0 0 .5rem; }
 /* ---------- Leçon ---------- */
 
 .lecon-entete { margin-bottom: 1rem; }
-.lecon-blocs { display: grid; gap: 1rem; }
+.lecon-blocs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
 
 .bloc {
   background: var(--couleur-surface); border: 1px solid var(--couleur-bordure);
@@ -229,6 +229,48 @@ tbody th { font-weight: 700; }
 .chronologie-titre { margin: .3rem 0 .2rem; font-weight: 700; }
 .chronologie-corps p { margin: .2rem 0; }
 .chronologie-conclusion { border-top: 1px solid var(--couleur-bordure); padding-top: .75rem; }
+
+.tableau-legende { padding: 0 1.25rem 1rem; margin: 0; }
+
+/* Comparateur de tableaux */
+.comparateur-etiquette {
+  display: inline-block; margin: 1rem 0 .4rem; padding: .15rem .6rem; border-radius: 999px;
+  font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
+  background: var(--couleur-alerte-clair); color: #4a2d00;
+}
+.comparateur-etiquette-apres { background: var(--couleur-succes-clair); color: var(--couleur-succes); }
+.bloc-comparateur .tableau-defilant { border: 1px solid var(--couleur-bordure); border-radius: var(--rayon); }
+.bloc-comparateur .tableau-defilant:focus-visible { outline: 3px solid var(--couleur-focus); outline-offset: 2px; }
+.tableau-comparateur { min-width: 32rem; }
+.tableau-comparateur caption { padding: .75rem 1rem .5rem; }
+.tableau-comparateur td.td-bouton { padding: .25rem; }
+.cellule-bouton {
+  width: 100%; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: .4rem;
+  padding: .4rem .75rem; font: inherit; text-align: left; color: var(--couleur-texte); cursor: pointer;
+  background: transparent; border: 2px dashed #dcdce4; border-radius: 6px;
+}
+.cellule-bouton:hover { background: #f6f6f9; border-color: var(--couleur-texte-doux); }
+.cellule-bouton.est-signalee { background: var(--couleur-alerte-clair); border: 2px solid var(--couleur-alerte); font-weight: 600; }
+.cellule-marque { color: var(--couleur-alerte); font-weight: 700; }
+.cellule-vide { color: var(--couleur-texte-doux); font-style: italic; }
+.tableau-indice { display: none; margin: .35rem 0 0; font-size: .85rem; color: var(--couleur-texte-doux); }
+@media (max-width: 36rem) {
+  .tableau-indice { display: block; }
+}
+.comparateur-sous-titre { margin: 1.25rem 0 .5rem; font-weight: 700; }
+.comparateur-problemes {
+  list-style: none; margin: 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .5rem;
+}
+.comparateur-problemes .schema-cible { min-height: 100%; }
+.comparateur-compteur { margin: .75rem 0 .25rem; font-size: .9rem; color: var(--couleur-texte-doux); }
+.comparateur-detail {
+  padding: .75rem 1rem; border-radius: var(--rayon); background: #fbfbfd; border: 1px dashed var(--couleur-bordure);
+}
+.comparateur-detail p { margin: .3rem 0; }
+.comparateur-lieux { font-size: .9rem; color: var(--couleur-texte-doux); }
+.comparateur-apres { margin-top: 1.25rem; padding-top: .5rem; border-top: 1px solid var(--couleur-bordure); }
+.comparateur-atouts ul { margin: .25rem 0 .75rem; padding-left: 1.25rem; }
 
 .recapitulatif { margin: 1.25rem 0; }
 .recapitulatif > summary { cursor: pointer; font-weight: 700; padding: .5rem 0; min-height: 44px; }

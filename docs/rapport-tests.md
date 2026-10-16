@@ -150,3 +150,67 @@ Les tests unitaires couvrent : format du temps SCORM, échappement du texte, cor
 - La position dans une leçon non terminée (étapes de chronologie déjà vues) n'est pas mémorisée après rechargement ; la leçon reprend au dernier exercice répondu.
 - **Rien n'a été testé dans un vrai LMS.** À vérifier sur eCampus : import du ZIP ; affichage du statut `completed` (et non `passed`/`failed`) ; prise en compte du score sans seuil ; réglage d'achèvement (« statut terminé requis » plutôt que « note minimale ») ; reprise ; rapport des 3 interactions.
 - Les nouveaux composants (schéma, chronologie, défi) n'ont pas été testés avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge.
+
+## 8. Module 3 « La qualité et la structuration des données »
+
+### Ce qui a été développé
+
+- Contenu `contenus/modules/module-03.json` : 4 leçons, 4 activités formatives (vrai/faux, association des 5 dimensions, 2 questions), défi de 4 questions (réponses B, A, C, A), 6 objectifs couverts. Sans seuil.
+- Nouveau composant réutilisable **comparateur** (tableau A cliquable / liste de difficultés / tableau B) ; légende facultative des tableaux ; listes à puces dans les textes.
+- L'association utilise l'activité `classement` existante (boutons radio, sans glisser-déposer).
+- Archive : `module-03-qualite-structuration-scorm12.zip` (12 fichiers, champ `slugArchive`).
+- Validateur : contrôles du comparateur (tailles des tableaux, cellules hors tableau, identifiants en double, textes manquants, avertissement absent) et de `slugArchive`, vérifiés par injection volontaire de 6 erreurs : toutes signalées.
+
+### Tests automatisés
+
+**36 / 36** (dont 9 nouveaux pour le module 3 : réponses attendues, réponses du défi, correction élément par élément de l'association, verrouillage du défi, 3/4 → `completed` 75, 0/4 → meilleur score conservé, adaptateur SCORM avec reprise et 4 interactions, 3 tests d'affichage du comparateur).
+
+### Site web (piloté dans le navigateur, Chrome intégré à Cursor)
+
+| Scénario | Résultat |
+|---|---|
+| Clic sur une cellule : cellule encadrée, marque ⚠ et mention « (difficulté signalée) » lue par les lecteurs d'écran (pas seulement la couleur) | **OK** |
+| Cellule concernée par deux difficultés : un deuxième clic passe à la seconde | **OK** |
+| « Voir le tableau mieux structuré » n'apparaît qu'après les 5 difficultés ; focus placé sur le tableau B ; « Continuer » bloqué avant | **OK** |
+| Avertissement « structure cible, pas une correction automatique » affiché avec le tableau B | **OK** |
+| Leçons 3.2 à 3.4 : vrai/faux, association (correction par élément, « Réessayer »), questions 3.3 (B) et 3.4 (C) | **OK** |
+| Défi une question à la fois, focus sur chaque question ; 3/4 → « 3 / 4 bonnes réponses (75 %) », message personnalisé, statut « Terminé », synthèse | **OK** |
+| Pas de bouton « Module 4 » (module non disponible) | **OK** |
+| Tablette 768 px : tableaux entièrement visibles, cellules de 44 px de haut | **OK** |
+| Mobile 375 px : aucune largeur de page excédentaire ; les tableaux défilent dans leur cadre, avec l'indication « Fais glisser le tableau » | **OK** (après correction) |
+| Page Parcours : module 3 « Terminé », meilleur score, lien vers le ZIP | **OK** |
+
+### SCORM 1.2 dans le simulateur
+
+| Scénario | Résultat |
+|---|---|
+| Session 1 interrompue en leçon 3.2 : `incomplete`, `exit` = `suspend`, `lesson_location` = `m03-l2`, 1 `Initialize` et 1 `Finish` | **OK** |
+| Session 2 : `entry` = `resume`, reprise en leçon 3.2, fin à 3/4 → `completed`, score brut 75 (min 0, max 100), 4 interactions (q2 fausse), `exit` vide, temps cumulé | **OK** |
+| `suspend_data` en fin de parcours : 239 / 4096 caractères ; 0 erreur SCORM | **OK** |
+| Aucun lien vers le site web ni vers d'autres modules dans le package ; manifeste bien formé, sans `masteryscore` | **OK** |
+| Deux builds successifs produisent des ZIP identiques | **OK** |
+
+### Non-régression des modules 1 et 2
+
+| Scénario | Résultat |
+|---|---|
+| Module 1 : quiz 4/4 → « Seuil de réussite atteint (70 %) », statut « Réussi », bouton « Module 2 » | **OK** |
+| Module 2 : défi 3/3, statut « Terminé » ; **nouveau** bouton « Module 3 : La qualité et la structuration des données → » | **OK** |
+| Schéma du module 2 : 4 cibles, pas de débordement de page | **OK** |
+| Tests unitaires des modules 1 et 2 | **OK** |
+
+Modifications communes justifiées : la grille des leçons (`.lecon-blocs`) empêche désormais un contenu large de déborder sur mobile (correction utile à tous les modules) ; les ZIP des modules 1 et 2 sont reconstruits parce que le code commun a changé. Leurs contenus n'ont pas été modifiés.
+
+### Anomalies rencontrées et corrigées
+
+1. **Mobile** : le tableau A élargissait toute la page (562 px pour un écran de 375 px). Corrigé dans la grille commune ; le tableau défile désormais dans son cadre.
+2. Cellules cliquables peu identifiables avant toute sélection : ajout d'un contour pointillé.
+3. Charge de lecture : environ 1 100 mots de leçons, soit 50 % de plus que le module 1. Les explications ont été resserrées (environ 1 000 mots) sans retirer de notion.
+
+### Limites et points à valider
+
+- La progression dans le comparateur n'est pas mémorisée après rechargement : la leçon 3.1 non terminée repart de zéro ; une fois vue, le tableau B est affiché d'emblée.
+- Un défi interrompu reprend à la question 1 (comme au module 2).
+- Durée réelle à mesurer avec quelques agents (estimation : 8 à 11 minutes).
+- **Rien n'a été testé dans un vrai LMS.** À vérifier sur eCampus : import du ZIP, statut `completed` sans seuil, score, reprise, rapport des 4 interactions (dont l'association, de type `matching`), affichage du tableau dans le cadre du LMS sur mobile.
+- Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge.
