@@ -21,6 +21,7 @@
     comparateur: {},     /* difficultés examinées et tableau « après » affiché, par comparateur */
     simulateur: {},      /* situation en cours et décisions prises, par simulateur */
     defi: {},            /* défi « une question à la fois » en cours : { i, codes, verifie } */
+    final: {},           /* écran de synthèse affiché après le résultat, par évaluation */
     avertissement: null,
     session: null,       /* SCORM : 'terminee' après LMSFinish */
     focus: null
@@ -177,6 +178,99 @@
     return liste;
   }
 
+  /* ---------- Parcours complet et reconnaissance (site web) ---------- */
+
+  function infoModuleCatalogue(id) {
+    var entree = catalogue.modules.filter(function (e) { return e.id === id; })[0] || {};
+    var mod = contenu.modules[id];
+    return {
+      numero: entree.numero, titre: (mod && mod.titre) || entree.titre,
+      accessible: !modeScorm && entree.etat === 'disponible' && !!mod
+    };
+  }
+
+  function etatParcours() {
+    var r = catalogue.reconnaissance || {};
+    var conditions = r.conditions || {};
+    var total = catalogue.modules.length, commences = 0, termines = 0;
+    catalogue.modules.forEach(function (e) {
+      if (e.etat !== 'disponible' || !contenu.modules[e.id]) { return; }
+      var st = moteur(e.id).statut();
+      if (st.completion !== 'non-commence') { commences++; }
+      if (st.completion === 'termine') { termines++; }
+    });
+    var stFinal = r.moduleFinal && contenu.modules[r.moduleFinal] ? moteur(r.moduleFinal).statut() : null;
+    var finalTermine = !!stFinal && stFinal.completion === 'termine';
+    var finalReussi = finalTermine && (stFinal.seuil === null || stFinal.reussite === 'reussi');
+    var tousOk = conditions.tousLesModules === false || termines === total;
+    var finalOk = !r.moduleFinal || (conditions.reussiteModuleFinal === false ? finalTermine : finalReussi);
+    return {
+      total: total, commences: commences, termines: termines, final: stFinal,
+      finalTermine: finalTermine, finalReussi: finalReussi, conditions: conditions,
+      termine: tousOk && finalOk,
+      enCours: commences > 0
+    };
+  }
+
+  function texteMissionFinale(st) {
+    if (!st || st.completion === 'non-commence') { return 'non commencée'; }
+    if (st.completion !== 'termine') { return 'en cours'; }
+    var score = ' (score retenu : ' + st.score + ' %)';
+    if (st.reussite === 'reussi') { return 'seuil de réussite atteint' + score; }
+    if (st.reussite === 'echoue') { return 'seuil de réussite non atteint' + score; }
+    return 'terminée' + score;
+  }
+
+  function carteReconnaissance(p, niveauTitre) {
+    var r = catalogue.reconnaissance;
+    if (!r) { return null; }
+    var finale = r.moduleFinal ? infoModuleCatalogue(r.moduleFinal) : null;
+    var contenuCarte;
+    if (p.termine) {
+      contenuCarte = h('div', { class: 'reconnaissance-badge' }, [
+        h('span', { class: 'reconnaissance-icone', 'aria-hidden': 'true', text: '★' }),
+        h('div', null, [
+          h('p', { class: 'reconnaissance-nom', text: r.titre }),
+          h('p', { text: 'Parcours de sensibilisation terminé (selon les données de ce navigateur).' })
+        ])
+      ]);
+    } else {
+      contenuCarte = h('div', null, [
+        h('p', { text: 'Pour afficher la reconnaissance « ' + r.titre + ' » :' }),
+        h('ul', { class: 'liste-conditions' }, [
+          p.conditions.tousLesModules === false ? null
+            : h('li', null, [h('span', { 'aria-hidden': 'true', text: p.termines === p.total ? '✓ ' : '○ ' }),
+              'terminer les ' + p.total + ' modules (' + p.termines + ' sur ' + p.total + ' pour l\'instant)']),
+          finale ? h('li', null, [h('span', { 'aria-hidden': 'true', text: (p.conditions.reussiteModuleFinal === false ? p.finalTermine : p.finalReussi) ? '✓ ' : '○ ' }),
+            p.conditions.reussiteModuleFinal === false ? 'terminer la mission finale (module ' + finale.numero + ')'
+              : 'atteindre le seuil de réussite de la mission finale (module ' + finale.numero + ')']) : null
+        ])
+      ]);
+    }
+    return h('div', { class: 'reconnaissance' + (p.termine ? ' est-obtenue' : '') }, [
+      h(niveauTitre, { text: 'Reconnaissance du parcours' }),
+      contenuCarte,
+      r.mention ? h('p', { class: 'reconnaissance-mention', text: r.mention }) : null
+    ]);
+  }
+
+  function carteParcours(niveauTitre) {
+    if (modeScorm) { return null; }
+    var p = etatParcours();
+    var finale = catalogue.reconnaissance && catalogue.reconnaissance.moduleFinal;
+    var sousTitre = niveauTitre === 'h2' ? 'h3' : 'h4';
+    return h('section', { class: 'carte carte-parcours', 'aria-label': 'Ma progression dans la formation' }, [
+      h(niveauTitre, { text: 'Ma progression dans la formation' }),
+      h('ul', { class: 'parcours-etat' }, [
+        h('li', null, [h('strong', null, 'Modules commencés : '), p.commences + ' sur ' + p.total]),
+        h('li', null, [h('strong', null, 'Modules terminés : '), p.termines + ' sur ' + p.total]),
+        finale ? h('li', null, [h('strong', null, 'Mission finale (module ' + infoModuleCatalogue(finale).numero + ') : '), texteMissionFinale(p.final)]) : null,
+        h('li', null, [h('strong', null, 'Parcours : '), p.termine ? 'terminé' : (p.enCours ? 'en cours' : 'non commencé')])
+      ]),
+      carteReconnaissance(p, sousTitre)
+    ]);
+  }
+
   function sectionTelechargements() {
     var exports = config.exports || {};
     var ids = Object.keys(exports);
@@ -197,6 +291,7 @@
       h('h1', { tabindex: '-1', text: 'Parcours de formation' }),
       h('p', { class: 'chapo', text: 'Les modules sont indépendants : tu peux les suivre dans l\'ordre proposé ou selon tes besoins.' }),
       avertissement(),
+      carteParcours('h2'),
       listeModules('h2'),
       sectionTelechargements(),
       h('div', { class: 'actions actions-discretes' }, h('button', {
@@ -204,7 +299,7 @@
         onclick: function () {
           if (root.confirm('Effacer toute ta progression enregistrée dans ce navigateur ?')) {
             GDD.TraceurLocal.effacerTout(catalogue.id);
-            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.simulateur = {}; etat.defi = {};
+            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.simulateur = {}; etat.defi = {}; etat.final = {};
             afficher();
             annoncer('Progression effacée.');
           }
@@ -416,7 +511,12 @@
   function pageEvaluation(m, index) {
     var l = m.lecons[index];
     var precedent = m.resultatEvaluation(l.id);
-    if (precedent && !etat.repasser[l.id]) { return pageResultat(m, index, precedent); }
+    var differee = l.presentation === 'une-par-une' && l.correction === 'differee';
+    var enCours = differee && m.tentativeEnCours(l.id) && m.tentativesRestantes(l.id) > 0;
+    if (precedent && !etat.repasser[l.id] && !enCours) {
+      return etat.final[l.id] && l.ecranFinal ? pageSynthese(m, index) : pageResultat(m, index, precedent);
+    }
+    if (differee) { return pageMission(m, index); }
     if (l.presentation === 'une-par-une') { return pageDefi(m, index); }
 
     var composants = [];
@@ -526,6 +626,151 @@
     ];
   }
 
+  /*
+   * Évaluation finale à correction différée : une question à la fois, retour possible,
+   * aucune correction avant la validation. La tentative en cours est enregistrée
+   * (reprise après interruption, y compris dans le LMS via cmi.suspend_data).
+   */
+  function pageMission(m, index) {
+    var l = m.lecons[index];
+    var n = l.activites.length;
+    var t = m.tentativeEnCours(l.id) || { i: 0, r: {} };
+    var i = Math.min(t.i, n - 1);
+    var idQ = l.activites[i];
+    var q = m.module.activites[idQ];
+    var composant = UI.activite(idQ, q, { mode: 'evaluation', code: t.r[idQ] || null, titre: 'Question ' + (i + 1) + ' sur ' + n });
+    var message = h('div', { class: 'activite-message', role: 'status', tabindex: '-1' });
+
+    function reponses() {
+      var actuel = m.tentativeEnCours(l.id) || { r: {} };
+      var r = {};
+      Object.keys(actuel.r).forEach(function (k) { r[k] = actuel.r[k]; });
+      var code = composant.lireReponse();
+      if (code !== null) { r[idQ] = code; }
+      return r;
+    }
+    function alerter(texte) {
+      message.innerHTML = '';
+      message.appendChild(h('p', { class: 'message-alerte', text: texte }));
+      message.focus();
+    }
+    function allerA(j) {
+      m.enregistrerTentative(l.id, j, reponses());
+      etat.focus = 'act-' + l.activites[j];
+      afficher();
+    }
+    composant.element.addEventListener('change', function () { m.enregistrerTentative(l.id, i, reponses()); });
+
+    var boutons = [];
+    if (i > 0) {
+      boutons.push(h('button', { type: 'button', class: 'bouton bouton-secondaire', onclick: function () { allerA(i - 1); } }, '← Question précédente'));
+    }
+    if (i < n - 1) {
+      boutons.push(h('button', {
+        type: 'button', class: 'bouton bouton-principal',
+        onclick: function () {
+          if (composant.lireReponse() === null) { alerter('Choisis une réponse avant de passer à la question suivante.'); return; }
+          allerA(i + 1);
+        }
+      }, 'Question suivante →'));
+    } else {
+      boutons.push(h('button', {
+        type: 'button', class: 'bouton bouton-principal',
+        onclick: function () {
+          if (composant.lireReponse() === null) { alerter('Choisis une réponse avant de valider.'); return; }
+          var r = reponses();
+          var manquantes = [];
+          l.activites.forEach(function (id, k) { if (!r[id]) { manquantes.push(k + 1); } });
+          if (manquantes.length) {
+            m.enregistrerTentative(l.id, i, r);
+            alerter((manquantes.length > 1 ? 'Questions sans réponse : ' : 'Question sans réponse : ') + manquantes.join(', ') + '. Utilise « Question précédente » pour y revenir.');
+            return;
+          }
+          var res = m.soumettreEvaluation(l.id, r);
+          if (!res) { alerter('Le nombre maximal de tentatives est atteint.'); return; }
+          etat.repasser[l.id] = false;
+          etat.final[l.id] = false;
+          etat.focus = 'resultat-titre';
+          afficher();
+          annoncer('Résultat : ' + res.bonnes + ' bonnes réponses sur ' + res.total + '.');
+        }
+      }, (l.libelleValider || 'Valider mes réponses') + ' →'));
+    }
+
+    var repondues = l.activites.filter(function (id) { return !!t.r[id]; }).length;
+    return [
+      enteteLecon(m, index),
+      avertissement(),
+      i === 0 && l.introduction ? h('p', { class: 'chapo', text: l.introduction }) : null,
+      UI.barreProgression(Math.round(repondues / n * 100), 'Réponses enregistrées dans la mission',
+        repondues + ' réponse' + (repondues > 1 ? 's' : '') + ' enregistrée' + (repondues > 1 ? 's' : '') + ' sur ' + n),
+      h('div', { class: 'bloc bloc-activite' }, composant.element),
+      message,
+      h('div', { class: 'actions' }, boutons)
+    ];
+  }
+
+  function bilanNotions(items) {
+    if (!items.length || !items.every(function (it) { return it.activite.remediation; })) { return null; }
+    return h('section', { class: 'carte bilan-notions', 'aria-labelledby': 'bilan-notions-titre' }, [
+      h('h2', { id: 'bilan-notions-titre', text: 'Mon bilan par notion' }),
+      h('p', { class: 'aide', text: 'Chaque notion n\'est observée ici qu\'à travers une seule situation : ce bilan est une indication pour orienter tes révisions, pas un diagnostic de tes compétences.' }),
+      h('ul', { class: 'liste-bilan' }, items.map(function (it) {
+        var rem = it.activite.remediation;
+        var info = infoModuleCatalogue(rem.module);
+        var libelleModule = 'module ' + info.numero + ' « ' + info.titre + ' »';
+        return h('li', { class: it.correct ? 'est-juste' : 'est-a-revoir' }, [
+          h('p', { class: 'bilan-notion' }, [
+            h('span', { 'aria-hidden': 'true', text: it.correct ? '✓ ' : '↻ ' }),
+            h('strong', { text: rem.notion }),
+            it.correct ? ' : notion correctement mobilisée dans cette situation.' : ' : notion à revoir.'
+          ]),
+          it.correct ? null : h('p', { class: 'bilan-resume', html: GDD.util.inlineText(rem.resume) }),
+          it.correct ? null : (info.accessible
+            ? h('p', null, h('a', { href: lienModule(rem.module) }, 'Tu peux approfondir ce point dans le ' + libelleModule))
+            : h('p', { text: 'Tu peux approfondir ce point dans le ' + libelleModule + ' du parcours.' }))
+        ]);
+      }))
+    ]);
+  }
+
+  function pageSynthese(m, index) {
+    var l = m.lecons[index];
+    var f = l.ecranFinal;
+    document.title = f.titre + ' - ' + m.module.titre;
+    var actions = h('div', { class: 'actions' }, [
+      h('button', {
+        type: 'button', class: 'bouton bouton-secondaire',
+        onclick: function () { etat.final[l.id] = false; etat.focus = 'resultat-titre'; afficher(); }
+      }, '← Revoir mon résultat'),
+      modeScorm ? h('button', { type: 'button', class: 'bouton bouton-principal', onclick: function () { terminerSession(m); } }, 'Terminer et enregistrer mes résultats')
+        : lienBouton('Retour au parcours', '#/parcours')
+    ]);
+    var r = catalogue.reconnaissance;
+    return [
+      h('div', { class: 'lecon-entete' }, [
+        h('p', { class: 'fil' }, h('a', { href: lienModule(m.module.id) }, '← Module ' + m.module.numero + ' : ' + m.module.titre)),
+        h('p', { class: 'surtitre', text: 'Synthèse du parcours' }),
+        h('h1', { tabindex: '-1', text: f.titre })
+      ]),
+      avertissement(),
+      h('ol', { class: 'synthese-parcours' }, f.messages.map(function (msg) {
+        return h('li', null, [h('h2', { text: msg.titre }), h('p', { html: GDD.util.inlineText(msg.texte) })]);
+      })),
+      f.conclusion ? h('section', { class: 'bloc bloc-aretenir' }, [
+        h('h2', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '★ ' }), 'Message final']),
+        h('div', { class: 'bloc-corps', html: GDD.util.richText(f.conclusion) })
+      ]) : null,
+      modeScorm
+        ? (r ? h('section', { class: 'carte reconnaissance' }, [
+          h('h2', { text: 'Reconnaissance du parcours' }),
+          h('p', { text: 'Ton score et ton statut sont transmis à la plateforme de formation. L\'éventuelle attribution d\'un badge « ' + r.titre + ' » est gérée par la plateforme, selon les règles définies par l\'établissement.' })
+        ]) : null)
+        : carteParcours('h2'),
+      actions
+    ];
+  }
+
   function messageResultat(lecon, score) {
     var messages = (lecon.messagesResultat || []).slice().sort(function (a, b) { return b.min - a.min; });
     for (var i = 0; i < messages.length; i++) { if (score >= messages[i].min) { return messages[i].texte; } }
@@ -551,27 +796,46 @@
     var corrections = h('div', { class: 'evaluation-questions' });
     if (n && items.every(function (i) { return i.code; })) {
       items.forEach(function (it, i) {
-        corrections.appendChild(h('div', { class: 'bloc bloc-activite' }, UI.activite(it.id, it.activite, {
-          mode: 'evaluation', corrige: true, code: it.code, titre: 'Question ' + (i + 1) + ' sur ' + n
-        }).element));
+        var rem = it.activite.remediation;
+        var info = rem ? infoModuleCatalogue(rem.module) : null;
+        corrections.appendChild(h('div', { class: 'bloc bloc-activite' }, [
+          UI.activite(it.id, it.activite, {
+            mode: 'evaluation', corrige: true, code: it.code, titre: 'Question ' + (i + 1) + ' sur ' + n
+          }).element,
+          info ? h('p', { class: 'correction-module', text: 'Notion travaillée dans le module ' + info.numero + ' : ' + info.titre + '.' }) : null
+        ]));
       });
     }
 
+    var restantes = m.tentativesRestantes(l.id);
+    var max = mod.validation.tentativesMax;
+    var dernier = mod.validation.scoreRetenu === 'dernier';
     var suivant = modeScorm ? null : moduleSuivant(mod);
     var actions = h('div', { class: 'actions' }, [
-      h('button', {
+      l.ecranFinal ? h('button', {
+        type: 'button', class: 'bouton bouton-principal',
+        onclick: function () { etat.final[l.id] = true; etat.focus = null; afficher(); }
+      }, 'Voir la synthèse du parcours →') : null,
+      restantes > 0 ? h('button', {
         type: 'button', class: 'bouton bouton-secondaire',
-        onclick: function () { etat.repasser[l.id] = true; delete etat.defi[l.id]; etat.focus = null; afficher(); }
-      }, l.libelleRecommencer || 'Repasser le quiz'),
+        onclick: function () {
+          etat.repasser[l.id] = true; delete etat.defi[l.id]; etat.final[l.id] = false; etat.focus = null;
+          if (l.correction === 'differee') { m.enregistrerTentative(l.id, 0, {}); }
+          afficher();
+        }
+      }, l.libelleRecommencer || 'Repasser le quiz') : null,
       modeScorm ? h('button', {
         type: 'button', class: 'bouton bouton-principal',
         onclick: function () { terminerSession(m); }
       }, 'Terminer et enregistrer mes résultats')
-        : lienBouton('Retour au parcours', '#/parcours', suivant ? 'bouton-secondaire' : 'bouton-principal'),
+        : lienBouton('Retour au parcours', '#/parcours', suivant || l.ecranFinal ? 'bouton-secondaire' : 'bouton-principal'),
       suivant ? lienBouton('Module ' + suivant.numero + ' : ' + suivant.titre + ' →', lienModule(suivant.id)) : null
     ]);
 
     var texteMessage = messageResultat(l, enregistre.d);
+    if (avecSeuil && (reussi ? l.messageSeuilAtteint : l.messageSeuilNonAtteint)) {
+      texteMessage = reussi ? l.messageSeuilAtteint : l.messageSeuilNonAtteint;
+    }
     var message = avecSeuil
       ? h('p', { class: 'resultat-message' }, [
         h('span', { 'aria-hidden': 'true', text: reussi ? '✓ ' : '↻ ' }),
@@ -592,9 +856,13 @@
           : h('p', { class: 'resultat-score' }, [h('span', { class: 'resultat-valeur', text: bonnes + ' / ' + n }),
             h('span', { text: ' bonne' + (bonnes > 1 ? 's' : '') + ' réponse' + (bonnes > 1 ? 's' : '') + ' (' + enregistre.d + ' %)' })]),
         message,
-        enregistre.n > 1 ? h('p', { text: 'Meilleur résultat sur ' + enregistre.n + ' tentatives : ' + meilleur + '.' }) : null,
+        enregistre.n > 1 ? h('p', { text: dernier
+          ? 'Tentative n° ' + enregistre.n + ' : c\'est le résultat de la dernière tentative qui est retenu.'
+          : 'Meilleur résultat sur ' + enregistre.n + ' tentatives : ' + meilleur + '.' }) : null,
+        typeof max === 'number' ? h('p', { text: 'Tentatives utilisées : ' + enregistre.n + ' sur ' + max + '.' + (restantes > 0 ? '' : ' Tu ne peux plus recommencer dans ce module.') }) : null,
         h('p', null, ['Statut du module : ', UI.badge(st)])
       ]),
+      bilanNotions(items),
       defi
         ? h('details', { class: 'recapitulatif' }, [h('summary', null, 'Revoir les corrections'), corrections])
         : h('div', null, [h('h2', { text: 'Correction' }), corrections]),

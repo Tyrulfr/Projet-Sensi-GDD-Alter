@@ -60,6 +60,17 @@
         etat.e[id] = { b: e.b, d: typeof e.d === 'number' ? e.d : e.b, n: parseInt(e.n, 10) || 1, r: e.r || {} };
       }
     });
+    Object.keys(brut.t || {}).forEach(function (id) {
+      var t = brut.t[id];
+      var lecon = self.lecons[self.indexLecon(id)];
+      if (!lecon || lecon.type !== 'evaluation' || !t) { return; }
+      var codes = {};
+      Object.keys(t.r || {}).forEach(function (q) {
+        if (lecon.activites.indexOf(q) >= 0) { codes[q] = String(t.r[q]); }
+      });
+      if (!etat.t) { etat.t = {}; }
+      etat.t[id] = { i: Math.min(Math.max(parseInt(t.i, 10) || 0, 0), lecon.activites.length - 1), r: codes };
+    });
     this.etat = etat;
     return true;
   };
@@ -74,6 +85,10 @@
     }
     if (texte.length > LIMITE_ETAT) {
       copie.a = {};
+      texte = JSON.stringify(copie);
+    }
+    if (texte.length > LIMITE_ETAT) {
+      delete copie.t;
       texte = JSON.stringify(copie);
     }
     return texte;
@@ -140,10 +155,39 @@
     return this.etat.e[idLecon] || null;
   };
 
+  /* Tentative en cours d'une évaluation à correction différée : { i: question affichée, r: réponses }. */
+  Moteur.prototype.tentativeEnCours = function (idLecon) {
+    return (this.etat.t && this.etat.t[idLecon]) || null;
+  };
+
+  Moteur.prototype.enregistrerTentative = function (idLecon, index, codes) {
+    if (!this.etat.t) { this.etat.t = {}; }
+    this.etat.t[idLecon] = { i: index, r: codes };
+    this.sauvegarder();
+  };
+
+  Moteur.prototype.abandonnerTentative = function (idLecon) {
+    if (this.etat.t && this.etat.t[idLecon]) {
+      delete this.etat.t[idLecon];
+      if (!Object.keys(this.etat.t).length) { delete this.etat.t; }
+      this.sauvegarder();
+    }
+  };
+
+  /* Nombre de tentatives encore possibles (Infinity sans validation.tentativesMax). */
+  Moteur.prototype.tentativesRestantes = function (idLecon) {
+    var max = this.module.validation.tentativesMax;
+    if (typeof max !== 'number') { return Infinity; }
+    var res = this.etat.e[idLecon];
+    return Math.max(max - (res ? res.n : 0), 0);
+  };
+
   /* Évaluation notée : codes = { idQuestion: reponseEncodee }. */
   Moteur.prototype.soumettreEvaluation = function (idLecon, codes) {
     var self = this;
     var lecon = this.lecons[this.indexLecon(idLecon)];
+    if (this.tentativesRestantes(idLecon) <= 0) { return null; }
+    if (this.etat.t) { delete this.etat.t[idLecon]; if (!Object.keys(this.etat.t).length) { delete this.etat.t; } }
     var total = 0, obtenu = 0, bonnes = 0;
     var items = lecon.activites.map(function (idQ) {
       var q = self.module.activites[idQ];
@@ -191,7 +235,9 @@
     var idEval = this.module.validation.evaluation;
     var resEval = idEval ? this.etat.e[idEval] : null;
     var seuil = this.module.validation.seuilReussite;
-    var commence = this.etat.s.length > 0 || Object.keys(this.etat.a).length > 0 || this.etat.p > 0;
+    /* Score retenu pour le statut et le LMS : meilleur (défaut) ou dernier résultat. */
+    var retenu = resEval ? (this.module.validation.scoreRetenu === 'dernier' ? resEval.d : resEval.b) : null;
+    var commence = this.etat.s.length > 0 || Object.keys(this.etat.a).length > 0 || this.etat.p > 0 || !!this.etat.t;
 
     var completion = 'non-commence';
     if (commence) { completion = 'en-cours'; }
@@ -201,12 +247,13 @@
     var avecSeuil = typeof seuil === 'number';
     var reussite = 'inconnue';
     if (completion === 'termine' && idEval && resEval && avecSeuil) {
-      reussite = resEval.b >= seuil ? 'reussi' : 'echoue';
+      reussite = retenu >= seuil ? 'reussi' : 'echoue';
     }
     return {
       completion: completion,
       reussite: reussite,
-      score: resEval ? resEval.b : null,
+      score: retenu,
+      libelleEchec: this.module.validation.libelleEchec || null,
       seuil: avecSeuil ? seuil : null,
       vues: vues,
       obligatoires: obligatoires.length,

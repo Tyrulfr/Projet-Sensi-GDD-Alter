@@ -16,6 +16,8 @@ TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema
                "simulateur", "memo", "fiche", "activite", "aretenir"}
 RE_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PRESENTATIONS = {"toutes", "une-par-une"}
+CORRECTIONS = {"immediate", "differee"}
+SCORES_RETENUS = {"meilleur", "dernier"}
 TYPES_ACTIVITES = {"choix-unique", "choix-multiple", "vrai-faux", "classement"}
 NAVIGATIONS = {"sequentielle", "libre"}
 # Identifiants utilisés dans cmi.interactions (CMIIdentifier SCORM 1.2 : pas d'espace, 255 car. max).
@@ -230,7 +232,7 @@ def valider_fiche(f, lieu, r):
             r.erreur(lieu, f"« fiche.reflexes » {j} : « titre », « texte » et « question » sont obligatoires")
 
 
-def valider_module(mod, entree, r, ids_globaux):
+def valider_module(mod, entree, r, ids_globaux, renvois):
     lieu = f"module {entree.get('id')}"
     if "fiche" in mod:
         valider_fiche(mod["fiche"], lieu, r)
@@ -339,6 +341,25 @@ def valider_module(mod, entree, r, ids_globaux):
                         r.avertir(llieu, f"question « {q} » marquée formative dans une évaluation")
             if lec.get("presentation", "toutes") not in PRESENTATIONS:
                 r.erreur(llieu, f"« presentation » doit valoir {sorted(PRESENTATIONS)}")
+            if lec.get("correction", "immediate") not in CORRECTIONS:
+                r.erreur(llieu, f"« correction » doit valoir {sorted(CORRECTIONS)}")
+            elif lec.get("correction") == "differee" and lec.get("presentation") != "une-par-une":
+                r.erreur(llieu, "« correction » : « differee » ne s'utilise qu'avec « presentation » : « une-par-une »")
+            for cle in ("libelleValider", "messageSeuilAtteint", "messageSeuilNonAtteint"):
+                if cle in lec and not texte_present(lec, cle):
+                    r.erreur(llieu, f"« {cle} » doit être un texte non vide")
+            if ("messageSeuilAtteint" in lec or "messageSeuilNonAtteint" in lec) and \
+                    (mod.get("validation") or {}).get("seuilReussite") is None:
+                r.avertir(llieu, "messages de seuil définis sans validation.seuilReussite : ils ne s'afficheront pas")
+            if "ecranFinal" in lec:
+                f = lec["ecranFinal"]
+                msgs = f.get("messages") if isinstance(f, dict) else None
+                if not isinstance(f, dict) or not texte_present(f, "titre") or not isinstance(msgs, list) or len(msgs) < 2:
+                    r.erreur(llieu, "« ecranFinal » : « titre » et au moins deux « messages » sont obligatoires")
+                else:
+                    for j, msg in enumerate(msgs, 1):
+                        if not (texte_present(msg, "titre") and texte_present(msg, "texte")):
+                            r.erreur(llieu, f"ecranFinal, message {j} : « titre » et « texte » sont obligatoires")
             messages = lec.get("messagesResultat")
             if messages is not None:
                 if not isinstance(messages, list) or not messages:
@@ -374,6 +395,21 @@ def valider_module(mod, entree, r, ids_globaux):
             r.erreur(lieu, "validation.seuilReussite doit être compris entre 0 et 100 (ou absent : module « terminé » sans seuil)")
     elif seuil is not None:
         r.erreur(lieu, "validation.seuilReussite n'a de sens qu'avec validation.evaluation")
+    tmax = val.get("tentativesMax")
+    if tmax is not None and (not isinstance(tmax, int) or isinstance(tmax, bool) or tmax < 1):
+        r.erreur(lieu, "validation.tentativesMax doit être un entier ≥ 1 (ou absent : tentatives illimitées)")
+    if val.get("scoreRetenu", "meilleur") not in SCORES_RETENUS:
+        r.erreur(lieu, f"validation.scoreRetenu doit valoir {sorted(SCORES_RETENUS)}")
+    if "libelleEchec" in val and not texte_present(val, "libelleEchec"):
+        r.erreur(lieu, "validation.libelleEchec doit être un texte non vide")
+    for id_act, act in activites.items():
+        rem = act.get("remediation")
+        if rem is None:
+            continue
+        if not isinstance(rem, dict) or not all(texte_present(rem, k) for k in ("module", "notion", "resume")):
+            r.erreur(f"activité {id_act}", "« remediation » : « module », « notion » et « resume » sont obligatoires")
+        else:
+            renvois.append((id_act, rem["module"]))
     couverts = {a.get("objectif") for a in activites.values()} | couverts_blocs
     for o in objectifs - couverts:
         r.avertir(lieu, f"objectif « {o} » n'est couvert par aucune activité")
@@ -389,7 +425,7 @@ def valider():
     for cle in ("id", "titre", "sousTitre", "institution", "version", "introduction"):
         if not texte_present(catalogue, cle):
             r.erreur("catalogue", f"« {cle} » manquant")
-    vus, numeros, ids_globaux = set(), set(), set()
+    vus, numeros, ids_globaux, renvois = set(), set(), set(), []
     for entree in catalogue.get("modules") or []:
         mid = entree.get("id")
         if not mid or not RE_ID.match(mid) or mid in vus:
@@ -401,7 +437,7 @@ def valider():
         if entree.get("etat") == "disponible":
             mod = charger_json(DOSSIER_CONTENUS / "modules" / str(entree.get("fichier")), r)
             if mod is not None:
-                valider_module(mod, entree, r, ids_globaux)
+                valider_module(mod, entree, r, ids_globaux, renvois)
                 modules[mid] = mod
         elif entree.get("etat") == "a-venir":
             for cle in ("titre", "objectif"):
@@ -409,6 +445,17 @@ def valider():
                     r.erreur(f"catalogue, module {mid}", f"« {cle} » manquant")
         else:
             r.erreur(f"catalogue, module {mid}", "« etat » doit valoir « disponible » ou « a-venir »")
+    for id_act, cible in renvois:
+        if cible not in vus:
+            r.erreur(f"activité {id_act}", f"remediation.module « {cible} » absent du catalogue")
+    rec = catalogue.get("reconnaissance")
+    if rec is not None:
+        if not isinstance(rec, dict) or not texte_present(rec, "titre") or not texte_present(rec, "mention"):
+            r.erreur("catalogue", "« reconnaissance » : « titre » et « mention » (caractère non officiel) sont obligatoires")
+        elif rec.get("moduleFinal") is not None and rec.get("moduleFinal") not in modules:
+            r.erreur("catalogue", f"reconnaissance.moduleFinal « {rec.get('moduleFinal')} » n'est pas un module disponible")
+        elif not isinstance(rec.get("conditions", {}), dict):
+            r.erreur("catalogue", "reconnaissance.conditions doit être un objet")
     return catalogue, modules, r
 
 

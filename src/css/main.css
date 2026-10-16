@@ -433,6 +433,33 @@ tbody th { font-weight: 700; }
 .resultat-valeur { font-size: 2.5rem; font-weight: 800; color: var(--couleur-primaire); line-height: 1; }
 .resultat-message { font-weight: 600; }
 
+.correction-module { margin: .5rem 0 0; color: var(--couleur-texte-doux); font-size: .95rem; }
+
+.liste-bilan { list-style: none; padding: 0; margin: .75rem 0 0; display: grid; gap: .6rem; }
+.liste-bilan li { border-left: 5px solid var(--couleur-bordure); padding: .45rem .9rem; border-radius: 0 var(--rayon) var(--rayon) 0; background: var(--couleur-fond); }
+.liste-bilan li.est-juste { border-left-color: var(--couleur-succes); }
+.liste-bilan li.est-a-revoir { border-left-color: var(--couleur-alerte); background: var(--couleur-alerte-clair); }
+.liste-bilan p { margin: .2rem 0; }
+
+/* ---------- Synthèse du parcours et reconnaissance ---------- */
+
+.synthese-parcours { list-style: none; padding: 0; margin: 1rem 0; display: grid; gap: .7rem; counter-reset: message; }
+.synthese-parcours li { counter-increment: message; background: var(--couleur-surface); border: 1px solid var(--couleur-bordure); border-left: 5px solid var(--couleur-primaire); border-radius: var(--rayon); padding: .7rem 1rem; }
+.synthese-parcours h2 { font-size: 1.1rem; margin: 0 0 .25rem; color: var(--couleur-primaire); }
+.synthese-parcours h2::before { content: counter(message) ". "; }
+.synthese-parcours p { margin: 0; }
+
+.parcours-etat { list-style: none; padding: 0; margin: .5rem 0 1rem; display: grid; gap: .3rem; }
+.reconnaissance { border-top: 1px solid var(--couleur-bordure); padding-top: .75rem; }
+.carte.reconnaissance { border-top: 1px solid var(--couleur-bordure); }
+.reconnaissance > h2, .reconnaissance > h3, .reconnaissance > h4 { margin-top: 0; }
+.reconnaissance-badge { display: flex; align-items: center; gap: 1rem; background: var(--couleur-primaire-clair); border: 2px solid var(--couleur-primaire); border-radius: var(--rayon); padding: .8rem 1rem; }
+.reconnaissance-icone { flex: none; display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 50%; background: var(--couleur-primaire); color: #fff; font-size: 1.6rem; }
+.reconnaissance-nom { font-weight: 800; color: var(--couleur-primaire); margin: 0 0 .2rem; }
+.reconnaissance-badge p { margin: 0; }
+.liste-conditions { list-style: none; padding: 0; margin: .3rem 0; }
+.reconnaissance-mention { font-size: .9rem; color: var(--couleur-texte-doux); margin-bottom: 0; }
+
 @keyframes apparition { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 @media (prefers-reduced-motion: reduce) {

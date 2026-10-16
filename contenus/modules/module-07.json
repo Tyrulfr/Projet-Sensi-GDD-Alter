@@ -1,0 +1,225 @@
+{
+  "id": "m07",
+  "numero": 7,
+  "titre": "Validation et consolidation des acquis",
+  "sousTitre": "Mettre en pratique les principes essentiels de la gouvernance de la donnée.",
+  "slugArchive": "validation-consolidation",
+  "duree": 7,
+  "statutContenu": "proposition - à valider (seuil, tentatives et reconnaissance à arbitrer)",
+  "objectif": "Vérifier que tu as compris les notions essentielles de la gouvernance de la donnée et que tu sais reconnaître les bonnes pratiques dans des situations professionnelles simples.",
+  "objectifsSpecifiques": [
+    { "id": "os7-1", "texte": "Reconnaître ce qu'est une donnée." },
+    { "id": "os7-2", "texte": "Comprendre qu'une donnée peut être utilisée dans plusieurs services." },
+    { "id": "os7-3", "texte": "Identifier les conséquences d'une donnée incorrecte ou mal structurée." },
+    { "id": "os7-4", "texte": "Reconnaître l'utilité d'un identifiant et d'un référentiel." },
+    { "id": "os7-5", "texte": "Identifier les conditions essentielles d'un partage responsable." },
+    { "id": "os7-6", "texte": "Comprendre les rôles de la gouvernance et de la gestion opérationnelle." },
+    { "id": "os7-7", "texte": "Choisir les bons réflexes professionnels face à une situation." }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m07-mission",
+    "seuilReussite": 70,
+    "scoreRetenu": "meilleur",
+    "libelleEchec": "Seuil non atteint"
+  },
+  "lecons": [
+    {
+      "id": "m07-intro",
+      "type": "lecon",
+      "titre": "À toi de jouer : une université, des données, des décisions",
+      "blocs": [
+        {
+          "type": "texte",
+          "texte": "Tu as découvert comment les données sont créées, utilisées, vérifiées, partagées et organisées au sein de l'université.\n\nDans cette dernière activité, tu vas rencontrer plusieurs situations inspirées du quotidien des services. Pour chacune, choisis la réponse qui te semble la plus adaptée."
+        },
+        {
+          "type": "texte",
+          "titre": "Comment se déroule la mission",
+          "texte": "- **Sept situations**, une seule réponse attendue pour chacune.\n- **Environ 5 à 8 minutes**, sans chronomètre.\n- Tu peux revenir sur une question et modifier ta réponse tant que tu n'as pas validé.\n- **Le résultat et les corrections** s'affichent après la validation de tes sept réponses.\n- Seuil de réussite retenu pour ce prototype : **70 %**, soit 5 bonnes réponses sur 7. Tu peux recommencer la mission.\n- Si tu t'interromps, tes réponses sont conservées : tu reprendras là où tu en étais."
+        },
+        {
+          "type": "aretenir",
+          "texte": "L'objectif n'est pas de devenir expert des données, mais de reconnaître les principes essentiels et les bons réflexes professionnels."
+        }
+      ]
+    },
+    {
+      "id": "m07-mission",
+      "type": "evaluation",
+      "titre": "Mission finale",
+      "surtitre": "Mission finale",
+      "libelleAcces": "Commencer la mission finale",
+      "libelleRecommencer": "Recommencer la mission",
+      "libelleValider": "Valider mes réponses",
+      "presentation": "une-par-une",
+      "correction": "differee",
+      "introduction": "Sept situations, une à la fois. Choisis la réponse qui te semble la plus adaptée : tu pourras revenir en arrière avant de valider, et découvrir ensuite les corrections.",
+      "activites": ["m07-q1", "m07-q2", "m07-q3", "m07-q4", "m07-q5", "m07-q6", "m07-q7"],
+      "messageSeuilAtteint": "Bravo ! Tu as compris les principes essentiels de la gouvernance de la donnée. Tu sais désormais reconnaître l'importance de la qualité, de la structuration, du partage responsable et des règles communes. Ces connaissances t'aideront à contribuer, à ton niveau, à une meilleure gestion collective des données.",
+      "messageSeuilNonAtteint": "Tu as terminé cette tentative. Certaines notions méritent d'être revues : tu peux consulter les corrections et revenir sur les modules correspondants avant de recommencer.",
+      "ecranFinal": {
+        "titre": "Ce que je retiens de la gouvernance de la donnée",
+        "messages": [
+          { "titre": "La donnée est partout.", "texte": "Je manipule des données dans mes activités quotidiennes, même sans utiliser d'outils spécialisés." },
+          { "titre": "Une donnée peut avoir plusieurs usages.", "texte": "Une information créée dans un service peut être utile ailleurs." },
+          { "titre": "La qualité facilite le travail collectif.", "texte": "Une donnée exacte, cohérente, suffisamment complète et actualisée est plus facile à exploiter." },
+          { "titre": "Le partage doit être responsable.", "texte": "Je tiens compte des finalités, des besoins, des droits d'accès et des règles applicables." },
+          { "titre": "La gouvernance organise les responsabilités.", "texte": "Elle définit un cadre collectif auquel les services métiers, les responsables et les agents contribuent." },
+          { "titre": "Je peux agir à mon niveau.", "texte": "Je recherche, vérifie, respecte les règles, partage dans le bon cadre, documente et signale les anomalies." }
+        ],
+        "conclusion": "La gouvernance de la donnée n'est pas uniquement une affaire de spécialistes.\n\nElle repose sur une organisation commune et sur des pratiques professionnelles auxquelles chacun peut contribuer."
+      }
+    }
+  ],
+  "activites": {
+    "m07-q1": {
+      "type": "choix-unique",
+      "objectif": "os7-1",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un technicien de maintenance renseigne dans une application la date du dernier contrôle d'un équipement. Cette information est-elle une donnée ?",
+      "choix": [
+        { "id": "a", "texte": "Non, car elle ne concerne pas une personne." },
+        { "id": "b", "texte": "Oui, car il s'agit d'une information enregistrée et exploitable." },
+        { "id": "c", "texte": "Non, car seules les informations contenues dans Excel sont des données." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Une donnée peut concerner une personne, un équipement, un bâtiment, une opération ou une activité. Elle n'est pas nécessairement personnelle ni numérique.",
+        "incorrect": "Une donnée peut concerner une personne, un équipement, un bâtiment, une opération ou une activité. Elle n'est pas nécessairement personnelle ni numérique."
+      },
+      "remediation": {
+        "module": "m01",
+        "notion": "Reconnaître une donnée",
+        "resume": "Une donnée est une information enregistrée et exploitable. Elle peut décrire une personne, mais aussi un équipement, un bâtiment ou une activité, sur papier comme dans une application."
+      }
+    },
+    "m07-q2": {
+      "type": "choix-unique",
+      "objectif": "os7-2",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Le service RH met à jour l'affectation d'un agent. Pourquoi cette information peut-elle être importante au-delà du service RH ?",
+      "choix": [
+        { "id": "a", "texte": "Parce que certains autres services peuvent en avoir besoin dans le cadre de leurs missions." },
+        { "id": "b", "texte": "Parce que tous les services doivent pouvoir consulter librement le dossier complet de l'agent." },
+        { "id": "c", "texte": "Parce qu'une donnée RH ne peut être utilisée qu'une seule fois." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Une donnée peut être utilisée dans plusieurs activités, selon les besoins et les autorisations. Une information mal actualisée peut donc produire des conséquences dans d'autres services.",
+        "incorrect": "Une donnée peut être utilisée dans plusieurs activités, selon les besoins et les autorisations. Une information mal actualisée peut donc produire des conséquences dans d'autres services."
+      },
+      "remediation": {
+        "module": "m02",
+        "notion": "Les usages multiples d'une donnée",
+        "resume": "Une information créée dans un service sert souvent à d'autres, selon leurs besoins et leurs autorisations : une mise à jour oubliée a des effets au-delà du service qui la gère."
+      }
+    },
+    "m07-q3": {
+      "type": "choix-unique",
+      "objectif": "os7-3",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un service reçoit un tableau contenant des dates saisies dans plusieurs formats et des noms de structures non homogènes. Quel problème cela peut-il provoquer ?",
+      "choix": [
+        { "id": "a", "texte": "Aucun, puisque le fichier s'ouvre correctement." },
+        { "id": "b", "texte": "Les données risquent d'être plus difficiles à comparer, trier ou réutiliser." },
+        { "id": "c", "texte": "Le fichier devient automatiquement inutilisable par tous les logiciels." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Des formats et des nomenclatures homogènes facilitent les contrôles, les rapprochements et la réutilisation des données.",
+        "incorrect": "Des formats et des nomenclatures homogènes facilitent les contrôles, les rapprochements et la réutilisation des données."
+      },
+      "remediation": {
+        "module": "m03",
+        "notion": "Qualité et structuration des données",
+        "resume": "Des formats de date et des libellés homogènes permettent de trier, comparer, contrôler et réutiliser les données. Un fichier qui s'ouvre n'est pas forcément exploitable."
+      }
+    },
+    "m07-q4": {
+      "type": "choix-unique",
+      "objectif": "os7-4",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Deux étudiants portent le même nom et le même prénom. Quelle démarche permet de mieux distinguer leurs dossiers dans le système de scolarité ?",
+      "choix": [
+        { "id": "a", "texte": "Utiliser l'identifiant étudiant individuel prévu par le système." },
+        { "id": "b", "texte": "Choisir celui qui apparaît en premier dans la liste." },
+        { "id": "c", "texte": "Ajouter un surnom inventé." }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Un identifiant stable et unique dans son périmètre permet de distinguer des enregistrements ayant des informations similaires.",
+        "incorrect": "Un identifiant stable et unique dans son périmètre permet de distinguer des enregistrements ayant des informations similaires."
+      },
+      "remediation": {
+        "module": "m03",
+        "notion": "Identifiants et référentiels",
+        "resume": "Un identifiant unique et stable distingue deux enregistrements qui se ressemblent ; un référentiel fixe les valeurs communes à utiliser par tous."
+      }
+    },
+    "m07-q5": {
+      "type": "choix-unique",
+      "objectif": "os7-5",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Un service demande un fichier nominatif contenant des informations administratives individuelles sur les agents. Le besoin n'est pas précisé. Quelle attitude adopter ?",
+      "choix": [
+        { "id": "a", "texte": "Transmettre immédiatement le fichier puisqu'il s'agit d'un service interne." },
+        { "id": "b", "texte": "Refuser définitivement toute possibilité de partage." },
+        { "id": "c", "texte": "Vérifier la finalité, les données nécessaires et les conditions d'accès avant toute transmission." }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Le partage doit respecter une finalité appropriée, les autorisations et les règles applicables. Une donnée personnelle n'est pas automatiquement interdite de partage, mais sa transmission doit être encadrée.",
+        "incorrect": "Le partage doit respecter une finalité appropriée, les autorisations et les règles applicables. Une donnée personnelle n'est pas automatiquement interdite de partage, mais sa transmission doit être encadrée."
+      },
+      "remediation": {
+        "module": "m04",
+        "notion": "Le partage responsable",
+        "resume": "Partager n'est ni tout transmettre, ni tout refuser : on vérifie la finalité, les données vraiment nécessaires, les droits d'accès et les règles applicables."
+      }
+    },
+    "m07-q6": {
+      "type": "choix-unique",
+      "objectif": "os7-6",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Plusieurs services souhaitent utiliser une même nomenclature pour identifier les bâtiments universitaires. Qui doit organiser la définition et la validation de cette règle commune ?",
+      "choix": [
+        { "id": "a", "texte": "Un agent isolé, sans consulter les autres services." },
+        { "id": "b", "texte": "Les responsables métiers et acteurs de gouvernance compétents, selon l'organisation établie." },
+        { "id": "c", "texte": "Un logiciel, sans intervention humaine." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "La gouvernance repose sur des règles, des responsabilités et des décisions collectives. Les métiers apportent leur connaissance des besoins et des usages.",
+        "incorrect": "La gouvernance repose sur des règles, des responsabilités et des décisions collectives. Les métiers apportent leur connaissance des besoins et des usages."
+      },
+      "remediation": {
+        "module": "m05",
+        "notion": "Gouvernance et responsabilités",
+        "resume": "La gouvernance organise les règles communes, les responsabilités et les décisions ; les services métiers y apportent leur connaissance des besoins, la gestion opérationnelle les applique."
+      }
+    },
+    "m07-q7": {
+      "type": "choix-unique",
+      "objectif": "os7-7",
+      "notation": { "formative": false, "points": 1 },
+      "consigne": "Tu dois créer un nouveau tableau de suivi. Un collègue t'indique qu'une source d'information institutionnelle pourrait déjà exister. Quel est le meilleur réflexe ?",
+      "choix": [
+        { "id": "a", "texte": "Créer un nouveau fichier sans vérification." },
+        { "id": "b", "texte": "Vérifier si la source existante répond au besoin et dans quelles conditions tu peux l'utiliser." },
+        { "id": "c", "texte": "Copier plusieurs anciens tableaux sans contrôler leur actualité." }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Rechercher les données existantes permet de limiter les copies inutiles, les versions contradictoires et les corrections répétées.",
+        "incorrect": "Rechercher les données existantes permet de limiter les copies inutiles, les versions contradictoires et les corrections répétées."
+      },
+      "remediation": {
+        "module": "m06",
+        "notion": "Les bons réflexes professionnels",
+        "resume": "Rechercher ce qui existe, vérifier, respecter les règles, partager dans le bon cadre, documenter et signaler les anomalies."
+      }
+    }
+  }
+}

@@ -797,6 +797,127 @@
     });
   }
 
+  function lancerModule7(module) {
+    var idEval = module.validation.evaluation;
+    var intro = module.lecons[0];
+    var mission = module.lecons[1];
+    var attendues = { 'm07-q1': 'b', 'm07-q2': 'a', 'm07-q3': 'b', 'm07-q4': 'a', 'm07-q5': 'c', 'm07-q6': 'b', 'm07-q7': 'b' };
+    function avecBonnes(n) {
+      var codes = {};
+      mission.activites.forEach(function (id, i) {
+        var act = module.activites[id];
+        codes[id] = i < n ? act.reponse : act.choix.filter(function (c) { return c.id !== act.reponse; })[0].id;
+      });
+      return codes;
+    }
+    function moteurPret(mod, traceur) {
+      var m = new GDD.Moteur(mod || module, traceur || new TraceurTest()); m.demarrer();
+      m.marquerVue(intro.id);
+      return m;
+    }
+
+    test('M7 : 7 questions, réponses conformes au scénario (B, A, B, A, C, B, B)', function () {
+      egal(bonnesReponses(module, idEval), attendues);
+      Object.keys(module.activites).forEach(function (id) {
+        vrai(A.corriger(module.activites[id], A.reponseAttendue(module.activites[id])).correct, id);
+      });
+    });
+
+    test('M7 : un objectif par question, les 7 objectifs couverts', function () {
+      var objectifs = mission.activites.map(function (id) { return module.activites[id].objectif; });
+      egal(objectifs, module.objectifsSpecifiques.map(function (o) { return o.id; }));
+    });
+
+    test('M7 : remédiation Q1->M1, Q2->M2, Q3 et Q4->M3, Q5->M4, Q6->M5, Q7->M6, avec résumé local', function () {
+      egal(mission.activites.map(function (id) { return module.activites[id].remediation.module; }),
+        ['m01', 'm02', 'm03', 'm03', 'm04', 'm05', 'm06']);
+      mission.activites.forEach(function (id) { vrai(module.activites[id].remediation.resume.length > 40, id); });
+    });
+
+    test('M7 : seuil 70 % configuré, correction différée, mission verrouillée avant l\'introduction', function () {
+      egal([module.validation.seuilReussite, mission.correction, mission.presentation], [70, 'differee', 'une-par-une']);
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      vrai(!m.estAccessible(1));
+      m.marquerVue(intro.id);
+      vrai(m.estAccessible(1));
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'incomplete');
+    });
+
+    test('M7 : scores 0/7, 4/7, 5/7, 7/7 -> 0 failed, 57 failed, 71 passed, 100 passed', function () {
+      [[0, 0, 'failed'], [4, 57, 'failed'], [5, 71, 'passed'], [7, 100, 'passed']].forEach(function (c) {
+        var m = moteurPret();
+        var r = m.soumettreEvaluation(idEval, avecBonnes(c[0]));
+        egal([r.bonnes, r.total, r.score, GDD.TraceurScorm12.statutScorm(m.statut())], [c[0], 7, c[1], c[2]], c[0] + '/7');
+      });
+    });
+
+    test('M7 : tentative interrompue enregistrée puis restaurée ; données inconnues ignorées', function () {
+      var t = new TraceurTest(); var m = moteurPret(null, t);
+      m.enregistrerTentative(idEval, 3, { 'm07-q1': 'b', 'm07-q2': 'a', 'm07-q3': 'c' });
+      egal(m.statut().completion, 'en-cours');
+      var etat = JSON.parse(t.paquets[t.paquets.length - 1].etat);
+      etat.t[idEval].r['inconnue'] = 'a'; etat.t[idEval].i = 99;
+      var m2 = new GDD.Moteur(module, new TraceurTest({ etat: JSON.stringify(etat) })); m2.demarrer();
+      egal(m2.tentativeEnCours(idEval), { i: 6, r: { 'm07-q1': 'b', 'm07-q2': 'a', 'm07-q3': 'c' } });
+      m2.soumettreEvaluation(idEval, avecBonnes(7));
+      egal(m2.tentativeEnCours(idEval), null, 'tentative close après validation');
+      egal(JSON.parse(m2.serialiser()).t, undefined);
+    });
+
+    test('M7 : nouvelle tentative après échec puis après réussite (meilleur score conservé)', function () {
+      var m = moteurPret();
+      m.soumettreEvaluation(idEval, avecBonnes(4));
+      egal(m.statut().reussite, 'echoue');
+      m.soumettreEvaluation(idEval, avecBonnes(6));
+      egal([m.statut().reussite, m.statut().score], ['reussi', 86]);
+      m.soumettreEvaluation(idEval, avecBonnes(2));
+      egal([m.statut().reussite, m.statut().score, m.resultatEvaluation(idEval).n], ['reussi', 86, 3]);
+    });
+
+    test('M7 : options scoreRetenu « dernier » et tentativesMax', function () {
+      var copie = JSON.parse(JSON.stringify(module));
+      copie.validation.scoreRetenu = 'dernier'; copie.validation.tentativesMax = 2;
+      var m = moteurPret(copie);
+      m.soumettreEvaluation(idEval, avecBonnes(7));
+      egal(m.tentativesRestantes(idEval), 1);
+      m.soumettreEvaluation(idEval, avecBonnes(3));
+      egal([m.statut().reussite, m.statut().score, m.tentativesRestantes(idEval)], ['echoue', 43, 0]);
+      egal(m.soumettreEvaluation(idEval, avecBonnes(7)), null, 'tentative refusée au-delà du maximum');
+      egal(moteurPret().tentativesRestantes(idEval), Infinity);
+    });
+
+    test('M7 : adaptateur SCORM 1.2 -> reprise de tentative, failed 57 (suspend), puis passed 86 (sortie normale)', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = moteurPret(null, new GDD.TraceurScorm12());
+      m.definirPosition(1);
+      m.enregistrerTentative(idEval, 2, { 'm07-q1': 'b', 'm07-q2': 'a' });
+      m.terminer();
+      egal([api.d['cmi.core.exit'], api.d['cmi.core.lesson_location'], api.d['cmi.core.lesson_status']], ['suspend', 'm07-mission', 'incomplete']);
+      var api2 = new FausseApi({ 'cmi.core.lesson_status': 'incomplete', 'cmi.core.entry': 'resume', 'cmi.core.lesson_mode': 'normal', 'cmi.suspend_data': api.d['cmi.suspend_data'] });
+      window.API = api2;
+      var m2 = new GDD.Moteur(module, new GDD.TraceurScorm12()); m2.demarrer();
+      egal(m2.tentativeEnCours(idEval).i, 2);
+      m2.soumettreEvaluation(idEval, avecBonnes(4));
+      egal([api2.d['cmi.core.lesson_status'], api2.d['cmi.core.score.raw'], api2.d['cmi.core.score.min'], api2.d['cmi.core.score.max']], ['failed', '57', '0', '100']);
+      egal([api2.d['cmi.interactions.6.id'], api2.d['cmi.interactions.6.result'], api2.d['cmi.interactions.6.objectives.0.id']], ['m07-q7', 'wrong', 'os7-7']);
+      m2.soumettreEvaluation(idEval, avecBonnes(6));
+      egal([api2.d['cmi.core.lesson_status'], api2.d['cmi.core.score.raw'], api2.d['cmi.interactions.13.id']], ['passed', '86', 'm07-q7']);
+      m2.terminer();
+      egal(api2.d['cmi.core.exit'], '');
+      vrai(/^\d{2,4}:\d{2}:\d{2}/.test(api2.d['cmi.core.session_time']), api2.d['cmi.core.session_time']);
+      delete window.API;
+    });
+
+    test('M7 : tutoiement, partage non présenté comme interdit, écran final à 6 messages', function () {
+      var textes = JSON.stringify(module);
+      vrai(!/\b(vous|votre|vos)\b/i.test(textes), 'tutoiement comme les modules 1 à 6');
+      vrai(/n'est pas automatiquement interdite de partage/.test(module.activites['m07-q5'].explication.correct));
+      egal(mission.ecranFinal.messages.length, 6);
+      egal(mission.ecranFinal.titre, 'Ce que je retiens de la gouvernance de la donnée');
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -816,7 +937,7 @@
   function charger(fichier) {
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
-  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json'), charger('module-06.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); afficher(); })
+  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json'), charger('module-06.json'), charger('module-07.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); lancerModule7(mods[6]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

@@ -764,7 +764,7 @@
 
   UI.libelleStatut = function (statut) {
     if (statut.reussite === 'reussi') { return { texte: 'Réussi', icone: '✓', classe: 'reussi' }; }
-    if (statut.reussite === 'echoue') { return { texte: 'Quiz à repasser', icone: '↻', classe: 'echoue' }; }
+    if (statut.reussite === 'echoue') { return { texte: statut.libelleEchec || 'Quiz à repasser', icone: '↻', classe: 'echoue' }; }
     if (statut.completion === 'termine') { return { texte: 'Terminé', icone: '✓', classe: 'termine' }; }
     if (statut.completion === 'en-cours') { return { texte: 'En cours', icone: '◐', classe: 'en-cours' }; }
     return { texte: 'Non commencé', icone: '○', classe: 'non-commence' };

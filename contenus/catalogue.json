@@ -54,10 +54,14 @@
     {
       "id": "m07",
       "numero": 7,
-      "etat": "a-venir",
-      "titre": "Validation et consolidation",
-      "duree": 10,
-      "objectif": "Vérifier l'acquisition des messages essentiels."
+      "etat": "disponible",
+      "fichier": "module-07.json"
     }
-  ]
+  ],
+  "reconnaissance": {
+    "titre": "Sensibilisation à la gouvernance de la donnée",
+    "moduleFinal": "m07",
+    "conditions": { "tousLesModules": true, "reussiteModuleFinal": true },
+    "mention": "Reconnaissance indicative, calculée dans ce navigateur : ce n'est ni une attestation officielle, ni une certification d'expertise en gouvernance des données ou en RGPD. L'attribution éventuelle d'un badge institutionnel relève de la plateforme de formation, selon les règles validées par l'établissement."
+  }
 }

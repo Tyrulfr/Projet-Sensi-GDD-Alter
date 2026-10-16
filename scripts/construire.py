@@ -224,6 +224,12 @@ def construire():
         shutil.rmtree(DIST)
     problemes = []
     empreinte = empreinte_sources()
+    # Chaque package SCORM ne contient que son module : le catalogue publié porte le titre
+    # des autres modules (renvois de la remédiation du module final).
+    catalogue = json.loads(json.dumps(catalogue))
+    for entree in catalogue["modules"]:
+        if entree["id"] in modules:
+            entree["titre"] = modules[entree["id"]]["titre"]
 
     print("2. Site web -> index.html (racine) + contenus/contenu.js")
     ecrire(RACINE / "contenus" / "contenu.js", fichier_contenu(catalogue, modules))
