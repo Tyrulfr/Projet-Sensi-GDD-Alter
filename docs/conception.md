@@ -94,6 +94,9 @@ Navigation complète au clavier, lien d'évitement, focus déplacé sur chaque n
 12. **Module 3 sans seuil** (même règle que le module 2) et durée annoncée de **10 min** (haut de la fourchette 8–10 min : c'est le module le plus dense, environ 1 000 mots de leçons et 8 interactions).
 13. **Contenus du module 3** : tableaux et noms fictifs ; le tableau B est présenté comme une structure cible supposant des vérifications, jamais comme une correction automatique. Les 5 dimensions retenues (exactitude, complétude, cohérence, actualité, conformité au format) sont à faire valider.
 14. **Exploration du comparateur obligatoire** (les 5 difficultés) avant d'afficher le tableau B et de continuer. Alternative possible : rendre le tableau B accessible directement.
+15. **Module 4 : simulateur à trois issues communes** (« Partager », « Vérifier avant de décider », « Ne pas transmettre en l'état »), avec un texte propre à chaque situation. Chaque issue est la bonne réponse au moins une fois, pour illustrer « ni tout partager, ni tout bloquer ». Simulateur formatif, hors score, non transmis au LMS, placé à la fin de la leçon 4.4 pour mettre en pratique les quatre réflexes. Module sans seuil, comme les modules 2 et 3.
+16. **Durée du module 4** : annoncée à 10 min, mais la charge de lecture (environ 1 600 mots) laisse plutôt prévoir 11 à 13 min. Pistes si la mesure le confirme : retirer l'activité m04-a4 (redondante avec le simulateur), réduire le simulateur à 3 situations, ou alléger la liste du cadre RGPD en leçon 4.4.
+17. **Contenus du module 4** : non validés juridiquement ; voir `docs/validation-metier-module-04.md`.
 
 ## 7. Évolutions possibles de l'espace concepteur
 

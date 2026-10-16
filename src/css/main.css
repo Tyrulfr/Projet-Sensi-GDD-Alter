@@ -272,6 +272,69 @@ tbody th { font-weight: 700; }
 .comparateur-apres { margin-top: 1.25rem; padding-top: .5rem; border-top: 1px solid var(--couleur-bordure); }
 .comparateur-atouts ul { margin: .25rem 0 .75rem; padding-left: 1.25rem; }
 
+@media (min-width: 40rem) {
+  .schema-cibles-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+/* Mémo */
+.bloc-memo { border-left: 5px solid var(--couleur-primaire); }
+.memo-etapes {
+  list-style: none; margin: .5rem 0 0; padding: 0;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .6rem;
+}
+.memo-etape {
+  display: grid; grid-template-columns: 2.25rem 1fr; gap: .6rem; align-items: start;
+  padding: .7rem .8rem; border: 1px solid var(--couleur-bordure); border-radius: var(--rayon); background: #fbfbfd;
+}
+.memo-numero {
+  width: 2.25rem; height: 2.25rem; border-radius: 50%; display: grid; place-items: center;
+  background: var(--couleur-primaire); color: #fff; font-weight: 700;
+}
+.memo-titre { margin: .2rem 0; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--couleur-primaire); }
+.memo-texte { margin: 0; }
+
+/* Simulateur de décisions */
+.bloc-simulateur { border: 2px solid var(--couleur-primaire); }
+.simulateur-progression { display: flex; align-items: center; justify-content: space-between; gap: .75rem; margin-top: .75rem; }
+.simulateur-progression .activite-numero { margin: 0; }
+.simulateur-points { list-style: none; display: flex; gap: .35rem; margin: 0; padding: 0; }
+.simulateur-points li { width: .8rem; height: .8rem; border-radius: 50%; border: 2px solid var(--couleur-primaire); }
+.simulateur-points li.est-fait { background: var(--couleur-primaire); }
+.simulateur-points li.est-courant { border-color: var(--couleur-accent); background: var(--couleur-accent); transform: scale(1.3); }
+.simulateur-carte {
+  margin: .6rem 0 1rem; padding: 1rem 1.1rem; border-radius: var(--rayon);
+  background: var(--couleur-primaire-clair); border: 1px solid #e2c9d7;
+}
+.simulateur-titre { margin: 0 0 .4rem; font-size: 1.1rem; }
+.simulateur-carte > p { margin: .3rem 0 .75rem; }
+.simulateur-fiche { display: grid; grid-template-columns: max-content 1fr; gap: .35rem .9rem; margin: 0; }
+.simulateur-fiche dt { font-weight: 700; color: var(--couleur-primaire); }
+.simulateur-fiche dd { margin: 0; }
+@media (max-width: 30rem) {
+  .simulateur-fiche { grid-template-columns: 1fr; gap: .1rem; }
+  .simulateur-fiche dd { margin-bottom: .4rem; }
+}
+.simulateur-decision {
+  display: inline-block; margin-bottom: .25rem; padding: .05rem .5rem; border-radius: 999px;
+  font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; border: 1px solid currentColor;
+}
+.option-decision .option-texte { display: block; }
+.simulateur-decision-partager { color: var(--couleur-succes); }
+.simulateur-decision-verifier { color: var(--couleur-accent); }
+.simulateur-decision-ne-pas-transmettre { color: var(--couleur-alerte); }
+.simulateur-criteres { margin-top: .5rem; padding-top: .5rem; border-top: 1px solid var(--couleur-bordure); }
+.simulateur-criteres p { margin: .35rem 0; }
+.simulateur-criteres ul { margin: .2rem 0 .5rem; padding-left: 1.25rem; }
+.simulateur-reflexe { padding: .4rem .6rem; border-radius: var(--rayon); background: var(--couleur-succes-clair); }
+.simulateur-bilan { margin-top: .75rem; }
+.simulateur-bilan h4 { margin: 0 0 .5rem; font-size: 1.1rem; }
+.simulateur-recap { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .35rem; }
+.simulateur-recap li { padding: .5rem .7rem; border-radius: var(--rayon); border: 1px solid var(--couleur-bordure); }
+.simulateur-recap li.est-juste { border-left: 4px solid var(--couleur-succes); }
+.simulateur-recap li.est-faux { border-left: 4px solid var(--couleur-erreur); }
+.simulateur-conclusion { padding: .75rem 1rem; border-radius: var(--rayon); background: var(--couleur-succes-clair); font-weight: 600; }
+.simulateur-conclusion p { margin: 0; }
+
 .recapitulatif { margin: 1.25rem 0; }
 .recapitulatif > summary { cursor: pointer; font-weight: 700; padding: .5rem 0; min-height: 44px; }
 .recapitulatif .evaluation-questions { margin-top: .5rem; }

@@ -214,3 +214,60 @@ Modifications communes justifiées : la grille des leçons (`.lecon-blocs`) emp�
 - Durée réelle à mesurer avec quelques agents (estimation : 8 à 11 minutes).
 - **Rien n'a été testé dans un vrai LMS.** À vérifier sur eCampus : import du ZIP, statut `completed` sans seuil, score, reprise, rapport des 4 interactions (dont l'association, de type `matching`), affichage du tableau dans le cadre du LMS sur mobile.
 - Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge.
+
+## 9. Module 4 « Partager sans perdre le contrôle »
+
+### Ce qui a été développé
+
+- Contenu `contenus/modules/module-04.json` : 4 leçons, 4 activités formatives (classement en 3 catégories, 3 questions), un simulateur de 4 situations, défi de 4 questions (réponses B, A, B, C), synthèse de 7 messages, 6 objectifs couverts. Sans seuil.
+- Nouveaux composants réutilisables : **simulateur de décisions** (`simulateur`) et **mémo** (`memo`). Le schéma accepte désormais une phrase d'annonce configurable et s'affiche sur 3 colonnes quand il a 3 cibles (le schéma du module 2, à 4 cibles, est inchangé).
+- Archive : `module-04-partager-sans-perdre-controle-scorm12.zip` (12 fichiers).
+- Validateur : contrôle du simulateur (décisions, choix, réponse, correction complète, objectifs, avertissement) et du mémo, vérifié par injection volontaire de 7 erreurs : toutes signalées.
+- Tableau de validation métier à soumettre au DPO : `docs/validation-metier-module-04.md`.
+
+### Tests automatisés
+
+**46 / 46** (dont 10 nouveaux pour le module 4). Ils vérifient notamment, sur le contenu lui-même : chaque situation propose les trois issues (partager, vérifier, ne pas transmettre en l'état) ; chacune est la bonne réponse au moins une fois ; la situation « santé » n'attend jamais une transmission ; la rémunération est classée « donnée personnelle » et non « catégorie particulière ».
+
+### Site web (piloté dans le navigateur, Chrome intégré à Cursor)
+
+| Scénario | Résultat |
+|---|---|
+| Module 4 présent dans le parcours (« Non commencé », puis « Terminé » et meilleur score) avec son lien ZIP | **OK** |
+| Leçon 4.1 : classement avec une erreur volontaire (rémunération classée « catégorie particulière ») : correction élément par élément, focus sur le message, « Réessayer » puis réussite | **OK** |
+| Leçons 4.2 et 4.3 : questions B, feedback du choix et explication ; schéma à 3 critères sur 3 colonnes, détail affiché au clic, annonce « Trois critères à examiner » | **OK** |
+| Leçon 4.4 : mémo des 4 réflexes ; « Continuer » bloqué tant que le simulateur n'est pas terminé | **OK** |
+| Simulateur : validation sans choix refusée avec message ; fiche demandeur / finalité / données ; correction en 5 parties ; conduite attendue affichée en cas d'erreur ; annotations textuelles (pas seulement la couleur) ; focus sur la correction puis sur le bilan | **OK** |
+| Bilan : « 3 réflexes adaptés sur 4 », récapitulatif par situation, « Recommencer le simulateur » ; « Continuer » disponible ensuite | **OK** |
+| Défi : une question à la fois ; 3/4 → « 3 / 4 bonnes réponses (75 %) », message personnalisé, statut « Terminé », synthèse de 7 messages ; pas de bouton « Module 5 » (non disponible) | **OK** |
+| Fin du module 3 : nouveau bouton « Module 4 : Partager sans perdre le contrôle → » | **OK** |
+| Mobile 375 px : aucune largeur excédentaire ; fiche de la situation et mémo sur une colonne | **OK** |
+
+### SCORM 1.2 dans le simulateur
+
+| Scénario | Résultat |
+|---|---|
+| Session 1 (leçon 4.1 faite, sortie en leçon 4.2) : `incomplete`, `lesson_location` = `m04-l2`, sortie `suspend` (le LMS passe `entry` à `resume`), 1 `LMSInitialize`, 1 `LMSFinish`, `session_time` au bon format | **OK** |
+| Session 2 : « Reprendre où j'en étais » mène à la leçon 4.2 ; fin du module et défi à 3/4 → `completed`, score 75 (min 0, max 100), 4 interactions (q1 `wrong`, les autres `correct`), dernière sortie `""`, temps cumulé | **OK** |
+| `suspend_data` en fin de parcours : 235 / 4096 caractères ; 0 erreur SCORM | **OK** |
+| Le simulateur, formatif, n'est pas transmis au LMS ; aucun lien vers le site web dans le package | **OK** |
+
+### Non-régression des modules 1 à 3
+
+| Scénario | Résultat |
+|---|---|
+| Tests unitaires des modules 1, 2 et 3 | **OK** |
+| Schéma du module 2 : 4 services, annonce « Cette information peut servir à 4 services » inchangée | **OK** |
+
+### Anomalies rencontrées et corrigées
+
+1. Le point de la situation en cours était trop pâle pour se distinguer : remplacé par un point plein, plus grand.
+2. Formulation du bilan peu claire (« réflexe adapté (conduite attendue : partager) ») : reformulée.
+
+### Limites et points à valider
+
+- **Durée** : environ 1 600 mots à lire (leçons et simulateur), contre 1 000 pour le module 3. Estimation : 11 à 13 minutes, au-delà de la cible de 8 à 10 minutes. À mesurer avec quelques agents ; pistes de réduction dans `docs/conception.md` (décision 16).
+- La progression dans le simulateur n'est pas mémorisée après rechargement : il reprend à la situation 1 tant que la leçon 4.4 n'est pas terminée (même choix que le comparateur du module 3).
+- **Aucune validation juridique** : contenus et corrections à faire relire par le DPO et les référents (`docs/validation-metier-module-04.md`).
+- **Rien n'a été testé dans un vrai LMS** (import, statut `completed` sans seuil, score, reprise, 4 interactions).
+- Pas de test avec un lecteur d'écran réel, ni sous Safari, Firefox ou Edge. Les icônes des décisions (↗, 🔍, ✋) sont décoratives et peuvent s'afficher différemment selon le système.

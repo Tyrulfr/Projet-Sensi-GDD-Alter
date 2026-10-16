@@ -1,0 +1,742 @@
+{
+  "id": "m04",
+  "numero": 4,
+  "titre": "Partager sans perdre le contrôle",
+  "sousTitre": "Comprendre comment utiliser et transmettre des données de manière responsable.",
+  "slugArchive": "partager-sans-perdre-controle",
+  "duree": 10,
+  "statutContenu": "proposition - à valider (notamment par le DPO)",
+  "objectif": "Comprendre que le partage des données peut être nécessaire au fonctionnement collectif de l'université, mais qu'il doit respecter des règles adaptées à leur nature, aux finalités de leur utilisation et aux personnes autorisées.",
+  "objectifsSpecifiques": [
+    {
+      "id": "os4-1",
+      "texte": "Distinguer une donnée personnelle d'une donnée qui ne l'est pas."
+    },
+    {
+      "id": "os4-2",
+      "texte": "Reconnaître que certaines données nécessitent une protection particulière."
+    },
+    {
+      "id": "os4-3",
+      "texte": "Comprendre les notions de finalité et d'habilitation."
+    },
+    {
+      "id": "os4-4",
+      "texte": "Identifier les principaux risques d'un partage non maîtrisé."
+    },
+    {
+      "id": "os4-5",
+      "texte": "Reconnaître les situations nécessitant une vérification avant transmission."
+    },
+    {
+      "id": "os4-6",
+      "texte": "Comprendre que le RGPD encadre le traitement des données personnelles sans en interdire systématiquement le partage."
+    }
+  ],
+  "validation": {
+    "navigation": "sequentielle",
+    "leconsObligatoires": true,
+    "evaluation": "m04-defi"
+  },
+  "lecons": [
+    {
+      "id": "m04-l1",
+      "type": "lecon",
+      "titre": "Toutes les données ne se partagent pas de la même manière",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles dans un service administratif. Trois collègues te demandent :\n\n- le numéro d'une salle de réunion ;\n- la liste des agents du service, avec leurs coordonnées professionnelles ;\n- un tableau des rémunérations individuelles des personnels.\n\nCes informations n'ont pas la même nature : elles ne demandent pas les mêmes précautions."
+        },
+        {
+          "type": "definition",
+          "terme": "Donnée personnelle",
+          "texte": "Une information qui se rapporte à une personne physique **identifiée ou identifiable**, directement ou non : nom et prénom, adresse électronique nominative (même professionnelle), numéro étudiant, identifiant agent, adresse personnelle, certaines données de connexion, rémunération individuelle… Elle n'a pas besoin d'être secrète pour être personnelle."
+        },
+        {
+          "type": "definition",
+          "terme": "Donnée non personnelle",
+          "texte": "Une information qui ne permet d'identifier personne : nombre de salles d'un bâtiment, référence d'un équipement, nombre de documents d'une bibliothèque."
+        },
+        {
+          "type": "exemple",
+          "etiquette": "Attention",
+          "titre": "Une donnée anodine peut devenir personnelle",
+          "texte": "Croisée avec d'autres informations, elle peut permettre d'identifier quelqu'un : « un agent de 58 ans, dans un service de trois personnes » ne cite aucun nom, et pourtant on devine souvent de qui il s'agit."
+        },
+        {
+          "type": "tableau",
+          "titre": "Trois notions à ne pas confondre",
+          "colonnes": [
+            "Notion",
+            "Ce que cela veut dire",
+            "Exemple"
+          ],
+          "lignes": [
+            [
+              "Donnée personnelle",
+              "Se rapporte à une personne identifiée ou identifiable.",
+              "Adresse électronique nominative"
+            ],
+            [
+              "Donnée confidentielle",
+              "Ne doit être connue que des personnes autorisées, qu'elle soit personnelle ou non.",
+              "Rémunération individuelle, dossier administratif d'un agent, mot de passe"
+            ],
+            [
+              "Catégorie particulière (article 9 du RGPD)",
+              "Liste précise de données à protection renforcée : santé, origine, opinions politiques, convictions religieuses, appartenance syndicale, données génétiques ou biométriques, vie ou orientation sexuelle.",
+              "Information médicale"
+            ]
+          ],
+          "legende": "Une rémunération individuelle demande une grande confidentialité, sans être pour autant une catégorie particulière au sens de l'article 9."
+        },
+        {
+          "type": "activite",
+          "ref": "m04-a1"
+        },
+        {
+          "type": "aretenir",
+          "texte": "Toutes les données ne présentent pas les mêmes enjeux de protection."
+        }
+      ]
+    },
+    {
+      "id": "m04-l2",
+      "type": "lecon",
+      "titre": "Pourquoi partage-t-on une donnée ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Le service de scolarité reçoit, d'un autre service de l'université, une demande de liste nominative d'étudiants.\n\nFaut-il envoyer le fichier tout de suite ? Pas forcément : il faut d'abord comprendre **pourquoi** ces informations sont demandées."
+        },
+        {
+          "type": "definition",
+          "terme": "Finalité",
+          "texte": "L'objectif déterminé pour lequel des données personnelles sont utilisées. Un service qui gère les inscriptions pédagogiques a besoin de certaines données d'inscription pour cette mission ; cela ne lui permet pas de les réutiliser automatiquement pour n'importe quel autre objectif."
+        },
+        {
+          "type": "definition",
+          "terme": "Minimisation",
+          "texte": "Limiter les données personnelles à ce qui est **adéquat, pertinent et nécessaire** au regard de la finalité."
+        },
+        {
+          "type": "tableau",
+          "titre": "Un besoin, quelles données ?",
+          "colonnes": [
+            "Besoin",
+            "Ce qui suffit",
+            "Inutile pour ce besoin"
+          ],
+          "lignes": [
+            [
+              "Préparer une salle pour une formation",
+              "Le nombre d'étudiants inscrits",
+              "Noms, dates de naissance, adresses personnelles"
+            ],
+            [
+              "Envoyer une convocation à un examen",
+              "Nom, prénom, adresse électronique, formation suivie",
+              "Situation familiale, coordonnées bancaires"
+            ]
+          ],
+          "legende": "Exemples illustratifs : le besoin réel s'apprécie au cas par cas."
+        },
+        {
+          "type": "activite",
+          "ref": "m04-a2"
+        },
+        {
+          "type": "aretenir",
+          "texte": "Avant de partager une donnée personnelle, je cherche à comprendre la finalité et quelles informations sont réellement nécessaires."
+        }
+      ]
+    },
+    {
+      "id": "m04-l3",
+      "type": "lecon",
+      "titre": "Qui a le droit d'accéder aux données ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Tu travailles dans un service RH. Un collègue d'un autre service te demande des informations détaillées sur la situation administrative d'un agent.\n\nIl travaille dans la même université : est-ce suffisant pour lui répondre ? **Non.** Travailler dans le même établissement ne donne pas accès à toutes les informations."
+        },
+        {
+          "type": "definition",
+          "terme": "Habilitation",
+          "texte": "Une autorisation d'accès attribuée à une personne ou à une fonction, dans un cadre défini et en cohérence avec ses missions. Elle organise qui peut consulter ou traiter certaines données."
+        },
+        {
+          "type": "schema",
+          "titre": "Avant de transmettre : trois critères à examiner ensemble",
+          "source": {
+            "libelle": "Une demande de données",
+            "detail": "« Tu peux m'envoyer… ? »"
+          },
+          "flux": "s'examine selon",
+          "annonce": "Trois critères à examiner :",
+          "consigne": "Sélectionne un critère pour découvrir la question à se poser.",
+          "cibles": [
+            {
+              "libelle": "Finalité déterminée",
+              "usage": "Pourquoi cette demande ?",
+              "detail": "La personne doit pouvoir expliquer l'objectif poursuivi, en lien avec ses missions. « J'en ai besoin » ne suffit pas : pour quoi faire ?"
+            },
+            {
+              "libelle": "Données nécessaires",
+              "usage": "Faut-il toutes ces informations ?",
+              "detail": "On ne transmet que ce qui est utile à l'objectif. Souvent, un extrait, un total ou des données non nominatives suffisent."
+            },
+            {
+              "libelle": "Accès autorisé",
+              "usage": "Cette personne peut-elle les recevoir ?",
+              "detail": "Ses fonctions lui donnent-elles le droit d'accéder à ces données, ou une procédure permet-elle de le vérifier ? Avoir techniquement accès à une application ne justifie pas, à lui seul, n'importe quel usage des données."
+            }
+          ],
+          "legende": "Ces trois critères ne suffisent pas toujours : le traitement doit aussi reposer sur une base légale et respecter les autres règles applicables."
+        },
+        {
+          "type": "activite",
+          "ref": "m04-a3"
+        },
+        {
+          "type": "aretenir",
+          "texte": "Travailler dans la même organisation ne signifie pas avoir accès aux mêmes données."
+        }
+      ]
+    },
+    {
+      "id": "m04-l4",
+      "type": "lecon",
+      "titre": "Le RGPD interdit-il de partager les données ?",
+      "blocs": [
+        {
+          "type": "situation",
+          "texte": "Un agent doit répondre à la demande d'un autre service. Il hésite : « Je préfère refuser : avec le RGPD, on ne peut plus transmettre de données personnelles. »\n\n**Cette affirmation est incorrecte.**"
+        },
+        {
+          "type": "texte",
+          "titre": "Un cadre, pas une interdiction",
+          "texte": "Le RGPD n'interdit pas systématiquement de transmettre des données personnelles. Il fixe un cadre, qui prévoit notamment :\n\n- une base juridique appropriée ;\n- une finalité déterminée et légitime ;\n- la minimisation des données ;\n- la sécurité et la confidentialité ;\n- la transparence envers les personnes concernées ;\n- le respect de leurs droits ;\n- une durée de conservation adaptée.\n\nUn partage peut donc être possible s'il respecte ces conditions. Mais un besoin professionnel ne suffit pas, à lui seul, à le rendre légal : les règles de l'établissement et les responsabilités définies s'appliquent aussi."
+        },
+        {
+          "type": "memo",
+          "titre": "Les quatre réflexes avant de transmettre",
+          "etapes": [
+            {
+              "titre": "Comprendre",
+              "texte": "Quel est l'objectif de la demande ?"
+            },
+            {
+              "titre": "Vérifier",
+              "texte": "Quelles données sont nécessaires, et qui est autorisé à les recevoir ?"
+            },
+            {
+              "titre": "Sécuriser",
+              "texte": "Quel canal de transmission ou mode d'accès est prévu et approprié ?"
+            },
+            {
+              "titre": "Demander conseil",
+              "texte": "En cas de doute : ton responsable, le référent métier, le DPO ou le service compétent, selon la procédure interne."
+            }
+          ],
+          "legende": "Tu n'as pas à mener seul une analyse juridique complexe : demander conseil fait partie du bon réflexe."
+        },
+        {
+          "type": "activite",
+          "ref": "m04-a4"
+        },
+        {
+          "type": "simulateur",
+          "titre": "Puis-je partager cette donnée ?",
+          "consigne": "Quatre demandes fictives. Pour chacune, choisis la conduite à tenir, puis découvre la correction.",
+          "avertissement": "Exercice de sensibilisation, pas un outil de validation : face à une demande réelle, suis les procédures de l'établissement et demande conseil aux personnes compétentes.",
+          "decisions": [
+            {
+              "id": "partager",
+              "libelle": "Partager",
+              "icone": "↗"
+            },
+            {
+              "id": "verifier",
+              "libelle": "Vérifier avant de décider",
+              "icone": "🔍"
+            },
+            {
+              "id": "ne-pas-transmettre",
+              "libelle": "Ne pas transmettre en l'état",
+              "icone": "✋"
+            }
+          ],
+          "scenarios": [
+            {
+              "id": "salles",
+              "objectif": "os4-3",
+              "titre": "Préparer une salle",
+              "contexte": "Le service logistique doit réserver une salle pour une formation.",
+              "demandeur": "Service logistique",
+              "finalite": "Prévoir une salle de capacité suffisante",
+              "donnees": "Le nombre de participants inscrits",
+              "choix": [
+                {
+                  "id": "a",
+                  "decision": "partager",
+                  "texte": "Transmettre l'effectif global des inscrits.",
+                  "feedback": "Un chiffre répond entièrement au besoin, sans faire circuler de données nominatives."
+                },
+                {
+                  "id": "b",
+                  "decision": "verifier",
+                  "texte": "Demander l'avis du DPO avant de donner le chiffre.",
+                  "feedback": "Prudent, mais pas nécessaire ici : un effectif global ne permet pas, en général, d'identifier les participants. Le DPO est à solliciter en cas de doute réel."
+                },
+                {
+                  "id": "c",
+                  "decision": "ne-pas-transmettre",
+                  "texte": "Refuser : la liste des inscrits contient des données personnelles.",
+                  "feedback": "Le besoin porte sur un nombre, pas sur la liste. Refuser bloquerait l'organisation sans protéger personne davantage."
+                }
+              ],
+              "reponse": "a",
+              "correction": {
+                "pourquoi": "Le besoin est légitime et un chiffre suffit : c'est la minimisation.",
+                "aVerifier": [
+                  "Le besoin porte-t-il bien sur un nombre, et non sur des noms ?",
+                  "Le groupe est-il assez grand pour que le chiffre n'identifie personne ?"
+                ],
+                "risque": "Envoyer la liste complète par habitude, ou bloquer un besoin simple.",
+                "reflexe": "Quand un effectif suffit, je transmets un effectif."
+              }
+            },
+            {
+              "id": "remunerations",
+              "objectif": "os4-4",
+              "titre": "Un fichier de rémunérations",
+              "contexte": "Un collègue t'écrit : « Tu peux m'envoyer le fichier des rémunérations de l'équipe ? » Il ne dit pas pourquoi.",
+              "demandeur": "Un collègue d'un autre service",
+              "finalite": "Non précisée",
+              "donnees": "Les rémunérations individuelles des agents, nominatives",
+              "choix": [
+                {
+                  "id": "a",
+                  "decision": "partager",
+                  "texte": "Envoyer le fichier : c'est un collègue de l'université.",
+                  "feedback": "Être collègue ne donne pas accès aux rémunérations individuelles. Le fichier pourrait arriver chez une personne qui n'a pas à les connaître."
+                },
+                {
+                  "id": "b",
+                  "decision": "verifier",
+                  "texte": "Lui demander l'objectif de sa demande, et vérifier avec ton responsable s'il peut accéder à ces données.",
+                  "feedback": "C'est le bon réflexe : tant que la finalité et le droit d'accès ne sont pas vérifiés, on ne transmet pas."
+                },
+                {
+                  "id": "c",
+                  "decision": "ne-pas-transmettre",
+                  "texte": "Refuser définitivement, sans autre échange.",
+                  "feedback": "Ne pas envoyer tout de suite est juste. Mais refuser sans chercher à comprendre peut bloquer une mission légitime : mieux vaut clarifier la demande."
+                }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Données personnelles très confidentielles, finalité inconnue, accès non vérifié : on ne peut pas encore décider.",
+                "aVerifier": [
+                  "L'objectif de la demande, et si des données agrégées suffiraient.",
+                  "L'habilitation du demandeur et la procédure applicable."
+                ],
+                "risque": "Divulguer des rémunérations individuelles à une personne non autorisée.",
+                "reflexe": "Demande floue sur des données confidentielles : je clarifie et je vérifie avant de transmettre."
+              }
+            },
+            {
+              "id": "bibliotheque",
+              "objectif": "os4-5",
+              "titre": "Un inventaire de la bibliothèque",
+              "contexte": "Le service chargé de l'inventaire des collections demande à la bibliothèque une liste de références bibliographiques.",
+              "demandeur": "Le service chargé de l'inventaire",
+              "finalite": "Constituer un inventaire des collections",
+              "donnees": "Des références bibliographiques (titre, auteur, cote…)",
+              "complement": "Certaines notices viennent de fournisseurs extérieurs. L'export disponible contient aussi l'historique des prêts.",
+              "choix": [
+                {
+                  "id": "a",
+                  "decision": "partager",
+                  "texte": "Envoyer immédiatement l'export complet du catalogue.",
+                  "feedback": "L'export contient l'historique des prêts, qui renvoie à des lecteurs. Et les conditions de réutilisation des notices n'ont pas été vérifiées."
+                },
+                {
+                  "id": "b",
+                  "decision": "verifier",
+                  "texte": "Vérifier les conditions de réutilisation, puis transmettre seulement les références utiles à l'inventaire.",
+                  "feedback": "C'est le bon réflexe : le partage est sans doute possible, après ces vérifications et sans les données de prêt."
+                },
+                {
+                  "id": "c",
+                  "decision": "ne-pas-transmettre",
+                  "texte": "Refuser : les données de la bibliothèque ne se partagent pas.",
+                  "feedback": "Des références bibliographiques ne sont en général pas des données personnelles, et l'inventaire est une mission légitime. Refuser par principe bloquerait un travail utile."
+                }
+              ],
+              "reponse": "b",
+              "correction": {
+                "pourquoi": "Des références bibliographiques ne sont en général pas des données personnelles. Mais leur réutilisation peut être encadrée par des licences, et l'export contient d'autres informations.",
+                "aVerifier": [
+                  "Les licences ou accords qui encadrent les notices.",
+                  "Le contenu de l'export : rien sur les lecteurs ni sur les prêts."
+                ],
+                "risque": "Transmettre sans le voir des données sur les lecteurs, ou bloquer un inventaire légitime.",
+                "reflexe": "Même sans données personnelles, je vérifie ce que je transmets et à quelles conditions."
+              }
+            },
+            {
+              "id": "sante",
+              "objectif": "os4-2",
+              "titre": "Des informations médicales",
+              "contexte": "Pour une journée d'intégration, un responsable te demande les informations médicales des étudiants concernés, « pour prévoir les aménagements ».",
+              "demandeur": "Un responsable de formation",
+              "finalite": "Prévoir d'éventuels aménagements",
+              "donnees": "Des informations médicales individuelles d'étudiants",
+              "choix": [
+                {
+                  "id": "a",
+                  "decision": "partager",
+                  "texte": "Envoyer les informations médicales des étudiants concernés.",
+                  "feedback": "Des données de santé parviendraient à une personne qui n'a pas à les connaître : un risque sérieux pour les étudiants."
+                },
+                {
+                  "id": "b",
+                  "decision": "verifier",
+                  "texte": "Lui demander de justifier son besoin, puis lui envoyer les informations médicales s'il le justifie.",
+                  "feedback": "Une justification ne change rien ici : un organisateur n'a pas à connaître des détails médicaux pour prévoir un aménagement."
+                },
+                {
+                  "id": "c",
+                  "decision": "ne-pas-transmettre",
+                  "texte": "Ne pas transmettre ces informations, et orienter la demande vers les services compétents.",
+                  "feedback": "C'est le bon réflexe : les services compétents indiqueront comment prévoir les aménagements, sans communiquer de détails médicaux."
+                }
+              ],
+              "reponse": "c",
+              "correction": {
+                "pourquoi": "Les données de santé sont une catégorie particulière du RGPD. L'organisateur a besoin de savoir quoi prévoir, pas de connaître l'état de santé des personnes.",
+                "aVerifier": [
+                  "Le service compétent dans l'établissement (santé, accompagnement du handicap…).",
+                  "Les informations pratiques, non médicales, utiles à l'organisateur."
+                ],
+                "risque": "Exposer des informations de santé, au détriment des étudiants.",
+                "reflexe": "Données de santé : je ne transmets pas, j'oriente vers les personnes compétentes."
+              }
+            }
+          ],
+          "conclusion": "Ni tout partager, ni tout bloquer : je comprends le besoin, je vérifie les autorisations et les règles applicables, puis je décide, ou je demande conseil."
+        },
+        {
+          "type": "aretenir",
+          "texte": "Le RGPD organise un usage responsable des données personnelles : il ne signifie pas que tout partage est interdit."
+        }
+      ]
+    },
+    {
+      "id": "m04-defi",
+      "type": "evaluation",
+      "titre": "Le défi du module",
+      "surtitre": "Défi final",
+      "libelleAcces": "Relever le défi",
+      "libelleRecommencer": "Recommencer le défi",
+      "presentation": "une-par-une",
+      "introduction": "Quatre situations, une question à la fois. Tu découvres la correction après chaque réponse, et tu peux recommencer le défi autant de fois que tu le souhaites.",
+      "activites": [
+        "m04-q1",
+        "m04-q2",
+        "m04-q3",
+        "m04-q4"
+      ],
+      "messagesResultat": [
+        {
+          "min": 100,
+          "texte": "Bravo ! Tu sais qu'il ne faut ni tout partager ni tout bloquer, mais vérifier le besoin, les autorisations et les règles applicables."
+        },
+        {
+          "min": 75,
+          "texte": "Très bien. Relis la correction de la question à revoir : elle reprend un réflexe clé du partage responsable."
+        },
+        {
+          "min": 50,
+          "texte": "C'est un bon début. Les corrections t'aideront à consolider les notions de donnée personnelle, de finalité et d'habilitation."
+        },
+        {
+          "min": 0,
+          "texte": "Ces notions sont nouvelles pour beaucoup de personnes. Prends le temps de relire les corrections, puis recommence le défi quand tu le souhaites."
+        }
+      ]
+    }
+  ],
+  "activites": {
+    "m04-a1": {
+      "type": "classement",
+      "objectif": "os4-1",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Pour chaque information, choisis la catégorie qui convient dans le contexte présenté.",
+      "categories": [
+        {
+          "id": "n",
+          "texte": "Donnée non personnelle (dans ce contexte)"
+        },
+        {
+          "id": "p",
+          "texte": "Donnée personnelle"
+        },
+        {
+          "id": "s",
+          "texte": "Catégorie particulière du RGPD"
+        }
+      ],
+      "elements": [
+        {
+          "id": "1",
+          "texte": "L'adresse électronique nominative d'un agent.",
+          "categorie": "p",
+          "explication": "Elle identifie directement une personne, même si elle est professionnelle."
+        },
+        {
+          "id": "2",
+          "texte": "Le nombre de places disponibles dans un amphithéâtre.",
+          "categorie": "n",
+          "explication": "Ce chiffre décrit une salle, pas une personne."
+        },
+        {
+          "id": "3",
+          "texte": "La rémunération individuelle d'un agent.",
+          "categorie": "p",
+          "explication": "C'est une donnée personnelle très confidentielle, mais elle ne relève pas, à elle seule, des catégories particulières du RGPD."
+        },
+        {
+          "id": "4",
+          "texte": "Une information médicale concernant un étudiant.",
+          "categorie": "s",
+          "explication": "Les données de santé font partie des catégories particulières du RGPD : elles bénéficient d'une protection renforcée."
+        }
+      ],
+      "explication": {
+        "correct": "Bravo. Attention : le classement dépend parfois du contexte. Un chiffre portant sur un très petit groupe, croisé avec d'autres informations, peut permettre d'identifier une personne.",
+        "incorrect": "Certaines réponses sont à revoir : les explications ci-dessus précisent la catégorie attendue. Le classement dépend parfois du contexte et des possibilités d'identification."
+      }
+    },
+    "m04-a2": {
+      "type": "choix-unique",
+      "objectif": "os4-3",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Le service logistique souhaite connaître le nombre d'étudiants inscrits à une conférence, pour déterminer la capacité nécessaire. Que faire ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Transmettre le fichier complet des étudiants avec leurs coordonnées.",
+          "feedback": "Le fichier complet contient bien plus que ce qui est utile pour dimensionner une salle : ces données n'ont pas à circuler pour ce besoin."
+        },
+        {
+          "id": "b",
+          "texte": "Transmettre uniquement le nombre d'inscrits, si cette information suffit au besoin.",
+          "feedback": "C'est le bon réflexe : un chiffre suffit pour prévoir la capacité."
+        },
+        {
+          "id": "c",
+          "texte": "Refuser toute transmission, car les inscriptions concernent des étudiants.",
+          "feedback": "Refuser bloquerait un besoin légitime, alors qu'un effectif ne permet pas, en général, d'identifier les étudiants."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Lorsqu'une information agrégée suffit à répondre au besoin, il n'est pas nécessaire de transmettre des données nominatives.",
+        "incorrect": "La bonne réponse est la deuxième. Lorsqu'une information agrégée suffit à répondre au besoin, il n'est pas nécessaire de transmettre des données nominatives."
+      }
+    },
+    "m04-a3": {
+      "type": "choix-unique",
+      "objectif": "os4-5",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Une personne demande une extraction RH nominative, sans préciser son objectif. Que faut-il faire ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Transmettre le fichier, puisqu'il s'agit d'un collègue.",
+          "feedback": "Être collègue ne suffit pas : l'accès dépend des missions et des autorisations, pas de l'appartenance à l'établissement."
+        },
+        {
+          "id": "b",
+          "texte": "Vérifier la finalité, les droits et la procédure applicable avant toute transmission.",
+          "feedback": "C'est le bon réflexe : vérifier avant de transmettre."
+        },
+        {
+          "id": "c",
+          "texte": "Publier les données sur un espace partagé accessible à toute l'université.",
+          "feedback": "Des données RH nominatives seraient alors exposées à des personnes qui n'ont pas à les connaître."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Une demande professionnelle doit être examinée selon le besoin, l'autorisation d'accès et les règles applicables. En cas de doute, il faut solliciter les personnes compétentes.",
+        "incorrect": "La bonne réponse est la deuxième. Une demande professionnelle doit être examinée selon le besoin, l'autorisation d'accès et les règles applicables. En cas de doute, il faut solliciter les personnes compétentes."
+      }
+    },
+    "m04-a4": {
+      "type": "choix-unique",
+      "objectif": "os4-6",
+      "notation": {
+        "formative": true,
+        "points": 1
+      },
+      "consigne": "Un service habilité demande certaines données nécessaires à une mission identifiée. Une procédure interne prévoit leur transmission sécurisée. Que faire ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Refuser automatiquement, car ce sont des données personnelles.",
+          "feedback": "Refuser par principe bloquerait une mission identifiée, alors qu'une procédure encadre déjà cette transmission."
+        },
+        {
+          "id": "b",
+          "texte": "Suivre la procédure autorisée, après les vérifications prévues.",
+          "feedback": "C'est le bon réflexe : le cadre existe, il suffit de le suivre."
+        },
+        {
+          "id": "c",
+          "texte": "Envoyer le fichier à l'ensemble du personnel pour assurer la transparence.",
+          "feedback": "La transparence ne consiste pas à diffuser des données personnelles à tous : ce serait un partage non maîtrisé."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Le RGPD permet des traitements et transmissions de données personnelles lorsqu'ils reposent sur un cadre juridique approprié et respectent les règles applicables.",
+        "incorrect": "La bonne réponse est la deuxième. Le RGPD permet des traitements et transmissions de données personnelles lorsqu'ils reposent sur un cadre juridique approprié et respectent les règles applicables."
+      }
+    },
+    "m04-q1": {
+      "type": "choix-unique",
+      "objectif": "os4-1",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Une adresse électronique professionnelle nominative constitue-t-elle une donnée personnelle ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Non, puisqu'elle appartient à une organisation."
+        },
+        {
+          "id": "b",
+          "texte": "Oui, lorsqu'elle permet d'identifier une personne physique."
+        },
+        {
+          "id": "c",
+          "texte": "Seulement si elle figure dans un document confidentiel."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Une donnée professionnelle peut être une donnée personnelle lorsqu'elle identifie directement ou indirectement une personne.",
+        "incorrect": "La bonne réponse est la deuxième. Une donnée professionnelle peut être une donnée personnelle lorsqu'elle identifie directement ou indirectement une personne."
+      }
+    },
+    "m04-q2": {
+      "type": "choix-unique",
+      "objectif": "os4-3",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Le service logistique souhaite connaître le nombre d'étudiants inscrits à une conférence. Quelle information est généralement suffisante ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Un effectif global."
+        },
+        {
+          "id": "b",
+          "texte": "La liste complète avec adresses personnelles."
+        },
+        {
+          "id": "c",
+          "texte": "L'intégralité des dossiers d'inscription."
+        }
+      ],
+      "reponse": "a",
+      "explication": {
+        "correct": "Il faut limiter les données personnelles utilisées aux informations nécessaires à l'objectif poursuivi.",
+        "incorrect": "La bonne réponse est l'effectif global. Il faut limiter les données personnelles utilisées aux informations nécessaires à l'objectif poursuivi."
+      }
+    },
+    "m04-q3": {
+      "type": "choix-unique",
+      "objectif": "os4-3",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Un collègue demande une extraction RH détaillée sans préciser le motif. Quelle attitude adopter ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Transmettre, puisqu'il travaille dans l'université."
+        },
+        {
+          "id": "b",
+          "texte": "Vérifier la finalité et les autorisations avant transmission."
+        },
+        {
+          "id": "c",
+          "texte": "Envoyer le fichier sans contrôle, puis demander une justification après."
+        }
+      ],
+      "reponse": "b",
+      "explication": {
+        "correct": "Le partage doit respecter les missions, les droits d'accès et les règles applicables.",
+        "incorrect": "La bonne réponse est la deuxième : vérifier la finalité et les autorisations avant transmission. Le partage doit respecter les missions, les droits d'accès et les règles applicables."
+      }
+    },
+    "m04-q4": {
+      "type": "choix-unique",
+      "objectif": "os4-6",
+      "notation": {
+        "formative": false,
+        "points": 1
+      },
+      "consigne": "Quelle affirmation est correcte ?",
+      "choix": [
+        {
+          "id": "a",
+          "texte": "Le RGPD interdit tout partage de données personnelles."
+        },
+        {
+          "id": "b",
+          "texte": "Une donnée personnelle peut toujours être transmise entre collègues."
+        },
+        {
+          "id": "c",
+          "texte": "Le RGPD encadre les conditions dans lesquelles des données personnelles peuvent être traitées et partagées."
+        }
+      ],
+      "reponse": "c",
+      "explication": {
+        "correct": "Le RGPD définit un cadre de protection et de traitement responsable. Le partage peut être possible lorsqu'il respecte les conditions applicables.",
+        "incorrect": "La bonne réponse est la troisième. Le RGPD définit un cadre de protection et de traitement responsable. Le partage peut être possible lorsqu'il respecte les conditions applicables."
+      }
+    }
+  },
+  "synthese": [
+    "Une donnée personnelle peut aussi être une donnée professionnelle.",
+    "Toutes les données n'exigent pas les mêmes précautions.",
+    "Le partage doit répondre à une finalité et respecter les règles applicables.",
+    "Les informations transmises doivent être limitées au besoin.",
+    "Les droits d'accès et les habilitations doivent être vérifiés.",
+    "En cas de doute, il faut se rapprocher des personnes compétentes.",
+    "Le RGPD n'interdit pas systématiquement le partage."
+  ]
+}

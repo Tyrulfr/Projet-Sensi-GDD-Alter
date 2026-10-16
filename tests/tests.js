@@ -422,6 +422,132 @@
     });
   }
 
+  function lancerModule4(module) {
+    var idEval = module.validation.evaluation;
+    var lecons = module.lecons.filter(function (l) { return l.type === 'lecon'; });
+    var simulateur = lecons[3].blocs.filter(function (b) { return b.type === 'simulateur'; })[0];
+
+    test('M4 : chaque activité accepte sa réponse attendue', function () {
+      Object.keys(module.activites).forEach(function (id) {
+        var act = module.activites[id];
+        vrai(A.corriger(act, A.reponseAttendue(act)).correct, id);
+      });
+    });
+
+    test('M4 : bonnes réponses du défi conformes au scénario (B, A, B, C)', function () {
+      egal(bonnesReponses(module, idEval), { 'm04-q1': 'b', 'm04-q2': 'a', 'm04-q3': 'b', 'm04-q4': 'c' });
+    });
+
+    test('M4 : classification (rémunération = donnée personnelle, pas catégorie particulière)', function () {
+      var act = module.activites['m04-a1'];
+      egal(A.reponseAttendue(act), '1.p,2.n,3.p,4.s');
+      var r = A.corriger(act, '1.p,2.n,3.s,4.s');
+      vrai(!r.correct); egal(r.details['3'], false); egal(r.details['4'], true);
+    });
+
+    test('M4 : simulateur - trois issues par situation, chacune attendue au moins une fois', function () {
+      var attendues = {};
+      simulateur.scenarios.forEach(function (s) {
+        egal(s.choix.map(function (c) { return c.decision; }).sort(), ['ne-pas-transmettre', 'partager', 'verifier'], s.id);
+        attendues[s.choix.filter(function (c) { return c.id === s.reponse; })[0].decision] = true;
+      });
+      egal(Object.keys(attendues).sort(), ['ne-pas-transmettre', 'partager', 'verifier']);
+      var sante = simulateur.scenarios.filter(function (s) { return s.id === 'sante'; })[0];
+      egal(sante.choix.filter(function (c) { return c.id === sante.reponse; })[0].decision, 'ne-pas-transmettre', 'santé : pas de transmission');
+    });
+
+    test('M4 : 4 leçons obligatoires, défi verrouillé avant la fin', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      egal(lecons.length, 4);
+      lecons.slice(0, 3).forEach(function (l) { m.marquerVue(l.id); });
+      vrai(!m.estAccessible(4), 'défi verrouillé');
+      m.marquerVue(lecons[3].id);
+      vrai(m.estAccessible(4), 'défi ouvert');
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'incomplete');
+    });
+
+    test('M4 : défi 2/4 -> completed, score 50 (aucun seuil imposé)', function () {
+      var m = new GDD.Moteur(module, new TraceurTest()); m.demarrer();
+      lecons.forEach(function (l) { m.marquerVue(l.id); });
+      var codes = bonnesReponses(module, idEval); codes['m04-q1'] = 'a'; codes['m04-q4'] = 'a';
+      var r = m.soumettreEvaluation(idEval, codes);
+      egal([r.bonnes, r.total, r.score], [2, 4, 50]);
+      egal(m.statut().seuil, null);
+      egal(GDD.TraceurScorm12.statutScorm(m.statut()), 'completed');
+    });
+
+    test('M4 : adaptateur SCORM 1.2 -> reprise, completed, score 100, 4 interactions', function () {
+      var api = new FausseApi({ 'cmi.core.lesson_status': 'not attempted', 'cmi.core.entry': 'ab-initio', 'cmi.core.lesson_mode': 'normal' });
+      window.API = api;
+      var m = new GDD.Moteur(module, new GDD.TraceurScorm12()); m.demarrer();
+      m.marquerVue(lecons[0].id); m.repondre('m04-a1', '1.p,2.n,3.p,4.s'); m.definirPosition(1);
+      m.terminer();
+      egal([api.d['cmi.core.exit'], api.d['cmi.core.lesson_location'], api.d['cmi.core.lesson_status']], ['suspend', 'm04-l2', 'incomplete']);
+      var api2 = new FausseApi({ 'cmi.core.lesson_status': 'incomplete', 'cmi.core.entry': 'resume', 'cmi.core.lesson_mode': 'normal', 'cmi.suspend_data': api.d['cmi.suspend_data'] });
+      window.API = api2;
+      var m2 = new GDD.Moteur(module, new GDD.TraceurScorm12()); m2.demarrer();
+      egal(m2.etat.p, 1); egal(m2.reponseEnregistree('m04-a1'), '1.p,2.n,3.p,4.s');
+      lecons.forEach(function (l) { m2.marquerVue(l.id); });
+      m2.soumettreEvaluation(idEval, bonnesReponses(module, idEval));
+      egal(api2.d['cmi.core.lesson_status'], 'completed');
+      egal([api2.d['cmi.core.score.raw'], api2.d['cmi.core.score.min'], api2.d['cmi.core.score.max']], ['100', '0', '100']);
+      egal(api2.d['cmi.interactions.3.id'], 'm04-q4');
+      egal(api2.d['cmi.interactions.0.result'], 'correct');
+      m2.terminer();
+      egal(api2.d['cmi.core.exit'], '');
+      delete window.API;
+    });
+
+    function choisir(el, idChoix) {
+      el.querySelector('.option-decision input[value="' + idChoix + '"]').checked = true;
+      el.querySelector('.simulateur-zone .actions button').click();
+    }
+
+    test('Simulateur : validation sans choix refusée, puis correction complète', function () {
+      var etat = { i: 0, choix: {}, termine: false };
+      var el = GDD.ui.simulateur(simulateur, { etat: etat, prefixeId: 's1' });
+      document.body.appendChild(el);
+      egal(el.querySelectorAll('.option-decision').length, 3);
+      vrai(/Situation 1 sur 4/.test(el.textContent));
+      vrai(/Service logistique/.test(el.querySelector('.simulateur-fiche').textContent), 'fiche du demandeur');
+      el.querySelector('.simulateur-zone .actions button').click();
+      vrai(/Choisis une conduite/.test(el.querySelector('.activite-message').textContent));
+      egal(Object.keys(etat.choix).length, 0);
+      choisir(el, 'c');
+      var fb = el.querySelector('.activite-message').textContent;
+      vrai(/Réflexe à revoir/.test(fb) && /Conduite attendue/.test(fb), 'erreur expliquée');
+      vrai(/Pourquoi/.test(fb) && /À vérifier/.test(fb) && /Risque/.test(fb) && /Le bon réflexe/.test(fb), 'critères détaillés');
+      egal(document.activeElement && document.activeElement.id, 's1-retour', 'focus sur la correction');
+      vrai(el.querySelector('.option-decision input').disabled, 'choix verrouillé après validation');
+      document.body.removeChild(el);
+    });
+
+    test('Simulateur : bilan, fin signalée une seule fois, recommencer', function () {
+      var etat = { i: 0, choix: {}, termine: false };
+      var fins = 0;
+      var el = GDD.ui.simulateur(simulateur, { etat: etat, prefixeId: 's2', surTermine: function () { fins++; } });
+      document.body.appendChild(el);
+      simulateur.scenarios.forEach(function (s, j) {
+        choisir(el, j === 1 ? 'a' : s.reponse);
+        el.querySelector('.simulateur-zone .actions button').click();
+      });
+      egal([etat.i, etat.termine, fins], [4, true, 1]);
+      var el2 = GDD.ui.simulateur(simulateur, { etat: etat, prefixeId: 's3' });
+      vrai(/Bilan : 3 réflexes adaptés sur 4/.test(el2.textContent));
+      egal(el2.querySelectorAll('.simulateur-recap .est-faux').length, 1);
+      el2.querySelector('.simulateur-bilan button').click();
+      egal([etat.i, Object.keys(etat.choix).length, etat.termine], [0, 0, true]);
+      document.body.removeChild(el);
+    });
+
+    test('Mémo : quatre réflexes numérotés', function () {
+      var memo = lecons[3].blocs.filter(function (b) { return b.type === 'memo'; })[0];
+      var el = GDD.ui.memo(memo);
+      egal(el.querySelectorAll('.memo-etape').length, 4);
+      egal(el.querySelector('.memo-titre').textContent, 'Comprendre');
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -441,7 +567,7 @@
   function charger(fichier) {
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
-  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); afficher(); })
+  Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json')])
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

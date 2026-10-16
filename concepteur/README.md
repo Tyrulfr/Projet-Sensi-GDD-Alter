@@ -47,7 +47,9 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `exemple` | `titre` (facultatif), `texte`, `etiquette` (facultatif, « Exemple » par défaut ; ex. « Point de vigilance ») |
 | `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes), `legende` (facultatif, ex. « Données fictives ») |
 | `comparateur` | comparaison « avant / après » (module 3, voir ci-dessous) |
-| `schema` | schéma de circulation cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `id`, `libelle`, `usage`, `detail`), `legende` (ex. « Exemple illustratif ») |
+| `schema` | schéma cliquable : `titre`, `consigne`, `source` (`libelle`, `detail`), `flux` (texte sur la flèche), `cibles` (au moins 2 : `libelle`, `usage`, `detail` ; 3 cibles s'affichent sur une ligne), `legende` (ex. « Exemple illustratif »), `annonce` (facultatif : phrase lue par les lecteurs d'écran avant les cibles, « Cette information peut servir à N services : » par défaut ; module 4 : « Trois critères à examiner : ») |
+| `memo` | repères numérotés (module 4 : les quatre réflexes) : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `legende` (facultatif) |
+| `simulateur` | simulateur de décisions (module 4, voir ci-dessous) |
 | `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
 | `activite` | `ref` : identifiant d'une activité définie dans `activites` |
 | `aretenir` | `texte` |
@@ -74,9 +76,53 @@ L'apprenant clique sur une cellule du tableau « avant » (ou sur une difficult�
 - Une cellule vide (`""`) s'affiche « (non renseignée) ».
 - `avertissement` : à garder pour rappeler que le tableau « après » n'est pas une correction automatique (le validateur prévient s'il manque).
 
+## Le simulateur de décisions
+
+Une série de demandes présentées une à une, sous forme de carte (demandeur, finalité annoncée, données demandées). L'apprenant choisit une conduite, valide, puis lit la correction : réflexe adapté ou non, pourquoi, ce qu'il faut vérifier, le risque d'une mauvaise décision, le bon réflexe. Après la dernière situation, un bilan s'affiche avec « Recommencer le simulateur ». La première fois, « Continuer » n'apparaît qu'après le bilan. C'est un exercice **formatif** : il n'entre pas dans le score et n'est pas transmis au LMS.
+
+```json
+{
+  "type": "simulateur",
+  "titre": "Puis-je partager cette donnée ?",
+  "consigne": "…",
+  "avertissement": "Exercice de sensibilisation, pas un outil de validation : …",
+  "decisions": [
+    { "id": "partager", "libelle": "Partager", "icone": "↗" },
+    { "id": "verifier", "libelle": "Vérifier avant de décider", "icone": "🔍" },
+    { "id": "ne-pas-transmettre", "libelle": "Ne pas transmettre en l'état", "icone": "✋" }
+  ],
+  "scenarios": [
+    {
+      "id": "salles", "objectif": "os4-3",
+      "titre": "Préparer une salle",
+      "contexte": "Le service logistique doit réserver une salle pour une formation.",
+      "demandeur": "Service logistique",
+      "finalite": "Prévoir une salle de capacité suffisante",
+      "donnees": "Le nombre de participants inscrits",
+      "complement": "(facultatif : information complémentaire, affichée « À noter »)",
+      "choix": [
+        { "id": "a", "decision": "partager", "texte": "Transmettre l'effectif global des inscrits.", "feedback": "…" },
+        { "id": "b", "decision": "verifier", "texte": "…", "feedback": "…" },
+        { "id": "c", "decision": "ne-pas-transmettre", "texte": "…", "feedback": "…" }
+      ],
+      "reponse": "a",
+      "correction": { "pourquoi": "…", "aVerifier": ["…", "…"], "risque": "…", "reflexe": "…" }
+    }
+  ],
+  "conclusion": "Ni tout partager, ni tout bloquer : …"
+}
+```
+
+- `decisions` : les issues possibles, communes à toutes les situations. Le libellé et l'icône s'affichent sur chaque choix (l'icône est décorative : le libellé suffit à comprendre).
+- Chaque choix indique sa `decision` et un `texte` propre à la situation ; son `feedback` s'affiche s'il est choisi.
+- `reponse` : identifiant du choix attendu. Si le choix est faux, la correction affiche aussi la conduite attendue.
+- `objectif` : objectif du module travaillé par la situation (pris en compte par le validateur pour la couverture des objectifs).
+- **Ajouter une situation** : copier un scénario, lui donner un `id` nouveau (lettres, chiffres, tirets), adapter les textes. **Modifier une correction** : éditer `correction`, ou le `feedback` du choix concerné.
+- Les situations et leurs corrections sont **à faire valider** par les personnes compétentes (DPO notamment) avant diffusion : voir `docs/validation-metier-module-04.md`.
+
 ## Associer des situations à des catégories
 
-C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
+C'est l'activité `classement` (voir « Une activité ») : chaque situation reçoit un groupe de boutons radio, un par catégorie. Elle fonctionne au clavier et au doigt, sans glisser-déposer. Le module 3 l'utilise avec 5 catégories (les dimensions de la qualité), le module 4 avec 3 (donnée non personnelle, personnelle, catégorie particulière). Penser à **mélanger l'ordre** des éléments par rapport à celui des catégories.
 
 ## Le quiz ou le défi
 

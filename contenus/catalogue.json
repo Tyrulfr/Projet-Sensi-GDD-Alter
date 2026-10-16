@@ -36,10 +36,8 @@
     {
       "id": "m04",
       "numero": 4,
-      "etat": "a-venir",
-      "titre": "Partager sans perdre le contrôle",
-      "duree": 8,
-      "objectif": "Comprendre les principes du partage responsable."
+      "etat": "disponible",
+      "fichier": "module-04.json"
     },
     {
       "id": "m05",

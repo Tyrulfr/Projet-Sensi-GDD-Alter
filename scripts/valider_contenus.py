@@ -12,7 +12,8 @@ from pathlib import Path
 RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_CONTENUS = RACINE / "contenus"
 
-TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "comparateur", "activite", "aretenir"}
+TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "comparateur",
+               "simulateur", "memo", "activite", "aretenir"}
 RE_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PRESENTATIONS = {"toutes", "une-par-une"}
 TYPES_ACTIVITES = {"choix-unique", "choix-multiple", "vrai-faux", "classement"}
@@ -151,6 +152,51 @@ def valider_comparateur(b, lieu, r):
         r.avertir(lieu, "pas d'« avertissement » : préciser que le tableau « après » n'est pas une correction certaine")
 
 
+def valider_simulateur(b, lieu, objectifs, r):
+    """Renvoie les objectifs couverts par les scénarios."""
+    decisions = b.get("decisions") or []
+    ids_dec = [d.get("id") for d in decisions]
+    if len(decisions) < 2 or len(set(ids_dec)) != len(ids_dec):
+        r.erreur(lieu, "au moins deux « decisions » aux identifiants distincts sont nécessaires")
+    for d in decisions:
+        if not texte_present(d, "libelle"):
+            r.erreur(lieu, f"décision « {d.get('id')} » : « libelle » manquant")
+    scenarios = b.get("scenarios") or []
+    if not scenarios:
+        r.erreur(lieu, "au moins un scénario est nécessaire")
+    ids_sc = [s.get("id") for s in scenarios]
+    if len(set(ids_sc)) != len(ids_sc):
+        r.erreur(lieu, "identifiants de scénarios en double")
+    couverts = set()
+    for s in scenarios:
+        slieu = f"{lieu}, scénario « {s.get('id')} »"
+        if not RE_ID.match(str(s.get("id") or "")):
+            r.erreur(slieu, "identifiant manquant ou invalide")
+        for cle in ("titre", "contexte", "demandeur", "finalite", "donnees"):
+            if not texte_present(s, cle):
+                r.erreur(slieu, f"« {cle} » manquant")
+        if s.get("objectif") not in objectifs:
+            r.erreur(slieu, f"objectif « {s.get('objectif')} » absent des objectifsSpecifiques du module")
+        couverts.add(s.get("objectif"))
+        choix = s.get("choix") or []
+        ids_ch = [c.get("id") for c in choix]
+        if len(choix) < 2 or len(set(ids_ch)) != len(ids_ch):
+            r.erreur(slieu, "au moins deux choix aux identifiants distincts sont nécessaires")
+        for c in choix:
+            if c.get("decision") not in ids_dec:
+                r.erreur(slieu, f"choix « {c.get('id')} » : décision « {c.get('decision')} » inconnue")
+            if not (texte_present(c, "texte") and texte_present(c, "feedback")):
+                r.erreur(slieu, f"choix « {c.get('id')} » : « texte » et « feedback » sont obligatoires")
+        if s.get("reponse") not in ids_ch:
+            r.erreur(slieu, "« reponse » doit correspondre à un identifiant de choix")
+        corr = s.get("correction") or {}
+        if not all(texte_present(corr, k) for k in ("pourquoi", "risque", "reflexe")) or not corr.get("aVerifier"):
+            r.erreur(slieu, "« correction » : « pourquoi », « aVerifier » (liste), « risque » et « reflexe » sont obligatoires")
+    if not texte_present(b, "avertissement"):
+        r.avertir(lieu, "pas d'« avertissement » : préciser qu'il s'agit d'un exercice, pas d'un outil de validation réelle")
+    return couverts
+
+
 def valider_module(mod, entree, r, ids_globaux):
     lieu = f"module {entree.get('id')}"
     if "slugArchive" in mod and not RE_SLUG.match(str(mod["slugArchive"])):
@@ -174,6 +220,7 @@ def valider_module(mod, entree, r, ids_globaux):
     if not lecons:
         r.erreur(lieu, "aucune leçon")
     utilisations = {k: 0 for k in activites}
+    couverts_blocs = set()
     ids_lecons = set()
     for lec in lecons:
         lid = lec.get("id")
@@ -225,7 +272,9 @@ def valider_module(mod, entree, r, ids_globaux):
                         r.avertir(blieu, "schéma sans légende (préciser s'il s'agit d'un exemple illustratif)")
                 elif bt == "comparateur":
                     valider_comparateur(b, blieu, r)
-                elif bt == "chronologie":
+                elif bt == "simulateur":
+                    couverts_blocs |= valider_simulateur(b, blieu, objectifs, r)
+                elif bt in ("chronologie", "memo"):
                     etapes = b.get("etapes") or []
                     if len(etapes) < 2:
                         r.erreur(blieu, "au moins deux étapes sont nécessaires")
@@ -284,7 +333,7 @@ def valider_module(mod, entree, r, ids_globaux):
             r.erreur(lieu, "validation.seuilReussite doit être compris entre 0 et 100 (ou absent : module « terminé » sans seuil)")
     elif seuil is not None:
         r.erreur(lieu, "validation.seuilReussite n'a de sens qu'avec validation.evaluation")
-    couverts = {a.get("objectif") for a in activites.values()}
+    couverts = {a.get("objectif") for a in activites.values()} | couverts_blocs
     for o in objectifs - couverts:
         r.avertir(lieu, f"objectif « {o} » n'est couvert par aucune activité")
 

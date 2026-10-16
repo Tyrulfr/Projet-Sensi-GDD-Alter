@@ -73,6 +73,10 @@
         return UI.chronologie(bloc);
       case 'comparateur':
         return UI.comparateur(bloc);
+      case 'simulateur':
+        return UI.simulateur(bloc);
+      case 'memo':
+        return UI.memo(bloc);
       case 'aretenir':
         return h('div', { class: 'bloc bloc-aretenir' }, [
           h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '★ ' }), 'À retenir']),
@@ -89,7 +93,7 @@
     var detail = h('div', { class: 'schema-detail', id: idDetail, role: 'status' },
       h('p', { class: 'schema-invite', text: bloc.consigne || 'Sélectionne un service pour découvrir son usage de l\'information.' }));
     var boutons = [];
-    var cibles = h('ul', { class: 'schema-cibles' });
+    var cibles = h('ul', { class: 'schema-cibles' + (bloc.cibles.length === 3 ? ' schema-cibles-3' : '') });
     bloc.cibles.forEach(function (c) {
       var bouton = h('button', {
         type: 'button', class: 'schema-cible', 'aria-pressed': 'false', 'aria-controls': idDetail,
@@ -117,7 +121,7 @@
         h('div', { class: 'schema-source' }, [h('span', { class: 'schema-source-libelle', text: bloc.source.libelle }),
           bloc.source.detail ? h('span', { class: 'schema-source-detail', text: bloc.source.detail }) : null]),
         h('div', { class: 'schema-flux', 'aria-hidden': 'true' }, [h('span', { text: bloc.flux }), h('span', { class: 'schema-fleche', text: '↓' })]),
-        h('p', { class: 'sr-only', text: 'Cette information peut servir à ' + bloc.cibles.length + ' services :' }),
+        h('p', { class: 'sr-only', text: bloc.annonce || 'Cette information peut servir à ' + bloc.cibles.length + ' services :' }),
         cibles,
         detail
       ]),
@@ -322,6 +326,199 @@
       apres
     ]);
     majSuite();
+    return el;
+  };
+
+  /* Mémo : quelques repères numérotés à garder en tête. */
+  UI.memo = function (bloc) {
+    return h('div', { class: 'bloc bloc-memo' }, [
+      h('p', { class: 'bloc-etiquette', text: 'Mémo' }),
+      bloc.titre ? h('h3', { text: bloc.titre }) : null,
+      h('ol', { class: 'memo-etapes' }, bloc.etapes.map(function (e, i) {
+        return h('li', { class: 'memo-etape' }, [
+          h('span', { class: 'memo-numero', 'aria-hidden': 'true', text: String(i + 1) }),
+          h('div', null, [
+            h('p', { class: 'memo-titre', text: e.titre }),
+            h('p', { class: 'memo-texte', html: U.inlineText(e.texte) })
+          ])
+        ]);
+      })),
+      bloc.legende ? h('p', { class: 'bloc-legende', text: bloc.legende }) : null
+    ]);
+  };
+
+  /*
+   * Simulateur de décisions : une série de demandes, une conduite à choisir pour chacune,
+   * puis une correction détaillée et un bilan. Exercice formatif, non noté.
+   * options : etat ({ i, choix: { idScenario: idChoix }, termine }, conservé par l'appelant),
+   *           surTermine (function (idFocus)) appelée à l'affichage du bilan, prefixeId.
+   */
+  UI.simulateur = function (bloc, options) {
+    var o = options || {};
+    var etat = o.etat || { i: 0, choix: {}, termine: false };
+    var prefixe = o.prefixeId || uid('sim');
+    var scenarios = bloc.scenarios;
+    var n = scenarios.length;
+    var decisions = {};
+    bloc.decisions.forEach(function (d) { decisions[d.id] = d; });
+
+    function choixDe(s, id) { return s.choix.filter(function (c) { return c.id === id; })[0]; }
+    function estAdapte(s) { return etat.choix[s.id] === s.reponse; }
+    function etiquetteDecision(idDecision) {
+      var d = decisions[idDecision];
+      return h('span', { class: 'simulateur-decision simulateur-decision-' + d.id }, [
+        d.icone ? h('span', { 'aria-hidden': 'true', text: d.icone + ' ' }) : null, d.libelle
+      ]);
+    }
+
+    var zone = h('div', { class: 'simulateur-zone' });
+
+    function rendre(idFocus) {
+      zone.innerHTML = '';
+      zone.appendChild(etat.i < n ? carte(scenarios[etat.i], etat.i) : bilan());
+      if (idFocus) {
+        var cible = document.getElementById(idFocus);
+        if (cible) { cible.focus(); }
+      }
+    }
+
+    function correction(s) {
+      var choisi = choixDe(s, etat.choix[s.id]);
+      var attendu = choixDe(s, s.reponse);
+      var juste = estAdapte(s);
+      var c = s.correction;
+      return h('div', { class: 'feedback ' + (juste ? 'feedback-juste' : 'feedback-faux') }, [
+        h('p', { class: 'feedback-titre' }, [h('span', { 'aria-hidden': 'true', text: juste ? '✓ ' : '✗ ' }), juste ? 'Réflexe adapté' : 'Réflexe à revoir']),
+        choisi.feedback ? h('p', { html: U.inlineText(choisi.feedback) }) : null,
+        juste ? null : h('p', null, [h('strong', { text: 'Conduite attendue : ' }), decisions[attendu.decision].libelle + '. ' + attendu.texte]),
+        h('div', { class: 'simulateur-criteres' }, [
+          h('p', null, [h('strong', { text: 'Pourquoi : ' }), h('span', { html: U.inlineText(c.pourquoi) })]),
+          h('p', null, h('strong', { text: 'À vérifier :' })),
+          h('ul', null, c.aVerifier.map(function (v) { return h('li', { html: U.inlineText(v) }); })),
+          h('p', null, [h('strong', { text: 'Risque d\'une mauvaise décision : ' }), h('span', { html: U.inlineText(c.risque) })]),
+          h('p', { class: 'simulateur-reflexe' }, [h('strong', { text: 'Le bon réflexe : ' }), h('span', { html: U.inlineText(c.reflexe) })])
+        ])
+      ]);
+    }
+
+    function carte(s, i) {
+      var nom = prefixe + '-' + s.id;
+      var idChoisi = etat.choix[s.id];
+      var valide = idChoisi !== undefined;
+      var idTitre = prefixe + '-titre';
+
+      var fiche = h('dl', { class: 'simulateur-fiche' }, [
+        h('dt', { text: 'Demandeur' }), h('dd', { text: s.demandeur }),
+        h('dt', { text: 'Finalité annoncée' }), h('dd', { text: s.finalite }),
+        h('dt', { text: 'Données demandées' }), h('dd', { text: s.donnees }),
+        s.complement ? h('dt', { text: 'À noter' }) : null,
+        s.complement ? h('dd', { html: U.inlineText(s.complement) }) : null
+      ]);
+
+      var champs = h('fieldset', { class: 'activite-champs' }, h('legend', null, [
+        h('span', { class: 'activite-consigne', text: 'Quelle conduite adopter ?' }),
+        h('span', { class: 'activite-aide', text: 'Une seule réponse possible.' })
+      ]));
+      s.choix.forEach(function (c) {
+        var id = nom + '-' + c.id;
+        var annot = null;
+        if (valide) {
+          if (c.id === s.reponse && c.id === idChoisi) { annot = { classe: 'juste', texte: '✓ Ton choix, adapté' }; }
+          else if (c.id === s.reponse) { annot = { classe: 'attendue', texte: '→ Conduite attendue' }; }
+          else if (c.id === idChoisi) { annot = { classe: 'fausse', texte: '✗ Ton choix, à revoir' }; }
+        }
+        champs.appendChild(h('div', { class: 'option option-decision' + (annot ? ' option-' + annot.classe : '') }, [
+          h('input', { type: 'radio', id: id, name: nom, value: c.id, checked: c.id === idChoisi, disabled: valide }),
+          h('label', { for: id }, [
+            etiquetteDecision(c.decision),
+            h('span', { class: 'option-texte', html: U.inlineText(c.texte) }),
+            annot ? h('span', { class: 'option-annotation', text: annot.texte }) : null
+          ])
+        ]));
+      });
+
+      var retour = h('div', { class: 'activite-message', id: prefixe + '-retour', tabindex: '-1', role: 'status' },
+        valide ? correction(s) : null);
+
+      var actions = h('div', { class: 'actions' });
+      if (!valide) {
+        actions.appendChild(h('button', {
+          type: 'button', class: 'bouton bouton-principal',
+          onclick: function () {
+            var coche = champs.querySelector('input[name="' + nom + '"]:checked');
+            if (!coche) {
+              retour.innerHTML = '';
+              retour.appendChild(h('p', { class: 'message-alerte', text: 'Choisis une conduite avant de valider.' }));
+              return;
+            }
+            etat.choix[s.id] = coche.value;
+            rendre(prefixe + '-retour');
+          }
+        }, 'Valider ma décision'));
+      } else if (i < n - 1) {
+        actions.appendChild(h('button', {
+          type: 'button', class: 'bouton bouton-principal',
+          onclick: function () { etat.i = i + 1; rendre(prefixe + '-carte'); }
+        }, 'Situation suivante'));
+      } else {
+        actions.appendChild(h('button', {
+          type: 'button', class: 'bouton bouton-principal',
+          onclick: function () {
+            etat.i = n;
+            var premiereFois = !etat.termine;
+            etat.termine = true;
+            if (premiereFois && o.surTermine) { o.surTermine(prefixe + '-bilan'); } else { rendre(prefixe + '-bilan'); }
+          }
+        }, 'Voir le bilan'));
+      }
+
+      return h('div', null, [
+        h('div', { class: 'simulateur-progression' }, [
+          h('p', { class: 'activite-numero', text: 'Situation ' + (i + 1) + ' sur ' + n }),
+          h('ol', { class: 'simulateur-points', 'aria-hidden': 'true' }, scenarios.map(function (x, j) {
+            return h('li', { class: j < i ? 'est-fait' : (j === i ? 'est-courant' : null) });
+          }))
+        ]),
+        h('article', { class: 'simulateur-carte', id: prefixe + '-carte', tabindex: '-1', 'aria-labelledby': idTitre }, [
+          h('h4', { id: idTitre, class: 'simulateur-titre' }, [h('span', { 'aria-hidden': 'true', text: '✉ ' }), s.titre]),
+          h('p', { html: U.inlineText(s.contexte) }),
+          fiche
+        ]),
+        champs,
+        retour,
+        actions
+      ]);
+    }
+
+    function bilan() {
+      var nbAdaptes = scenarios.filter(estAdapte).length;
+      return h('div', { class: 'simulateur-bilan', id: prefixe + '-bilan', tabindex: '-1' }, [
+        h('h4', { text: 'Bilan : ' + nbAdaptes + ' réflexe' + (nbAdaptes > 1 ? 's' : '') + ' adapté' + (nbAdaptes > 1 ? 's' : '') + ' sur ' + n }),
+        h('ul', { class: 'simulateur-recap' }, scenarios.map(function (s) {
+          var juste = estAdapte(s);
+          return h('li', { class: juste ? 'est-juste' : 'est-faux' }, [
+            h('span', { 'aria-hidden': 'true', text: juste ? '✓ ' : '✗ ' }),
+            h('strong', { text: s.titre }), ' — ',
+            (juste ? 'réflexe adapté : ' : 'à revoir, la conduite attendue était : ')
+              + decisions[choixDe(s, s.reponse).decision].libelle.toLowerCase() + '.'
+          ]);
+        })),
+        bloc.conclusion ? h('div', { class: 'simulateur-conclusion', html: U.richText(bloc.conclusion) }) : null,
+        h('div', { class: 'actions' }, h('button', {
+          type: 'button', class: 'bouton bouton-secondaire',
+          onclick: function () { etat.i = 0; etat.choix = {}; rendre(prefixe + '-carte'); }
+        }, 'Recommencer le simulateur'))
+      ]);
+    }
+
+    var el = h('div', { class: 'bloc bloc-simulateur' }, [
+      h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '⚖ ' }), 'Simulateur']),
+      bloc.titre ? h('h3', { text: bloc.titre }) : null,
+      bloc.consigne ? h('p', { text: bloc.consigne }) : null,
+      bloc.avertissement ? h('p', { class: 'note', html: U.inlineText(bloc.avertissement) }) : null,
+      zone
+    ]);
+    rendre(null);
     return el;
   };
 

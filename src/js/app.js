@@ -19,6 +19,7 @@
     repasser: {},        /* évaluation en cours de nouvelle tentative */
     chrono: {},          /* nombre d'étapes affichées par chronologie */
     comparateur: {},     /* difficultés examinées et tableau « après » affiché, par comparateur */
+    simulateur: {},      /* situation en cours et décisions prises, par simulateur */
     defi: {},            /* défi « une question à la fois » en cours : { i, codes, verifie } */
     avertissement: null,
     session: null,       /* SCORM : 'terminee' après LMSFinish */
@@ -189,7 +190,7 @@
         onclick: function () {
           if (root.confirm('Effacer toute ta progression enregistrée dans ce navigateur ?')) {
             GDD.TraceurLocal.effacerTout(catalogue.id);
-            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.defi = {};
+            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.simulateur = {}; etat.defi = {};
             afficher();
             annoncer('Progression effacée.');
           }
@@ -319,6 +320,21 @@
             etat.focus = 'comp-' + cleComp + '-apres-zone';
             afficher();
             annoncer('Tableau mieux structuré affiché.');
+          }
+        });
+      } else if (b.type === 'simulateur') {
+        var cleSim = l.id + '-' + i;
+        var enCoursSim = !dejaVue && i === nb - 1;
+        var etatSim = etat.simulateur[cleSim] || (etat.simulateur[cleSim] = { i: 0, choix: {}, termine: !enCoursSim });
+        if (!enCoursSim) { etatSim.termine = true; }
+        if (!etatSim.termine) { bloque = 'Traite toutes les situations du simulateur pour continuer.'; }
+        el = UI.simulateur(b, {
+          etat: etatSim,
+          prefixeId: 'sim-' + cleSim,
+          surTermine: function (idFocus) {
+            etat.focus = idFocus;
+            afficher();
+            annoncer('Bilan du simulateur affiché.');
           }
         });
       } else if (b.type === 'activite') {
