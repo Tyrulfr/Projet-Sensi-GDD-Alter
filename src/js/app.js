@@ -143,18 +143,15 @@
           h('li', null, [h('strong', null, 'Format : '), modules.length + ' modules courts et indépendants']),
           h('li', null, [h('strong', null, 'Public : '), catalogue.public])
         ]),
-        h('div', { class: 'actions' }, [
-          suivant ? lienBouton(dejaCommence ? 'Reprendre la formation' : 'Commencer la formation', lienModule(suivant.id)) : null,
-          lienBouton('Voir le parcours', '#/parcours', 'bouton-secondaire')
-        ])
+        h('div', { class: 'actions' }, lienBouton(
+          suivant ? (dejaCommence ? 'Reprendre la formation' : 'Commencer la formation') : 'Revoir la formation',
+          '#/parcours'))
       ]),
       avertissement(),
       h('section', { class: 'carte' }, [
         h('h2', { text: 'À l\'issue de la formation, tu sauras' }),
         h('ul', { class: 'liste-objectifs' }, catalogue.objectifs.map(function (o) { return h('li', { text: o }); }))
-      ]),
-      h('h2', { text: 'Les modules de la formation' }),
-      listeModules('h3')
+      ])
     ];
   }
 
@@ -922,7 +919,7 @@
 
   function afficher() {
     var vue = route();
-    conteneur.classList.toggle('page-large', !modeScorm && /^#?\/?(parcours\/?)?$/.test(root.location.hash || ''));
+    conteneur.classList.toggle('page-large', !modeScorm && /^#\/parcours\/?$/.test(root.location.hash || ''));
     conteneur.innerHTML = '';
     (Array.isArray(vue) ? vue : [vue]).forEach(function (n) { if (n) { conteneur.appendChild(n); } });
     var cible = etat.focus ? document.getElementById(etat.focus) : conteneur.querySelector('h1');
