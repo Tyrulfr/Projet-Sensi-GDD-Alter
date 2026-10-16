@@ -922,6 +922,7 @@
 
   function afficher() {
     var vue = route();
+    conteneur.classList.toggle('page-large', !modeScorm && /^#?\/?(parcours\/?)?$/.test(root.location.hash || ''));
     conteneur.innerHTML = '';
     (Array.isArray(vue) ? vue : [vue]).forEach(function (n) { if (n) { conteneur.appendChild(n); } });
     var cible = etat.focus ? document.getElementById(etat.focus) : conteneur.querySelector('h1');

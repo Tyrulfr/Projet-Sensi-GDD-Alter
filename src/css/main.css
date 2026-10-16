@@ -122,8 +122,19 @@ h3 { font-size: 1.1rem; margin: 0 0 .5rem; }
 
 /* ---------- Parcours ---------- */
 
-.liste-modules { list-style: none; padding: 0; margin: 0; }
-.carte-module-titre { margin: .5rem 0; font-size: 1.3rem; }
+main.page-large { max-width: 64rem; }
+.page-large .hero, .page-large .chapo, .page-large > .note { max-width: var(--largeur-lecture); }
+
+.liste-modules {
+  list-style: none; padding: 0; margin: 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 1rem;
+}
+.liste-modules .carte-module { margin: 0; display: flex; flex-direction: column; border-top: 5px solid var(--couleur-primaire); }
+.liste-modules .carte-module.est-a-venir { border-top-color: var(--couleur-bordure); }
+.carte-module > p:not([class]) { flex: 1; margin: 0 0 .5rem; color: var(--couleur-texte-doux); font-size: .95rem; }
+.carte-module .actions { margin: .75rem 0 0; }
+.carte-module .actions .bouton { width: 100%; }
+.carte-module-titre { margin: .5rem 0; font-size: 1.2rem; line-height: 1.3; }
 .carte-module-entete { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
 .carte-module-numero { font-weight: 700; color: var(--couleur-primaire); text-transform: uppercase; font-size: .85rem; letter-spacing: .05em; }
 .carte-module-duree, .carte-module-score { color: var(--couleur-texte-doux); font-size: .95rem; margin: .25rem 0; }
