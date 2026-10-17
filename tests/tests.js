@@ -918,6 +918,46 @@
     });
   }
 
+  function lancerProfils() {
+    test('Profils testeurs : progressions isolées, un seul profil réinitialisé', function () {
+      var formation = 'test-profils';
+      new GDD.TraceurLocal(formation, 'm01', 'christophe').enregistrer({ etat: '{"v":1}', position: 'm01-l1', statut: { completion: 'en-cours' } });
+      new GDD.TraceurLocal(formation, 'm01', 'marion').enregistrer({ etat: '{"v":1}', position: 'm01-l2', statut: { completion: 'termine' } });
+      egal(GDD.TraceurLocal.lire(formation, 'm01', 'christophe').position, 'm01-l1');
+      egal(GDD.TraceurLocal.lire(formation, 'm01', 'marion').statut.completion, 'termine');
+      egal(GDD.TraceurLocal.lire(formation, 'm01', 'frederique'), null);
+      GDD.TraceurLocal.effacerTesteur(formation, 'christophe');
+      egal(GDD.TraceurLocal.lire(formation, 'm01', 'christophe'), null);
+      egal(GDD.TraceurLocal.lire(formation, 'm01', 'marion').position, 'm01-l2');
+      GDD.TraceurLocal.effacerTesteur(formation, 'marion');
+    });
+
+    test('Évaluation : 14 questions, moyennes par dimension, difficulté non inversée, profil isolé', function () {
+      var formation = 'test-evaluation';
+      var questions = GDD.evaluation.questions();
+      egal(questions.length, 14);
+      egal(GDD.evaluation.dimensions.map(function (d) { return d.items.length; }), [3, 3, 4, 4]);
+      var tout = {};
+      questions.forEach(function (q) { tout[q.id] = q.echelle.max; });
+      var note = GDD.evaluation.noter(tout);
+      vrai(note.complet);
+      egal(note.dimensions.map(function (d) { return d.moyenne; }), [7, 7, 6, 7]);
+      var partiel = { 'esel-dp-2': 7, 'esel-dp-5': 1, 'esel-dp-13': 4 };
+      var dp = GDD.evaluation.noter(partiel).dimensions.filter(function (d) { return d.id === 'dp'; })[0];
+      egal(dp.moyenne, 4);
+      egal(GDD.evaluation.noter(partiel).complet, false);
+      egal(GDD.evaluation.noter({ 'esel-up-1': 0, 'esel-up-6': 7, 'esel-up-11': 7 }).dimensions[0].moyenne, null);
+      GDD.evaluation.enregistrer(formation, 'christophe', tout);
+      GDD.evaluation.enregistrer(formation, 'marion', { 'esel-up-1': 2 });
+      egal(GDD.evaluation.lire(formation, 'christophe').reponses['esel-up-1'], 7);
+      egal(GDD.evaluation.lire(formation, 'marion').reponses['esel-up-1'], 2);
+      GDD.TraceurLocal.effacerTesteur(formation, 'christophe');
+      egal(GDD.evaluation.lire(formation, 'christophe'), null);
+      egal(GDD.evaluation.lire(formation, 'marion').reponses['esel-up-1'], 2);
+      GDD.TraceurLocal.effacerTesteur(formation, 'marion');
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -938,6 +978,6 @@
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
   Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json'), charger('module-06.json'), charger('module-07.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); lancerModule7(mods[6]); afficher(); })
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); lancerModule7(mods[6]); lancerProfils(); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

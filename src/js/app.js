@@ -47,7 +47,7 @@
         etat.avertissement = 'Mode consultation : la plateforme n\'enregistre pas de nouveaux résultats.';
       }
     } else {
-      m = new GDD.Moteur(module, new GDD.TraceurLocal(catalogue.id, idModule));
+      m = new GDD.Moteur(module, new GDD.TraceurLocal(catalogue.id, idModule, testeurActif()));
       var infoLocal = m.demarrer();
       if (!infoLocal.persistant) {
         etat.avertissement = 'Ton navigateur bloque l\'enregistrement local : la progression sera perdue à la fermeture.';
@@ -96,13 +96,63 @@
 
   /* ---------- Gabarit ---------- */
 
+  /* ---------- Profils testeurs (site web uniquement) ---------- */
+
+  var CLE_PROFIL = 'ups-gdd:v1:profil';
+
+  function testeurActif() {
+    if (modeScorm) { return null; }
+    try { return root.localStorage.getItem(CLE_PROFIL); } catch (e) { return null; }
+  }
+
+  function profilActif() {
+    var id = testeurActif();
+    return (catalogue.testeurs || []).filter(function (t) { return t.id === id; })[0] || null;
+  }
+
+  function oublierMoteurs() {
+    etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {};
+    etat.chrono = {}; etat.comparateur = {}; etat.simulateur = {}; etat.defi = {}; etat.final = {};
+  }
+
+  function choisirTesteur(id) {
+    if (testeurActif() === id) { return; }
+    try { root.localStorage.setItem(CLE_PROFIL, id); } catch (e) { /* enregistrement indisponible */ }
+    oublierMoteurs();
+  }
+
+  function bilanTesteur(id) {
+    var commences = 0, termines = 0, total = 0;
+    catalogue.modules.forEach(function (e) {
+      if (e.etat !== 'disponible' || !contenu.modules[e.id]) { return; }
+      total++;
+      var s = GDD.TraceurLocal.lire(catalogue.id, e.id, id);
+      var c = s && s.statut && s.statut.completion;
+      if (c && c !== 'non-commence') { commences++; }
+      if (c === 'termine') { termines++; }
+    });
+    return { commences: commences, termines: termines, total: total };
+  }
+
+  function reinitialiserTesteur(t) {
+    if (!root.confirm('Réinitialiser l\'avancement de ' + t.nom + ' ? Les autres profils ne sont pas touchés.')) { return; }
+    GDD.TraceurLocal.effacerTesteur(catalogue.id, t.id);
+    if (testeurActif() === t.id) { oublierMoteurs(); }
+    afficher();
+    annoncer('Avancement de ' + t.nom + ' réinitialisé.');
+  }
+
   function entete() {
     var titre = modeScorm
       ? h('span', { class: 'entete-titre', text: catalogue.titre })
       : h('a', { class: 'entete-titre', href: '#/', text: catalogue.titre });
+    var profil = profilActif();
     var nav = modeScorm ? null : h('nav', { 'aria-label': 'Navigation principale' }, h('ul', null, [
       h('li', null, h('a', { href: '#/' }, 'Accueil')),
-      h('li', null, h('a', { href: '#/parcours' }, 'Parcours'))
+      h('li', null, h('a', { href: '#/testeurs' }, 'Testeurs')),
+      h('li', null, h('a', { href: profil ? '#/parcours' : '#/testeurs' }, 'Parcours')),
+      profil ? h('li', null, h('a', { href: '#/evaluation' }, 'Évaluation')) : null,
+      profil ? h('li', null, h('span', { class: 'entete-profil', text: profil.nom })) : null
     ]));
     return h('div', { class: 'entete-inner' }, [
       h('div', null, [h('span', { class: 'entete-institution', text: catalogue.institution }), titre]),
@@ -126,11 +176,6 @@
   function pageAccueil() {
     var modules = catalogue.modules.map(infosModule);
     var dureeTotale = modules.reduce(function (s, m) { return s + (m.duree || 0); }, 0);
-    var suivant = null;
-    modules.forEach(function (mi) {
-      if (!suivant && mi.disponible && moteur(mi.id).statut().completion !== 'termine') { suivant = mi; }
-    });
-    var dejaCommence = modules.some(function (mi) { return mi.disponible && moteur(mi.id).statut().completion !== 'non-commence'; });
 
     document.title = catalogue.titre;
     return [
@@ -143,9 +188,7 @@
           h('li', null, [h('strong', null, 'Format : '), modules.length + ' modules courts et indépendants']),
           h('li', null, [h('strong', null, 'Public : '), catalogue.public])
         ]),
-        h('div', { class: 'actions' }, lienBouton(
-          suivant ? (dejaCommence ? 'Reprendre la formation' : 'Commencer la formation') : 'Revoir la formation',
-          '#/parcours'))
+        h('div', { class: 'actions' }, lienBouton('Commencer la formation', '#/testeurs'))
       ]),
       avertissement(),
       h('section', { class: 'carte' }, [
@@ -282,26 +325,158 @@
     ]);
   }
 
+  function pageTesteurs() {
+    document.title = 'Testeurs - ' + catalogue.titre;
+    var liste = h('ol', { class: 'liste-modules' });
+    (catalogue.testeurs || []).forEach(function (t) {
+      var bilan = bilanTesteur(t.id);
+      var commence = bilan.commences > 0;
+      liste.appendChild(h('li', { class: 'carte carte-module carte-testeur' + (profilActif() && profilActif().id === t.id ? ' est-actif' : '') }, [
+        h('p', { class: 'carte-module-numero', text: 'Profil testeur' }),
+        h('h2', { class: 'carte-module-titre', text: t.nom }),
+        h('p', { class: 'carte-module-duree', text: commence
+          ? (bilan.termines
+            ? bilan.termines + ' module' + (bilan.termines > 1 ? 's terminés' : ' terminé') + ' sur ' + bilan.total
+            : bilan.commences + ' module' + (bilan.commences > 1 ? 's commencés' : ' commencé') + ' sur ' + bilan.total)
+          : 'Pas encore commencé' }),
+        h('div', { class: 'actions' }, [
+          h('button', {
+            type: 'button', class: 'bouton bouton-principal',
+            onclick: function () { choisirTesteur(t.id); aller('#/parcours'); }
+          }, commence ? 'Reprendre la formation' : 'Commencer la formation'),
+          h('button', {
+            type: 'button', class: 'bouton bouton-secondaire',
+            onclick: function () { reinitialiserTesteur(t); }
+          }, 'Réinitialiser l\'avancement')
+        ])
+      ]));
+    });
+    return [
+      h('h1', { tabindex: '-1', text: 'Choisis ton profil' }),
+      h('p', { class: 'chapo', text: 'Dix profils pour l\'essai. Chacun a sa propre progression, comme un apprenant distinct sur une plateforme de formation.' }),
+      h('p', { class: 'note', role: 'note' }, 'Ce n\'est pas une connexion : le profil est mémorisé dans ce navigateur. Réinitialiser un profil ne touche pas les autres. Dans un LMS, c\'est la plateforme qui distingue les apprenants ; les packages SCORM ne changent pas.'),
+      liste
+    ];
+  }
+
   function pageParcours() {
+    var profil = profilActif();
     document.title = 'Parcours - ' + catalogue.titre;
     return [
+      h('p', { class: 'fil' }, h('a', { href: '#/testeurs' }, '← Testeurs')),
       h('h1', { tabindex: '-1', text: 'Parcours de formation' }),
-      h('p', { class: 'chapo', text: 'Les modules sont indépendants : tu peux les suivre dans l\'ordre proposé ou selon tes besoins.' }),
+      profil ? h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Les modules sont indépendants : tu peux les suivre dans l\'ordre proposé ou selon tes besoins.' }) : null,
       avertissement(),
       carteParcours('h2'),
       listeModules('h2'),
+      profil ? carteEvaluation(profil) : null,
       sectionTelechargements(),
-      h('div', { class: 'actions actions-discretes' }, h('button', {
+      profil ? h('div', { class: 'actions actions-discretes' }, h('button', {
         type: 'button', class: 'bouton bouton-lien',
-        onclick: function () {
-          if (root.confirm('Effacer toute ta progression enregistrée dans ce navigateur ?')) {
-            GDD.TraceurLocal.effacerTout(catalogue.id);
-            etat.moteurs = {}; etat.revele = {}; etat.resultats = {}; etat.repasser = {}; etat.chrono = {}; etat.comparateur = {}; etat.simulateur = {}; etat.defi = {}; etat.final = {};
-            afficher();
-            annoncer('Progression effacée.');
-          }
+        onclick: function () { reinitialiserTesteur(profil); }
+      }, 'Réinitialiser l\'avancement de ' + profil.nom)) : null
+    ];
+  }
+
+  function evaluationDu(profil) {
+    var sauve = GDD.evaluation.lire(catalogue.id, profil.id);
+    return GDD.evaluation.noter(sauve && sauve.reponses);
+  }
+
+  function carteEvaluation(profil) {
+    var note = evaluationDu(profil);
+    return h('section', { class: 'carte' }, [
+      h('h2', { text: 'Évaluation du dispositif' }),
+      h('p', { text: 'Quatorze questions, en quatre volets : utilité, difficulté, navigation, suite que tu donnerais. Ce n\'est pas une note de réussite.' }),
+      h('p', { text: note.complet ? 'Tes quatre moyennes sont enregistrées sur ce profil.' : 'Tu peux répondre en plusieurs fois : chaque réponse est gardée sur ce profil.' }),
+      lienBouton(note.complet ? 'Revoir le questionnaire' : 'Répondre au questionnaire', '#/evaluation')
+    ]);
+  }
+
+  function libellePoint(question, valeur) {
+    var points = question.echelle.points;
+    var mot = points ? points[valeur - question.echelle.min] : (valeur === question.echelle.min ? question.echelle.libelleMin : (valeur === question.echelle.max ? question.echelle.libelleMax : ''));
+    return mot ? valeur + ', ' + mot : String(valeur);
+  }
+
+  function moyenneFr(n) {
+    return n.toLocaleString('fr-FR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  }
+
+  function blocResultats(note, reponses) {
+    if (!note.complet) {
+      var manquantes = GDD.evaluation.questions().filter(function (q) {
+        var n = Number(reponses[q.id]);
+        return !isFinite(n) || n < q.echelle.min || n > q.echelle.max;
+      }).length;
+      return h('p', { class: 'note', role: 'status', text: manquantes + ' question' + (manquantes > 1 ? 's' : '') + ' restante' + (manquantes > 1 ? 's' : '') + '. Les moyennes s\'affichent quand les quatre volets sont complets.' });
+    }
+    return h('section', { class: 'evaluation-resultats', 'aria-label': 'Moyennes par volet' }, note.dimensions.map(function (d) {
+      return h('article', { class: 'carte evaluation-resultat' }, [
+        h('h2', { text: d.titre }),
+        h('p', { class: 'evaluation-moyenne', text: moyenneFr(d.moyenne) + ' / ' + d.max }),
+        h('p', { class: 'evaluation-lecture', text: d.source + '. ' + d.lecture })
+      ]);
+    }));
+  }
+
+  function pageQuestionnaire() {
+    var profil = profilActif();
+    var sauve = GDD.evaluation.lire(catalogue.id, profil.id);
+    var reponses = Object.assign({}, (sauve && sauve.reponses) || {});
+    var bilan = h('div', { id: 'evaluation-bilan' });
+    document.title = 'Évaluation - ' + catalogue.titre;
+
+    function dessinerBilan() {
+      var suivant = blocResultats(GDD.evaluation.noter(reponses), reponses);
+      bilan.innerHTML = '';
+      bilan.appendChild(suivant);
+    }
+
+    var formulaire = h('form', {
+      onsubmit: function (e) { e.preventDefault(); }
+    });
+    GDD.evaluation.dimensions.forEach(function (d) {
+      var champ = h('fieldset', { class: 'evaluation-dimension' }, [
+        h('legend', { text: d.titre }),
+        h('p', { class: 'evaluation-aide', text: 'De ' + d.echelle.min + ', ' + d.echelle.libelleMin + ', à ' + d.echelle.max + ', ' + d.echelle.libelleMax + '.' })
+      ]);
+      d.items.forEach(function (item) {
+        var question = { echelle: d.echelle };
+        var nom = 'evaluation-' + item.id;
+        var choix = h('div', { class: 'echelle' });
+        for (var v = d.echelle.min; v <= d.echelle.max; v++) {
+          var coche = Number(reponses[item.id]) === v;
+          choix.appendChild(h('label', { class: 'echelle-choix' }, [
+            h('input', {
+              type: 'radio', name: nom, value: String(v), checked: coche ? 'checked' : null,
+              'aria-label': libellePoint(question, v),
+              onchange: function (e) {
+                reponses[item.id] = Number(e.target.value);
+                var ok = GDD.evaluation.enregistrer(catalogue.id, profil.id, reponses);
+                dessinerBilan();
+                annoncer(ok ? 'Réponse enregistrée pour ' + profil.nom + '.' : 'Le navigateur n\'a pas enregistré la réponse.');
+              }
+            }),
+            h('span', { class: 'echelle-note', 'aria-hidden': 'true', text: String(v) })
+          ]));
         }
-      }, 'Effacer ma progression sur ce navigateur'))
+        champ.appendChild(h('fieldset', { class: 'evaluation-question' }, [
+          h('legend', { text: item.enonce }),
+          choix
+        ]));
+      });
+      formulaire.appendChild(champ);
+    });
+    dessinerBilan();
+
+    return [
+      h('p', { class: 'fil' }, h('a', { href: '#/parcours' }, '← Parcours')),
+      h('h1', { tabindex: '-1', text: 'Évaluation de la formation' }),
+      h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Quatorze questions, sans bonne réponse. Ce questionnaire ne mesure pas ce que tu as retenu : le module 7 s\'en charge.' }),
+      h('p', { class: 'note', role: 'note' }, 'Réponses gardées dans ce navigateur, pour ce profil seulement. Elles ne sont pas envoyées à une plateforme.'),
+      formulaire,
+      bilan
     ];
   }
 
@@ -907,7 +1082,13 @@
       return pageModule(m);
     }
     if (segments.length === 0) { return pageAccueil(); }
+    if (segments[0] === 'testeurs') { return pageTesteurs(); }
+    if ((segments[0] === 'parcours' || segments[0] === 'module' || segments[0] === 'evaluation') && !profilActif()) {
+      if ((root.location.hash || '') !== '#/testeurs') { root.location.hash = '#/testeurs'; }
+      return pageTesteurs();
+    }
     if (segments[0] === 'parcours') { return pageParcours(); }
+    if (segments[0] === 'evaluation') { return pageQuestionnaire(); }
     if (segments[0] === 'module') {
       var mw = moteur(segments[1]);
       if (!mw) { return pageIntrouvable(); }
@@ -919,7 +1100,9 @@
 
   function afficher() {
     var vue = route();
-    conteneur.classList.toggle('page-large', !modeScorm && /^#\/parcours\/?$/.test(root.location.hash || ''));
+    conteneur.classList.toggle('page-large', !modeScorm && /^#\/(parcours|testeurs)\/?$/.test(root.location.hash || ''));
+    var enteteEl = document.getElementById('entete');
+    if (enteteEl && !modeScorm) { enteteEl.innerHTML = ''; enteteEl.appendChild(entete()); }
     conteneur.innerHTML = '';
     (Array.isArray(vue) ? vue : [vue]).forEach(function (n) { if (n) { conteneur.appendChild(n); } });
     var cible = etat.focus ? document.getElementById(etat.focus) : conteneur.querySelector('h1');

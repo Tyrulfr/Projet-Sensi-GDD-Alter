@@ -58,6 +58,18 @@
       "fichier": "module-07.json"
     }
   ],
+  "testeurs": [
+    { "id": "christophe", "nom": "Christophe" },
+    { "id": "marion", "nom": "Marion" },
+    { "id": "frederique", "nom": "Frédérique" },
+    { "id": "testeur-4", "nom": "Testeur 4" },
+    { "id": "testeur-5", "nom": "Testeur 5" },
+    { "id": "testeur-6", "nom": "Testeur 6" },
+    { "id": "testeur-7", "nom": "Testeur 7" },
+    { "id": "testeur-8", "nom": "Testeur 8" },
+    { "id": "testeur-9", "nom": "Testeur 9" },
+    { "id": "testeur-10", "nom": "Testeur 10" }
+  ],
   "reconnaissance": {
     "titre": "Sensibilisation à la gouvernance de la donnée",
     "moduleFinal": "m07",

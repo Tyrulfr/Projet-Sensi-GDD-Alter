@@ -456,6 +456,19 @@ def valider():
             r.erreur("catalogue", f"reconnaissance.moduleFinal « {rec.get('moduleFinal')} » n'est pas un module disponible")
         elif not isinstance(rec.get("conditions", {}), dict):
             r.erreur("catalogue", "reconnaissance.conditions doit être un objet")
+    testeurs = catalogue.get("testeurs")
+    if testeurs is not None:
+        if not isinstance(testeurs, list) or len(testeurs) < 1:
+            r.erreur("catalogue", "« testeurs » doit être une liste non vide")
+        else:
+            ids_testeurs = set()
+            for i, t in enumerate(testeurs, 1):
+                if not isinstance(t, dict) or not RE_SLUG.match(str(t.get("id") or "")) or not texte_present(t, "nom"):
+                    r.erreur("catalogue", f"testeur {i} : « id » (lettres minuscules et tirets) et « nom » sont obligatoires")
+                elif t["id"] in ids_testeurs:
+                    r.erreur("catalogue", f"testeur « {t['id']} » en double")
+                else:
+                    ids_testeurs.add(t["id"])
     return catalogue, modules, r
 
 

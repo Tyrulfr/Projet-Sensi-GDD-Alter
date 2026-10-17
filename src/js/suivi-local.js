@@ -21,11 +21,22 @@
     }
   }
 
-  function TraceurLocal(idFormation, idModule) {
+  /* idTesteur sépare les progressions (un profil = un apprenant). Absent en dehors du site web. */
+  function cle(idFormation, idModule, idTesteur) {
+    return PREFIXE + idFormation + ':' + (idTesteur ? idTesteur + ':' : '') + idModule;
+  }
+
+  function TraceurLocal(idFormation, idModule, idTesteur) {
     this.type = 'local';
-    this.cle = PREFIXE + idFormation + ':' + idModule;
+    this.cle = cle(idFormation, idModule, idTesteur);
     this.store = stockage();
   }
+
+  TraceurLocal.lire = function (idFormation, idModule, idTesteur) {
+    var s = stockage();
+    if (!s) { return null; }
+    try { return JSON.parse(s.getItem(cle(idFormation, idModule, idTesteur)) || 'null'); } catch (e) { return null; }
+  };
 
   TraceurLocal.prototype.init = function () {
     var sauvegarde = null;
@@ -53,16 +64,24 @@
   TraceurLocal.prototype.valider = function () { return true; };
   TraceurLocal.prototype.terminer = function () { return true; };
 
-  TraceurLocal.effacerTout = function (idFormation) {
+  function effacerPrefixe(debut) {
     var s = stockage();
     if (!s) { return; }
-    var debut = PREFIXE + idFormation + ':';
     var cles = [];
     for (var i = 0; i < s.length; i++) {
       var k = s.key(i);
       if (k && k.indexOf(debut) === 0) { cles.push(k); }
     }
     cles.forEach(function (k) { s.removeItem(k); });
+  }
+
+  /* Réinitialise un seul profil. Les autres profils et le profil actif ne sont pas touchés. */
+  TraceurLocal.effacerTesteur = function (idFormation, idTesteur) {
+    effacerPrefixe(PREFIXE + idFormation + ':' + idTesteur + ':');
+  };
+
+  TraceurLocal.effacerTout = function (idFormation) {
+    effacerPrefixe(PREFIXE + idFormation + ':');
   };
 
   function TraceurMemoire() {
