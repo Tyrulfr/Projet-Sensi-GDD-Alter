@@ -28,7 +28,7 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Tu travailles dans un service administratif de l'université. On te demande de préparer la liste des agents inscrits à une session de formation.\n\nUn collègue te transmet un tableau. À première vue, tout y est… mais au moment de trier les inscriptions par date, plusieurs choses coincent."
+          "texte": "Julie te transmet la liste des agents inscrits à une session de formation : Camille, Karim, Noé.\n\nÀ première vue, tout y est… mais au moment de trier les inscriptions par date, plusieurs choses coincent."
         },
         {
           "type": "comparateur",
@@ -38,10 +38,10 @@
             "titre": "Tableau A : inscriptions reçues",
             "colonnes": ["Agent", "Service", "Date inscription"],
             "lignes": [
-              ["Martin Julie", "RH", "12/03/26"],
+              ["Camille Martin", "RH", "12/03/26"],
               ["Karim Bernard", "Ress. Humaines", "2026-03-12"],
-              ["Sophie Petit", "DRH", "13 mars 2026"],
-              ["Julie Martin", "RH", ""]
+              ["Noé Petit", "DRH", "13 mars 2026"],
+              ["Martin Camille", "RH", ""]
             ],
             "legende": "Données fictives."
           },
@@ -55,7 +55,7 @@
             {
               "id": "nom-prenom",
               "libelle": "Nom et prénom réunis",
-              "explication": "Une seule colonne, et pas toujours le même ordre : « Martin Julie », mais « Karim Bernard ». Impossible de trier par nom, ni d'être sûr de savoir lequel est le prénom.",
+              "explication": "Une seule colonne, et pas toujours le même ordre : « Camille Martin », mais « Karim Bernard ». Impossible de trier par nom, ni d'être sûr de savoir lequel est le prénom.",
               "cellules": [[0, 0], [1, 0], [2, 0], [3, 0]]
             },
             {
@@ -73,7 +73,7 @@
             {
               "id": "doublon",
               "libelle": "Un risque de doublon",
-              "explication": "« Martin Julie » et « Julie Martin » : une personne inscrite deux fois, ou deux homonymes ? Sans identifiant, impossible de trancher. On vérifie avant de fusionner ou de supprimer une ligne.",
+              "explication": "« Camille Martin » et « Martin Camille » : une personne inscrite deux fois, ou deux homonymes ? Sans identifiant, impossible de trancher. On vérifie avant de fusionner ou de supprimer une ligne.",
               "cellules": [[0, 0], [3, 0]]
             }
           ],
@@ -81,9 +81,9 @@
             "titre": "Tableau B : la même liste, mieux structurée",
             "colonnes": ["Identifiant", "Nom", "Prénom", "Service", "Date inscription"],
             "lignes": [
-              ["AG001", "Martin", "Julie", "RH", "2026-03-12"],
+              ["AG001", "Martin", "Camille", "RH", "2026-03-12"],
               ["AG002", "Bernard", "Karim", "RH", "2026-03-12"],
-              ["AG003", "Petit", "Sophie", "RH", "2026-03-13"]
+              ["AG003", "Petit", "Noé", "RH", "2026-03-13"]
             ],
             "legende": "Identifiants et données fictifs.",
             "atouts": [
@@ -144,7 +144,35 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Un service reçoit plusieurs listes concernant les mêmes agents. Il y trouve :\n\n- Julie Martin ;\n- MARTIN Julie ;\n- J. Martin ;\n- Julie MARTIN.\n\nQuatre personnes, ou une seule ? Impossible de le savoir avec certitude à partir de ces seuls libellés."
+          "texte": "Sophie reçoit plusieurs listes au sujet de Camille. Elle y trouve :\n\n- Camille Martin ;\n- MARTIN Camille ;\n- C. Martin ;\n- Camille MARTIN.\n\nQuatre personnes, ou une seule ? Impossible de le savoir avec certitude à partir de ces seuls libellés."
+        },
+        {
+          "type": "decision",
+          "id": "m03-d1",
+          "consigne": "Quatre libellés, peut-être une seule personne. Que fais-tu ?",
+          "donnee": "identite",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Je fusionne les lignes : c'est sûrement Camille.",
+              "implication": "Sans identifiant, tu peux réunir deux personnes différentes, ou effacer une inscription réelle.",
+              "trace": "Libellés de Camille fusionnés sans vérification.",
+              "etat": "L'identité n'est pas fiable : les lignes ont été réunies trop tôt."
+            },
+            {
+              "id": "b",
+              "texte": "Je cherche un identifiant avant de conclure.",
+              "implication": "Le nom seul ne suffit pas. L'identifiant, créé une fois, permet de reconnaître Camille dans les autres services.",
+              "etat": "On cherche un identifiant avant de dire s'il s'agit de Camille."
+            },
+            {
+              "id": "c",
+              "texte": "Je crée une quatrième fiche, une par libellé.",
+              "implication": "Camille existerait quatre fois. Chaque service continuerait de travailler sur une personne différente.",
+              "trace": "Une fiche de plus pour un libellé déjà vu.",
+              "etat": "Plusieurs fiches portent le nom de Camille."
+            }
+          ]
         },
         {
           "type": "definition",
@@ -155,14 +183,14 @@
           "type": "tableau",
           "titre": "Liste 1 : sans identifiant",
           "colonnes": ["Nom", "Prénom"],
-          "lignes": [["Martin", "Julie"], ["Martin", "Julie"]],
+          "lignes": [["Martin", "Camille"], ["Martin", "Camille"]],
           "legende": "Une seule personne inscrite deux fois, ou deux homonymes ? On ne peut pas le savoir."
         },
         {
           "type": "tableau",
           "titre": "Liste 2 : avec identifiant",
           "colonnes": ["Identifiant fictif", "Nom", "Prénom"],
-          "lignes": [["AG104", "Martin", "Julie"], ["AG287", "Martin", "Julie"]],
+          "lignes": [["AG104", "Martin", "Camille"], ["AG287", "Martin", "Camille"]],
           "legende": "Deux identifiants différents : il s'agit de deux personnes distinctes, qui portent les mêmes nom et prénom."
         },
         {
@@ -194,9 +222,28 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Tu travailles dans un service de maintenance. Tu dois renseigner la date de la dernière intervention sur un équipement. Le formulaire prévoit une date… mais tu ne disposes pas de l'information vérifiée. Que fais-tu ?"
+          "texte": "Tu aides Noé. Le formulaire demande la date de son intervention sur la chaudière du bâtiment C. Tu ne disposes pas de l'information vérifiée. Que fais-tu ?"
         },
-        { "type": "activite", "ref": "m03-a4" },
+        {
+          "type": "activite",
+          "ref": "m03-a4",
+          "carnet": {
+            "donnee": "intervention",
+            "effets": {
+              "a": {
+                "trace": "Une date approximative a été saisie pour l'intervention de Noé.",
+                "etat": "La date de la chaudière n'est pas vérifiée."
+              },
+              "b": {
+                "trace": "La date d'un autre équipement a été recopiée sur la chaudière.",
+                "etat": "La date ne correspond pas à cet équipement."
+              },
+              "c": {
+                "etat": "La date manque, et c'est signalé. Elle n'a pas été inventée."
+              }
+            }
+          }
+        },
         {
           "type": "texte",
           "titre": "Des gestes simples",

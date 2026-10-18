@@ -135,7 +135,35 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Une erreur est découverte dans une information utilisée par plusieurs services. Un agent la constate ; un responsable de service doit décider comment la traiter ; un référent métier aide à comprendre la donnée ; une équipe technique intervient si l'application est en cause.\n\nQui est responsable ? Cela dépend des rôles et des procédures définis : d'où l'intérêt de savoir qui intervient, et pourquoi."
+          "texte": "L'affectation de Camille n'est pas la même chez Julie et dans le fichier de Sophie. Noé, de son côté, a peut-être une autre date pour la salle.\n\nUn agent constate l'écart. Quelqu'un doit décider comment le traiter. Un référent aide à comprendre la donnée. Une équipe technique intervient si l'application est en cause.\n\nQui agit ? Cela dépend des rôles et des procédures définis."
+        },
+        {
+          "type": "decision",
+          "id": "m05-d1",
+          "consigne": "L'affectation de Camille diverge. Que fais-tu ?",
+          "donnee": "arrivee-camille",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Je corrige le fichier de Sophie moi-même, sans prévenir Julie.",
+              "implication": "Le bureau semble juste. Le dossier de Julie, qui fait référence, porte encore l'erreur. Elle reviendra au prochain envoi.",
+              "trace": "Fichier de Sophie corrigé sans revenir au dossier de Julie.",
+              "etat": "L'écart est masqué dans une copie. Le dossier de Julie est encore faux."
+            },
+            {
+              "id": "b",
+              "texte": "Je signale l'écart à Julie, qui tient le dossier agent.",
+              "implication": "Sophie a constaté. Julie peut corriger à la source. Les autres copies pourront ensuite être reprises.",
+              "etat": "Sophie a signalé l'écart. La correction appartient au dossier tenu par Julie."
+            },
+            {
+              "id": "c",
+              "texte": "Je demande à Noé de modifier la date d'intervention.",
+              "implication": "Noé tient les interventions, pas les affectations. La donnée de Camille ne sera pas corrigée au bon endroit.",
+              "trace": "La correction a été demandée à Noé, qui ne tient pas le dossier agent.",
+              "etat": "La mauvaise personne a été sollicitée. L'affectation de Camille est encore fausse."
+            }
+          ]
         },
         {
           "type": "schema",

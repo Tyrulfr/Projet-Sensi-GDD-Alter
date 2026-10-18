@@ -26,13 +26,13 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Un nouvel agent rejoint l'université. Au service RH, une gestionnaire enregistre son arrivée : son nom, son affectation, sa date d'arrivée et sa situation professionnelle.\n\nPour elle, la saisie est terminée. Pour l'information, le parcours ne fait que commencer."
+          "texte": "Camille rejoint l'université. Au service des ressources humaines, Julie enregistre son arrivée : son nom, son affectation, sa date d'arrivée et sa situation professionnelle.\n\nPour Julie, la saisie est terminée. Pour l'information, le parcours ne fait que commencer."
         },
         {
           "type": "schema",
           "titre": "Où cette information peut-elle être utile ?",
           "consigne": "Sélectionne chaque service pour découvrir pourquoi l'information lui est utile.",
-          "source": { "libelle": "Service RH", "detail": "Saisie de l'arrivée d'un agent" },
+          "source": { "libelle": "Julie · RH", "detail": "Saisie de l'arrivée de Camille" },
           "flux": "Information sur l'affectation",
           "cibles": [
             { "id": "gestion", "libelle": "Gestion administrative", "usage": "Mise à jour du dossier", "detail": "Le dossier administratif de l'agent doit refléter sa situation réelle : affectation, date d'arrivée, rattachement." },
@@ -41,6 +41,27 @@
             { "id": "pilotage", "libelle": "Pilotage", "usage": "Suivi des effectifs par structure", "detail": "Additionnées, les affectations permettent de suivre les effectifs de chaque structure et d'éclairer les décisions." }
           ],
           "legende": "Exemple illustratif : il ne décrit pas les circuits réels de l'Université Paris-Saclay."
+        },
+        {
+          "type": "decision",
+          "id": "m02-d1",
+          "consigne": "Karim doit ouvrir une carte de lecteur pour Camille. Que fait-il ?",
+          "donnee": "arrivee-camille",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Il cherche le nom déjà enregistré par Julie.",
+              "implication": "L'identité existe déjà. Karim s'en sert, il ne la recrée pas. La bibliothèque a une carte, pas une seconde fiche.",
+              "etat": "Karim a recherché le nom de Camille. Il ne l'a pas ressaisi."
+            },
+            {
+              "id": "b",
+              "texte": "Il retape le nom dans le catalogue de la bibliothèque.",
+              "implication": "Une seconde écriture vient de naître. Si Julie corrige une lettre, le catalogue de Karim gardera l'ancienne.",
+              "trace": "Nom de Camille retapé à la bibliothèque, sans lien avec le dossier de Julie.",
+              "etat": "Le nom de Camille existe en deux écritures."
+            }
+          ]
         },
         {
           "type": "texte",
@@ -67,7 +88,7 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Un agent a changé de service : il travaille désormais à la scolarité. Pourtant, un fichier local, utilisé pour produire des tableaux de suivi, indique toujours son ancienne affectation."
+          "texte": "Camille a changé de service : elle travaille désormais à la scolarité. Le dossier de Julie est à jour. Pourtant, le fichier local de Sophie, utilisé pour les bureaux, indique toujours l'ancienne affectation."
         },
         {
           "type": "chronologie",
@@ -79,6 +100,27 @@
             { "titre": "Plusieurs personnes doivent intervenir", "texte": "Pour corriger, il faut :\n- retrouver l'origine de l'erreur ;\n- identifier l'information qui fait référence ;\n- corriger les différents supports qui ont repris l'erreur." }
           ],
           "conclusion": "Une seule information non actualisée a mobilisé plusieurs personnes, dans plusieurs services, pour être corrigée."
+        },
+        {
+          "type": "decision",
+          "id": "m02-d2",
+          "consigne": "Le fichier de Sophie indique encore l'ancienne affectation de Camille. Que fais-tu ?",
+          "donnee": "arrivee-camille",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Je corrige le fichier de Sophie à partir du dossier de Julie.",
+              "implication": "La source est le dossier agent. Le bureau de Sophie retrouve la même affectation que les ressources humaines.",
+              "etat": "L'affectation de Camille a été reprise depuis le dossier de Julie."
+            },
+            {
+              "id": "b",
+              "texte": "Je mets à jour seulement le fichier local de Sophie.",
+              "implication": "Le bureau est juste pour aujourd'hui. Le dossier de Julie et le fichier local peuvent à nouveau diverger au prochain changement.",
+              "trace": "Fichier local de Sophie modifié sans revenir au dossier de Julie.",
+              "etat": "Deux affectations peuvent encore coexister."
+            }
+          ]
         },
         { "type": "activite", "ref": "m02-a2" },
         {
@@ -99,9 +141,24 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "La bibliothèque universitaire gère son catalogue d'ouvrages. Un autre service souhaite utiliser certaines informations bibliographiques pour réaliser un inventaire. Comment réagir ?"
+          "texte": "Karim gère le catalogue d'ouvrages de la bibliothèque. Sophie souhaite utiliser certaines informations bibliographiques pour un inventaire des salles de lecture. Comment réagir ?"
         },
-        { "type": "activite", "ref": "m02-a3" },
+        {
+          "type": "activite",
+          "ref": "m02-a3",
+          "carnet": {
+            "donnee": "catalogue-biblio",
+            "effets": {
+              "a": {
+                "trace": "Rien n'a été transmis, même les références qui auraient pu servir à Sophie.",
+                "etat": "Le catalogue reste à la bibliothèque. L'inventaire n'avance pas."
+              },
+              "b": {
+                "etat": "Karim vérifie ce qui peut partir. L'historique des prêts reste à la bibliothèque."
+              }
+            }
+          }
+        },
         {
           "type": "texte",
           "titre": "Un patrimoine informationnel partagé",

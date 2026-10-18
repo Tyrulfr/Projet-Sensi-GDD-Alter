@@ -52,13 +52,7 @@
           h('div', { class: 'bloc-corps', html: U.richText(bloc.texte) })
         ]);
       case 'definition':
-        return h('div', { class: 'bloc bloc-definition' }, [
-          h('p', { class: 'bloc-etiquette', text: 'Définition' }),
-          h('dl', null, [
-            h('dt', { text: bloc.terme }),
-            h('dd', { html: U.inlineText(bloc.texte) })
-          ])
-        ]);
+        return UI.definition(bloc);
       case 'exemple':
         return h('aside', { class: 'bloc bloc-exemple', 'aria-label': bloc.etiquette || 'Exemple' }, [
           h('p', { class: 'bloc-etiquette', text: bloc.etiquette || 'Exemple' }),
@@ -67,6 +61,8 @@
         ]);
       case 'tableau':
         return UI.tableau(bloc);
+      case 'visuel':
+        return UI.visuel(bloc);
       case 'schema':
         return UI.schema(bloc);
       case 'chronologie':
@@ -75,6 +71,8 @@
         return UI.comparateur(bloc);
       case 'simulateur':
         return UI.simulateur(bloc);
+      case 'decision':
+        return UI.decision(bloc, {});
       case 'memo':
         return UI.memo(bloc);
       case 'aretenir':
@@ -85,6 +83,171 @@
       default:
         return h('div', { class: 'bloc', text: '[Bloc inconnu : ' + bloc.type + ']' });
     }
+  };
+
+  UI.definition = function (bloc) {
+    if (!bloc.entrees) {
+      return h('div', { class: 'bloc bloc-definition' }, [
+        h('p', { class: 'bloc-etiquette', text: 'Définition' }),
+        h('dl', null, [
+          h('dt', { text: bloc.terme }),
+          h('dd', { html: U.inlineText(bloc.texte) })
+        ])
+      ]);
+    }
+    return h('div', { class: 'bloc bloc-definition bloc-definitions' }, [
+      h('p', { class: 'bloc-etiquette', text: 'Définitions' }),
+      h('ul', { class: 'visuel-pied' }, bloc.entrees.map(function (e) {
+        return h('li', null, [
+          e.icone ? h('span', { class: 'visuel-pied-icone', 'aria-hidden': 'true' }, iconeVisuel(e.icone)) : null,
+          h('p', null, [h('strong', { text: e.terme }), e.formule ? ' = ' + e.formule : ''])
+        ]);
+      })),
+      h('div', { class: 'definitions' }, bloc.entrees.map(function (e) {
+        return h('dl', null, [
+          h('dt', { text: e.terme }),
+          h('dd', { html: U.inlineText(e.texte) })
+        ]);
+      }))
+    ]);
+  };
+
+  function svg(balise, attrs) {
+    var el = document.createElementNS('http://www.w3.org/2000/svg', balise);
+    Object.keys(attrs || {}).forEach(function (k) { el.setAttribute(k, attrs[k]); });
+    return el;
+  }
+
+  function iconeVisuel(nom) {
+    var dessin = svg('svg', { viewBox: '0 0 32 32', 'aria-hidden': 'true', focusable: 'false', class: 'visuel-icone' });
+    if (nom === 'graphe') {
+      [['6', '18', '5', '8'], ['14', '14', '5', '12'], ['22', '8', '5', '18']].forEach(function (b) {
+        dessin.appendChild(svg('rect', { x: b[0], y: b[1], width: b[2], height: b[3], rx: '1.5' }));
+      });
+    } else if (nom === 'mallette') {
+      dessin.appendChild(svg('path', { d: 'M9 14 h14 v11 H9 z' }));
+      dessin.appendChild(svg('path', { d: 'M13 14 v-2 a3 3 0 0 1 6 0 v2' }));
+      dessin.appendChild(svg('path', { d: 'M9 19 h14' }));
+    } else if (nom === 'personne') {
+      dessin.appendChild(svg('circle', { cx: '16', cy: '11', r: '3.4' }));
+      dessin.appendChild(svg('path', { d: 'M8.5 26 c.5-5 3.6-7.4 7.5-7.4 s7 2.4 7.5 7.4' }));
+    } else {
+      dessin.appendChild(svg('path', { d: 'M8 6 h11 l5 5 v15 a2 2 0 0 1-2 2 H8 a2 2 0 0 1-2-2 V8 a2 2 0 0 1 2-2 z' }));
+      dessin.appendChild(svg('path', { d: 'M18 6 v6 h6' }));
+    }
+    return dessin;
+  }
+
+  function filsOrganisation() {
+    var dessin = svg('svg', { viewBox: '0 0 48 96', 'aria-hidden': 'true', focusable: 'false', class: 'visuel-fils' });
+    ['M0 16 C 30 16, 18 48, 48 48', 'M0 48 H 48', 'M0 80 C 30 80, 18 48, 48 48'].forEach(function (d) {
+      dessin.appendChild(svg('path', { d: d }));
+    });
+    return dessin;
+  }
+
+  /* Quatre services en parallèle : des données, puis l'information qu'on en tire. */
+  function visuelServices(bloc) {
+    var liste = h('ul', { class: 'visuel-services' });
+    (bloc.cas || []).forEach(function (cas) {
+      liste.appendChild(h('li', { class: 'visuel-cas' }, [
+        h('p', { class: 'visuel-cas-service', text: cas.service }),
+        h('p', { class: 'visuel-cas-legende', text: 'Données' }),
+        h('ul', { class: 'visuel-pastilles visuel-pastilles-service' },
+          (cas.donnees || []).map(function (d) { return h('li', { text: d }); })),
+        h('p', { class: 'visuel-cas-fleche', 'aria-hidden': 'true', text: '↓' }),
+        h('div', { class: 'visuel-cas-resultat' }, [
+          h('p', { class: 'visuel-cas-legende', text: 'Information' }),
+          h('p', { class: 'visuel-cas-info', text: cas.information })
+        ])
+      ]));
+    });
+    return h('div', { class: 'bloc bloc-visuel' }, [
+      h('h3', { text: bloc.titre }),
+      bloc.chapo ? h('p', { class: 'visuel-chapo', text: bloc.chapo }) : null,
+      liste
+    ]);
+  }
+
+  /* Deux regards en parallèle, qui peuvent se combiner. */
+  function visuelRegards(bloc) {
+    var cartes = h('ul', { class: 'visuel-regards' });
+    (bloc.regards || []).forEach(function (regard) {
+      cartes.appendChild(h('li', { class: 'visuel-regard visuel-regard-' + (regard.teinte || 'metier') }, [
+        h('p', { class: 'visuel-regard-titre' }, [
+          regard.icone ? h('span', { class: 'visuel-regard-icone', 'aria-hidden': 'true' }, iconeVisuel(regard.icone)) : null,
+          h('span', { text: regard.terme })
+        ]),
+        h('p', { class: 'visuel-regard-texte', text: regard.texte }),
+        regard.exemple ? h('p', { class: 'visuel-regard-ex', text: 'Ex. : ' + regard.exemple }) : null
+      ]));
+    });
+    var commun = bloc.commun || {};
+    return h('div', { class: 'bloc bloc-visuel' }, [
+      h('h3', { text: bloc.titre }),
+      bloc.chapo ? h('p', { class: 'visuel-chapo', text: bloc.chapo }) : null,
+      cartes,
+      h('div', { class: 'visuel-jonction', 'aria-hidden': 'true' }, [
+        h('span', { class: 'visuel-jonction-fleche' })
+      ]),
+      h('div', { class: 'visuel-commun' }, [
+        h('p', { class: 'visuel-commun-titre', text: commun.titre }),
+        h('p', { class: 'visuel-commun-texte', text: commun.texte })
+      ])
+    ]);
+  }
+
+  /* Schéma « des données à l'information » : trois étapes, puis la distinction à retenir. */
+  UI.visuel = function (bloc) {
+    if (bloc.variante === 'services') { return visuelServices(bloc); }
+    if (bloc.variante === 'regards') { return visuelRegards(bloc); }
+    var etapes = h('ol', { class: 'visuel-etapes' });
+    (bloc.etapes || []).forEach(function (etape, i) {
+      var corps = [
+        h('p', { class: 'visuel-etape-titre' }, [
+          h('span', { class: 'visuel-numero', 'aria-hidden': 'true', text: String(i + 1) }),
+          h('span', { text: etape.titre })
+        ]),
+        h('p', { class: 'visuel-etape-texte', text: etape.texte })
+      ];
+      (etape.groupes || []).forEach(function (groupe) {
+        corps.push(h('ul', { class: 'visuel-pastilles visuel-pastilles-' + (groupe.teinte || 'personne') },
+          (groupe.elements || []).map(function (nom) { return h('li', { text: nom }); })));
+      });
+      if (etape.liens && etape.liens.length) {
+        corps.push(h('div', { class: 'visuel-liens' }, [
+          h('ul', { class: 'visuel-pastilles visuel-pastilles-personne' },
+            etape.liens.map(function (nom) { return h('li', { text: nom }); })),
+          filsOrganisation(),
+          h('span', { class: 'visuel-cylindre', 'aria-hidden': 'true' })
+        ]));
+      }
+      if (etape.question) {
+        corps.push(h('p', { class: 'visuel-question', text: etape.question }));
+      }
+      if (etape.tableau) {
+        var tableau = etape.tableau;
+        corps.push(h('table', { class: 'visuel-tableau' }, [
+          h('thead', null, h('tr', null, (tableau.colonnes || []).map(function (c) { return h('th', { scope: 'col', text: c }); }))),
+          h('tbody', null, (tableau.lignes || []).map(function (ligne) {
+            return h('tr', null, ligne.map(function (cellule) { return h('td', { text: cellule }); }));
+          }))
+        ]));
+      }
+      etapes.appendChild(h('li', { class: 'visuel-etape' }, corps));
+    });
+    var pied = (bloc.pied || []).length ? h('ul', { class: 'visuel-pied' }, bloc.pied.map(function (p) {
+      return h('li', null, [
+        h('span', { class: 'visuel-pied-icone', 'aria-hidden': 'true' }, iconeVisuel(p.icone)),
+        h('p', null, [h('strong', { text: p.terme }), ' = ' + p.texte])
+      ]);
+    })) : null;
+    return h('div', { class: 'bloc bloc-visuel' }, [
+      h('h3', { text: bloc.titre }),
+      h('p', { class: 'visuel-chapo', text: bloc.chapo }),
+      etapes,
+      pied
+    ]);
   };
 
   /* Schéma de circulation : une source, un flux, plusieurs usages à explorer. */
@@ -496,6 +659,7 @@
               return;
             }
             etat.choix[s.id] = coche.value;
+            if (o.surChoix) { o.surChoix(s, coche.value); }
             rendre(prefixe + '-retour');
           }
         }, L.valider));
@@ -566,7 +730,11 @@
           }, L.revoir) : null,
           h('button', {
             type: 'button', class: 'bouton bouton-secondaire',
-            onclick: function () { etat.i = 0; etat.choix = {}; rendre(prefixe + '-carte'); }
+            onclick: function () {
+              etat.i = 0; etat.choix = {};
+              if (o.surRecommencer) { o.surRecommencer(); }
+              rendre(prefixe + '-carte');
+            }
           }, L.recommencer)
         ])
       ]);
@@ -773,5 +941,126 @@
   UI.badge = function (statut) {
     var l = UI.libelleStatut(statut);
     return h('span', { class: 'badge badge-' + l.classe }, [h('span', { 'aria-hidden': 'true', text: l.icone + ' ' }), l.texte]);
+  };
+
+  /* Décision narrative : le choix affiche son implication et alimente le carnet. Pas de note. */
+  UI.decision = function (bloc, o) {
+    o = o || {};
+    var id = 'decision-' + bloc.id;
+    var choisi = o.code || null;
+    var choixRetenu = (bloc.choix || []).filter(function (c) { return c.id === choisi; })[0];
+
+    var champs = h('fieldset', { class: 'activite-champs' }, h('legend', null, [
+      h('span', { class: 'activite-consigne', text: bloc.consigne }),
+      h('span', { class: 'activite-aide', text: 'Une seule réponse. Tu pourras la modifier.' })
+    ]));
+    (bloc.choix || []).forEach(function (c) {
+      var cid = id + '-' + c.id;
+      champs.appendChild(h('div', { class: 'option' }, [
+        h('input', {
+          type: 'radio', id: cid, name: id, value: c.id,
+          checked: c.id === choisi, disabled: !!choisi
+        }),
+        h('label', { for: cid }, h('span', { class: 'option-texte', text: c.texte }))
+      ]));
+    });
+
+    var message = h('div', { class: 'activite-message', id: id + '-message', role: 'status' });
+    var implication = null;
+    if (choixRetenu) {
+      implication = h('div', { class: 'decision-implication', id: id + '-implication', tabindex: '-1' }, [
+        h('p', { class: 'feedback-titre', text: 'Ce que ton choix change' }),
+        h('p', { text: choixRetenu.implication })
+      ]);
+    }
+
+    var actions = h('div', { class: 'actions' });
+    if (!choisi) {
+      actions.appendChild(h('button', {
+        type: 'button', class: 'bouton bouton-principal',
+        onclick: function () {
+          var coche = champs.querySelector('input[name="' + id + '"]:checked');
+          if (!coche) {
+            message.innerHTML = '';
+            message.appendChild(h('p', { class: 'message-alerte', text: 'Choisis une réponse avant de valider.' }));
+            message.focus();
+            return;
+          }
+          if (o.choisir) { o.choisir(coche.value); }
+        }
+      }, 'Voir la conséquence'));
+    } else if (o.modifier) {
+      actions.appendChild(h('button', {
+        type: 'button', class: 'bouton bouton-secondaire',
+        onclick: o.modifier
+      }, 'Modifier mon choix'));
+    }
+
+    return h('div', { class: 'bloc bloc-decision', id: id }, [
+      h('p', { class: 'bloc-etiquette' }, [h('span', { 'aria-hidden': 'true', text: '✎ ' }), 'À toi de décider']),
+      champs,
+      message,
+      implication,
+      actions
+    ]);
+  };
+
+  /* Panneau rappelé à la demande. Fermé, seul l'interrupteur est visible. */
+  UI.carnet = function (o) {
+    var def = o.def || {};
+    var ouvert = !!o.ouvert;
+    var interrupteur = h('button', {
+      type: 'button',
+      id: 'carnet-interrupteur',
+      class: 'carnet-interrupteur' + (o.nouveau ? ' a-nouveaute' : ''),
+      'aria-expanded': ouvert ? 'true' : 'false',
+      'aria-controls': 'carnet-panneau',
+      onclick: o.basculer
+    }, [
+      h('span', { text: def.interrupteur || 'Les données en jeu' }),
+      o.nouveau ? h('span', { class: 'carnet-pastille', text: def.misAJour || 'Une donnée a bougé' }) : null
+    ]);
+
+    var panneau = null;
+    var fond = null;
+    if (ouvert) {
+      var entrees = o.entrees || [];
+      var liste = entrees.length
+        ? h('ol', { class: 'carnet-liste' }, entrees.map(function (e) {
+          return h('li', { class: 'carnet-entree' }, [
+            h('h3', { text: e.titre }),
+            h('p', null, [h('span', { class: 'carnet-role', text: def.creee || 'Créée' }), ' ', e.creee]),
+            h('p', null, [h('span', { class: 'carnet-role', text: def.reprises || 'Reprise' }), ' ', e.reprises]),
+            h('p', null, [h('span', { class: 'carnet-role', text: def.absente || 'Absente' }), ' ', e.absente]),
+            e.etat ? h('p', { class: 'carnet-etat' }, [h('span', { class: 'carnet-role', text: def.etat || 'Après ton choix' }), ' ', e.etat]) : null,
+            e.traces.length ? h('ul', { class: 'carnet-traces' }, e.traces.map(function (t) {
+              return h('li', null, [h('span', { class: 'carnet-role', text: def.trace || 'Ta trace' }), ' ', t]);
+            })) : null
+          ]);
+        }))
+        : h('p', { class: 'carnet-vide', text: def.vide || 'Aucune donnée en jeu pour l\'instant.' });
+      panneau = h('div', {
+        id: 'carnet-panneau', class: 'carnet-panneau', role: 'region',
+        'aria-labelledby': 'carnet-titre'
+      }, [
+        h('div', { class: 'carnet-entete' }, [
+          h('h2', { id: 'carnet-titre', text: def.titre || 'Les données en jeu' }),
+          h('button', {
+            type: 'button', class: 'carnet-fermer',
+            onclick: o.basculer
+          }, def.fermer || 'Fermer')
+        ]),
+        h('div', { 'aria-live': 'polite' }, liste)
+      ]);
+      fond = h('button', {
+        type: 'button', class: 'carnet-fond',
+        onclick: o.basculer,
+        'aria-label': def.fermer || 'Fermer le carnet'
+      });
+    }
+
+    return h('aside', { id: 'carnet', class: 'carnet' + (ouvert ? ' est-ouvert' : ''), 'aria-label': def.titre || 'Les données en jeu' }, [
+      interrupteur, fond, panneau
+    ]);
   };
 })(typeof window !== 'undefined' ? window : this);

@@ -76,6 +76,39 @@
       egal(U.richText('Pour corriger :\n- a'), '<p>Pour corriger :<br>- a</p>', 'liste non séparée par une ligne vide');
     });
 
+    test('M1 : le passage des données à l\'information est un visuel en trois étapes', function () {
+      var bloc = lecons[0].blocs.filter(function (b) { return b.type === 'visuel'; })[0];
+      egal(bloc.titre, 'Ce que tu viens de manipuler');
+      egal(bloc.etapes.map(function (e) { return e.titre; }), ['Données', 'Organisation', 'Information utile']);
+      var el = GDD.ui.bloc(bloc);
+      egal(el.querySelectorAll('.visuel-etape').length, 3);
+      vrai(/Qui travaille dans quel service/.test(el.textContent));
+      egal(el.querySelectorAll('.visuel-tableau tbody tr').length, 3);
+      egal(el.querySelectorAll('.visuel-pied li').length, 0, 'le rappel Donnée / Information n\'est pas dans le schéma');
+      vrai(!/Sans y penser/.test(el.textContent), 'l\'ancien paragraphe est remplacé');
+      var defs = lecons[0].blocs.filter(function (b) { return b.type === 'definition'; })[0];
+      egal(defs.entrees.map(function (e) { return e.terme; }), ['Donnée', 'Information']);
+      var ed = GDD.ui.bloc(defs);
+      egal(ed.querySelectorAll('.visuel-pied li').length, 2);
+      egal(ed.querySelectorAll('dd').length, 2);
+      var services = lecons[0].blocs.filter(function (b) { return b.variante === 'services'; })[0];
+      egal(services.cas.map(function (c) { return c.service; }), ['Ressources humaines', 'Bibliothèque', 'Maintenance', 'Scolarité']);
+      var es = GDD.ui.bloc(services);
+      egal(es.querySelectorAll('.visuel-cas').length, 4);
+      vrai(/40 ouvrages sont en retard/.test(es.textContent));
+      egal(es.querySelectorAll('table').length, 0);
+      var regards = lecons[1].blocs.filter(function (b) { return b.variante === 'regards'; })[0];
+      egal(regards.regards.map(function (g) { return g.terme; }), ['Donnée métier', 'Donnée personnelle']);
+      var er = GDD.ui.bloc(regards);
+      egal(er.querySelectorAll('.visuel-regard').length, 2);
+      vrai(/emprunt d'un livre/.test(er.textContent));
+      var defs2 = lecons[1].blocs.filter(function (b) { return b.type === 'definition'; })[0];
+      egal(defs2.entrees.map(function (e) { return e.terme; }), ['Donnée métier', 'Donnée personnelle']);
+      var ed2 = GDD.ui.bloc(defs2);
+      egal(ed2.querySelectorAll('.visuel-pied li').length, 2);
+      egal(ed2.querySelectorAll('dd').length, 2);
+    });
+
     test('Chaque activité du module accepte sa réponse attendue', function () {
       Object.keys(module.activites).forEach(function (id) {
         var act = module.activites[id];
@@ -159,6 +192,19 @@
       var codes = bonnesReponses(module, idEval); codes['m01-q4'] = 'a';
       egal(m.soumettreEvaluation(idEval, codes).score, 75);
       egal(m.statut().reussite, 'reussi');
+    });
+
+    test('Carnet : le choix est conservé à la reprise et compte comme un début', function () {
+      var t = new TraceurTest(); var m = new GDD.Moteur(module, t); m.demarrer();
+      egal(m.statut().completion, 'non-commence');
+      m.choisirCarnet('m01-d1', 'b');
+      egal(m.choixCarnet('m01-d1'), 'b');
+      egal(m.statut().completion, 'en-cours');
+      var m2 = new GDD.Moteur(module, new TraceurTest({ etat: t.paquets[t.paquets.length - 1].etat })); m2.demarrer();
+      egal(m2.choixCarnet('m01-d1'), 'b');
+      m2.oublierCarnet('m01-d1');
+      egal(m2.choixCarnet('m01-d1'), null);
+      vrai(!m2.etat.c, 'plus de choix');
     });
 
     test('Sauvegarde puis reprise de l\'état', function () {
@@ -958,6 +1004,25 @@
     });
   }
 
+  function lancerCarnet() {
+    test('Carnet : une donnée apparaît après un choix, avec sa trace', function () {
+      var def = { donnees: [
+        { id: 'affectations', titre: 'Affectations', module: 1, depuis: 'm01-l1', creee: 'Julie', reprises: 'Sophie', absente: 'Noé' }
+      ] };
+      var sources = [{ id: 'm01-d1', donnee: 'affectations', effets: { b: { trace: 'copie', etat: 'deux endroits' } } }];
+      egal(GDD.carnet.assembler(def, sources, { vues: {}, choix: {} }).length, 0, 'rien avant le choix');
+      var vue = GDD.carnet.assembler(def, sources, { vues: { 'm01-l1': true }, choix: {} });
+      egal(vue.length, 1);
+      egal(vue[0].traces.length, 0, 'leçon vue, sans trace personnelle');
+      var choisi = GDD.carnet.assembler(def, sources, { vues: {}, choix: { 'm01-d1': 'b' } });
+      egal(choisi[0].etat, 'deux endroits');
+      egal(choisi[0].traces, ['copie']);
+      var etabli = GDD.carnet.assembler(def, sources, { vues: {}, choix: {}, etabliesAvant: 2 });
+      egal(etabli.length, 1, 'module précédent, dans un package seul');
+      egal(etabli[0].traces.length, 0);
+    });
+  }
+
   function afficher() {
     var ol = document.getElementById('resultats');
     var echecs = 0;
@@ -978,6 +1043,6 @@
     return fetch('../contenus/modules/' + fichier).then(function (r) { return r.json(); });
   }
   Promise.all([charger('module-01.json'), charger('module-02.json'), charger('module-03.json'), charger('module-04.json'), charger('module-05.json'), charger('module-06.json'), charger('module-07.json')])
-    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); lancerModule7(mods[6]); lancerProfils(); afficher(); })
+    .then(function (mods) { lancer(mods[0]); lancerModule2(mods[1]); lancerModule3(mods[2]); lancerModule4(mods[3]); lancerModule5(mods[4]); lancerModule6(mods[5]); lancerModule7(mods[6]); lancerProfils(); lancerCarnet(); afficher(); })
     .catch(function (e) { document.getElementById('resume').textContent = 'Impossible de charger le contenu : ' + e.message; });
 })();

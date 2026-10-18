@@ -29,7 +29,28 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Ton responsable te demande la liste des agents rattachés à plusieurs structures de l'université. Premier réflexe : « Je crée un nouveau fichier Excel. » C'est rapide… mais d'autres services disposent peut-être déjà de ces informations."
+          "texte": "Sophie doit préparer une liste de bâtiments pour une intervention de Noé. Premier réflexe : « Je crée un nouveau fichier. » C'est rapide… mais l'inventaire de Noé existe peut-être déjà."
+        },
+        {
+          "type": "decision",
+          "id": "m06-d1",
+          "consigne": "Sophie a besoin de la liste des bâtiments. Que fait-elle ?",
+          "donnee": "inventaire-batiments",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Elle crée tout de suite un nouveau fichier.",
+              "implication": "Un tableau de plus vient de naître. Dès la prochaine mise à jour de l'inventaire de Noé, les deux listes divergeront.",
+              "trace": "Nouveau fichier de bâtiments, à côté de l'inventaire de Noé.",
+              "etat": "La liste existe en deux endroits."
+            },
+            {
+              "id": "b",
+              "texte": "Elle vérifie d'abord si l'inventaire de Noé répond au besoin.",
+              "implication": "La donnée existe déjà. Sophie la cherche avant d'en créer une autre. S'il manque quelque chose, elle le saura.",
+              "etat": "Sophie consulte l'inventaire de Noé. Aucune copie nouvelle."
+            }
+          ]
         },
         {
           "type": "texte",
@@ -184,13 +205,21 @@
               "heure": "9 h",
               "objectif": "os6-1",
               "titre": "Un nouveau tableau à créer",
-              "contexte": "Tu dois préparer une liste de bâtiments pour organiser une intervention de maintenance. Un collègue t'indique qu'un inventaire institutionnel existe déjà.",
+              "contexte": "Sophie doit préparer une liste de bâtiments pour une intervention de Noé. Un collègue t'indique que son inventaire existe déjà.",
               "fiche": [{ "libelle": "Service", "valeur": "Patrimoine et maintenance" }],
               "choix": [
                 { "id": "a", "texte": "Je crée immédiatement une nouvelle liste, sans consulter l'inventaire.", "feedback": "Une liste de plus, qui risque de diverger de l'inventaire dès la prochaine mise à jour." },
                 { "id": "b", "texte": "Je vérifie si l'inventaire existant répond au besoin et si je peux l'utiliser.", "feedback": "Oui : c'est la démarche de l'arbre de décision." },
                 { "id": "c", "texte": "Je reprends un ancien tableau trouvé dans un dossier personnel, sans vérifier sa date.", "feedback": "Un ancien tableau peut contenir des bâtiments fermés ou oublier les nouveaux." }
               ],
+              "carnet": {
+                "donnee": "inventaire-batiments",
+                "effets": {
+                  "a": { "trace": "Une nouvelle liste de bâtiments a été créée, sans consulter l'inventaire de Noé.", "etat": "La liste existe en deux endroits." },
+                  "b": { "etat": "L'inventaire de Noé a été consulté avant de créer quoi que ce soit." },
+                  "c": { "trace": "Un ancien tableau personnel a été repris, sans date de mise à jour.", "etat": "La liste utilisée n'est peut-être plus celle de l'inventaire." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Avant de créer un fichier, il est utile de rechercher les données existantes : on limite les versions parallèles et on utilise des informations mieux maîtrisées.",
@@ -202,13 +231,21 @@
               "heure": "10 h",
               "objectif": "os6-4",
               "titre": "Une information contradictoire",
-              "contexte": "Tu prépares une liste d'agents. Deux documents indiquent des affectations différentes pour la même personne.",
+              "contexte": "Tu prépares une liste d'agents. Le dossier de Julie et le fichier de Sophie ne donnent pas la même affectation pour Camille.",
               "fiche": [{ "libelle": "Service", "valeur": "Ressources humaines" }],
               "choix": [
                 { "id": "a", "texte": "Je choisis l'affectation qui semble la plus probable.", "feedback": "Une supposition peut devenir une erreur, puis être reprise par d'autres." },
                 { "id": "b", "texte": "Je vérifie l'information auprès de la source ou du service compétent.", "feedback": "Oui : on lève le doute à la source avant d'utiliser la donnée." },
                 { "id": "c", "texte": "Je garde les deux informations sans signaler la contradiction.", "feedback": "L'écart restera, et chaque utilisateur devra le découvrir à son tour." }
               ],
+              "carnet": {
+                "donnee": "arrivee-camille",
+                "effets": {
+                  "a": { "trace": "Une affectation supposée a été choisie pour Camille.", "etat": "L'affectation de Camille n'a pas été vérifiée à la source." },
+                  "b": { "etat": "L'affectation de Camille a été vérifiée auprès de Julie." },
+                  "c": { "trace": "Les deux affectations de Camille ont été conservées, sans signalement.", "etat": "L'écart reste, chacun le redécouvrira." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Quand une information semble contradictoire, on recherche la source appropriée et on fait vérifier l'écart avant de réutiliser la donnée.",
@@ -220,13 +257,21 @@
               "heure": "11 h",
               "objectif": "os6-3",
               "titre": "Une date manquante",
-              "contexte": "Tu dois enregistrer la date d'une intervention sur un équipement. Elle ne figure pas dans le document transmis.",
+              "contexte": "Tu dois enregistrer la date de l'intervention de Noé sur la chaudière. Elle ne figure pas dans le document transmis.",
               "fiche": [{ "libelle": "Service", "valeur": "Maintenance des équipements" }],
               "choix": [
                 { "id": "a", "texte": "Je renseigne une date approximative.", "feedback": "Une date approximative sera lue comme exacte, par exemple pour planifier la prochaine intervention." },
                 { "id": "b", "texte": "Je copie la date de la dernière intervention sur un équipement voisin.", "feedback": "C'est la date d'un autre équipement : l'historique de celui-ci deviendrait faux." },
                 { "id": "c", "texte": "Je recherche l'information ou je signale son absence selon la procédure prévue.", "feedback": "Oui : un champ manquant et signalé vaut mieux qu'une valeur inventée." }
               ],
+              "carnet": {
+                "donnee": "intervention",
+                "effets": {
+                  "a": { "trace": "Une date approximative a été notée pour l'intervention de Noé.", "etat": "La date sera lue comme exacte." },
+                  "b": { "trace": "La date d'un équipement voisin a été copiée.", "etat": "L'historique de l'équipement est faux." },
+                  "c": { "etat": "La date de Noé manque, et c'est signalé. Elle n'a pas été inventée." }
+                }
+              },
               "reponse": "c",
               "correction": {
                 "pourquoi": "Une donnée non vérifiée ne doit pas être inventée : une information incorrecte peut être réutilisée et créer d'autres difficultés.",
@@ -245,6 +290,14 @@
                 { "id": "b", "texte": "Je vérifie la finalité de la demande, les autorisations et les règles applicables.", "feedback": "Oui : on comprend le besoin avant de transmettre, et seulement ce qui est nécessaire." },
                 { "id": "c", "texte": "Je diffuse le fichier à l'ensemble des services, par transparence.", "feedback": "Des informations individuelles seraient exposées à des personnes qui n'en ont pas besoin." }
               ],
+              "carnet": {
+                "donnee": "remunerations",
+                "effets": {
+                  "a": { "trace": "Un fichier individuel a été transmis sans que le besoin soit précisé.", "etat": "Des informations individuelles ont quitté leur service." },
+                  "b": { "etat": "Rien n'est transmis tant que le besoin et les droits ne sont pas vérifiés." },
+                  "c": { "trace": "Le fichier a été diffusé à l'ensemble des services.", "etat": "Des informations individuelles sont parties trop loin." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Le partage responsable demande de comprendre le besoin, de vérifier les autorisations et de limiter la transmission au nécessaire.",
@@ -263,6 +316,14 @@
                 { "id": "b", "texte": "J'ajoute ce qu'il faut pour les interpréter, notamment la date et le périmètre du calcul.", "feedback": "Oui : deux lignes suffisent souvent à éviter un contresens." },
                 { "id": "c", "texte": "Je supprime les intitulés de colonnes pour alléger le fichier.", "feedback": "Sans intitulés, le tableau devient illisible pour tout autre que toi." }
               ],
+              "carnet": {
+                "donnee": "effectifs-etudiants",
+                "effets": {
+                  "a": { "trace": "Le tableau des effectifs est parti sans date ni périmètre.", "etat": "Le chiffre peut être comparé à un autre, calculé autrement." },
+                  "b": { "etat": "La date et le périmètre accompagnent les effectifs." },
+                  "c": { "trace": "Les intitulés de colonnes ont été retirés.", "etat": "Le tableau n'est plus compréhensible sans toi." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Documenter l'essentiel permet aux autres utilisateurs de comprendre les données et de les réutiliser sans ambiguïté.",

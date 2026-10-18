@@ -1,6 +1,6 @@
 {
   "id": "ups-gdd",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "titre": "La donnée, une affaire collective",
   "sousTitre": "Sensibilisation à la gouvernance de la donnée",
   "institution": "Université Paris-Saclay",
@@ -58,6 +58,116 @@
       "fichier": "module-07.json"
     }
   ],
+  "carnet": {
+    "titre": "Les données en jeu",
+    "interrupteur": "Les données en jeu",
+    "vide": "Aucune donnée en jeu pour l'instant. Elles apparaîtront quand tu auras fait un choix.",
+    "misAJour": "Une donnée a bougé",
+    "trace": "Ta trace",
+    "etat": "Après ton choix",
+    "fermer": "Fermer",
+    "donnees": [
+      {
+        "id": "affectations",
+        "titre": "Affectations des agents",
+        "module": 1,
+        "depuis": "m01-l1",
+        "creee": "Julie · ressources humaines · fichier des agents",
+        "reprises": "Sophie s'en sert pour la liste des agents par service.",
+        "absente": "Elle n'est pas chez Noé, tant que personne ne la lui transmet."
+      },
+      {
+        "id": "pret",
+        "titre": "Prêt d'ouvrage",
+        "module": 1,
+        "depuis": "m01-l2",
+        "creee": "Karim · bibliothèque · tableau des relances",
+        "reprises": "Le prêt sert à relancer les retards, à la bibliothèque.",
+        "absente": "Il ne remonte pas aux ressources humaines."
+      },
+      {
+        "id": "intervention",
+        "titre": "Intervention du bâtiment C",
+        "module": 1,
+        "depuis": "m01-l3",
+        "creee": "Noé · maintenance · logiciel de suivi des interventions",
+        "reprises": "Sophie la cherche pour savoir si la salle est utilisable.",
+        "absente": "Elle n'existe pas à la bibliothèque."
+      },
+      {
+        "id": "arrivee-camille",
+        "titre": "Arrivée de Camille",
+        "module": 2,
+        "depuis": "m02-l1",
+        "creee": "Julie · ressources humaines · dossier agent",
+        "reprises": "Elle sert à Sophie pour le bureau, et peut servir à préparer les accès.",
+        "absente": "Karim ne la recrée pas : il cherche le nom déjà enregistré."
+      },
+      {
+        "id": "catalogue-biblio",
+        "titre": "Catalogue de la bibliothèque",
+        "module": 2,
+        "depuis": "m02-l3",
+        "creee": "Karim · bibliothèque · catalogue d'ouvrages",
+        "reprises": "Sophie peut s'en servir pour un inventaire, dans un cadre défini.",
+        "absente": "L'historique des prêts ne quitte pas la bibliothèque."
+      },
+      {
+        "id": "identite",
+        "titre": "Identité de Camille",
+        "module": 3,
+        "depuis": "m03-l3",
+        "creee": "Plusieurs services ont recopié son nom, chacun à sa façon.",
+        "reprises": "Un identifiant permet de voir qu'il s'agit de la même personne.",
+        "absente": "Sans identifiant, on ne sait pas si les libellés désignent une ou plusieurs personnes."
+      },
+      {
+        "id": "salle",
+        "titre": "Salle et effectif",
+        "module": 4,
+        "depuis": "m04-l1",
+        "creee": "Sophie · gestion des salles · numéro de salle",
+        "reprises": "Noé ou la logistique peuvent avoir besoin d'un effectif, pas des noms.",
+        "absente": "Les noms des participants ne sont pas nécessaires pour préparer la salle."
+      },
+      {
+        "id": "remunerations",
+        "titre": "Rémunérations",
+        "module": 4,
+        "depuis": "m04-l1",
+        "creee": "Julie · ressources humaines · dossier de paie",
+        "reprises": "Elles ne servent qu'aux personnes habilitées.",
+        "absente": "Elles ne sont ni à la bibliothèque, ni à la maintenance."
+      },
+      {
+        "id": "sante",
+        "titre": "Informations de santé",
+        "module": 4,
+        "depuis": "m04-l4",
+        "creee": "Service de santé · dossier médical",
+        "reprises": "Les aménagements se prévoient sans le détail médical.",
+        "absente": "Elles ne circulent pas vers les autres services."
+      },
+      {
+        "id": "inventaire-batiments",
+        "titre": "Inventaire des bâtiments",
+        "module": 6,
+        "depuis": "m06-l1",
+        "creee": "Noé · maintenance · inventaire des bâtiments",
+        "reprises": "Sophie peut s'en servir pour organiser une intervention.",
+        "absente": "Un nouveau tableau n'existe que si quelqu'un le crée à côté."
+      },
+      {
+        "id": "effectifs-etudiants",
+        "titre": "Effectifs étudiants",
+        "module": 6,
+        "depuis": "m06-l4",
+        "creee": "Scolarité · tableau des effectifs par formation",
+        "reprises": "Le service finances et pilotage peut s'en servir si la date et le périmètre sont indiqués.",
+        "absente": "Sans ces précisions, le chiffre ne peut pas être comparé à un autre."
+      }
+    ]
+  },
   "testeurs": [
     { "id": "christophe", "nom": "Christophe" },
     { "id": "marion", "nom": "Marion" },

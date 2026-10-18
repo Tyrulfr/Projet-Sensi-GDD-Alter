@@ -46,7 +46,7 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Tu travailles dans un service administratif. Trois collègues te demandent :\n\n- le numéro d'une salle de réunion ;\n- la liste des agents du service, avec leurs coordonnées professionnelles ;\n- un tableau des rémunérations individuelles des personnels.\n\nCes informations n'ont pas la même nature : elles ne demandent pas les mêmes précautions."
+          "texte": "Trois demandes arrivent en même temps :\n\n- Noé veut le numéro d'une salle pour une intervention ;\n- Sophie veut la liste des agents du service, avec leurs coordonnées professionnelles ;\n- un collègue veut le tableau des rémunérations individuelles, tenu par Julie.\n\nCes informations n'ont pas la même nature : elles ne demandent pas les mêmes précautions."
         },
         {
           "type": "definition",
@@ -297,6 +297,14 @@
                   "feedback": "Le besoin porte sur un nombre, pas sur la liste. Refuser bloquerait l'organisation sans protéger personne davantage."
                 }
               ],
+              "carnet": {
+                "donnee": "salle",
+                "effets": {
+                  "a": { "etat": "L'effectif a été transmis pour la salle. Les noms ne circulent pas." },
+                  "b": { "etat": "La demande de salle est en attente. Rien n'a encore été transmis." },
+                  "c": { "etat": "Rien n'a été transmis. La préparation de la salle est bloquée." }
+                }
+              },
               "reponse": "a",
               "correction": {
                 "pourquoi": "Le besoin est légitime et un chiffre suffit : c'est la minimisation.",
@@ -336,6 +344,17 @@
                   "feedback": "Ne pas envoyer tout de suite est juste. Mais refuser sans chercher à comprendre peut bloquer une mission légitime : mieux vaut clarifier la demande."
                 }
               ],
+              "carnet": {
+                "donnee": "remunerations",
+                "effets": {
+                  "a": {
+                    "trace": "Le fichier des rémunérations a été envoyé sans besoin précisé.",
+                    "etat": "Les rémunérations ont quitté le service de Julie."
+                  },
+                  "b": { "etat": "Les rémunérations restent chez Julie. La demande est à clarifier." },
+                  "c": { "etat": "Les rémunérations restent chez Julie." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Données personnelles très confidentielles, finalité inconnue, accès non vérifié : on ne peut pas encore décider.",
@@ -376,6 +395,17 @@
                   "feedback": "Des références bibliographiques ne sont en général pas des données personnelles, et l'inventaire est une mission légitime. Refuser par principe bloquerait un travail utile."
                 }
               ],
+              "carnet": {
+                "donnee": "catalogue-biblio",
+                "effets": {
+                  "a": {
+                    "trace": "L'export complet du catalogue, historique des prêts compris, a été envoyé.",
+                    "etat": "Des données de lecteurs ont quitté la bibliothèque."
+                  },
+                  "b": { "etat": "Seules les références utiles peuvent partir. L'historique des prêts reste chez Karim." },
+                  "c": { "etat": "Le catalogue reste à la bibliothèque." }
+                }
+              },
               "reponse": "b",
               "correction": {
                 "pourquoi": "Des références bibliographiques ne sont en général pas des données personnelles. Mais leur réutilisation peut être encadrée par des licences, et l'export contient d'autres informations.",
@@ -415,6 +445,17 @@
                   "feedback": "C'est le bon réflexe : les services compétents indiqueront comment prévoir les aménagements, sans communiquer de détails médicaux."
                 }
               ],
+              "carnet": {
+                "donnee": "sante",
+                "effets": {
+                  "a": {
+                    "trace": "Des informations de santé ont été transmises à l'organisateur.",
+                    "etat": "Des données de santé ont quitté leur service."
+                  },
+                  "b": { "etat": "La demande est encore ouverte. Le détail médical ne doit pas partir." },
+                  "c": { "etat": "Les informations de santé ne circulent pas. La demande est orientée." }
+                }
+              },
               "reponse": "c",
               "correction": {
                 "pourquoi": "Les données de santé sont une catégorie particulière du RGPD. L'organisateur a besoin de savoir quoi prévoir, pas de connaître l'état de santé des personnes.",

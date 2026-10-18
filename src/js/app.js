@@ -89,6 +89,96 @@
     return h('a', { class: 'bouton ' + (classe || 'bouton-principal'), href: href }, texte);
   }
 
+  /* ---------- Carnet des données ---------- */
+
+  function carnetOuvert() {
+    if (etat.carnetOuvert === undefined) {
+      try { etat.carnetOuvert = root.localStorage.getItem(CLE_CARNET) === '1'; }
+      catch (e) { etat.carnetOuvert = false; }
+    }
+    return !!etat.carnetOuvert;
+  }
+
+  function basculerCarnet() {
+    etat.carnetOuvert = !carnetOuvert();
+    if (etat.carnetOuvert) { etat.carnetNouveau = false; }
+    try { root.localStorage.setItem(CLE_CARNET, etat.carnetOuvert ? '1' : '0'); } catch (e) { /* préférence non enregistrée */ }
+    etat.focus = etat.carnetOuvert ? 'carnet-titre' : 'carnet-interrupteur';
+    afficher();
+  }
+
+  function sourcesCarnet() {
+    var list = [];
+    Object.keys(contenu.modules).forEach(function (id) {
+      (contenu.modules[id].lecons || []).forEach(function (l) {
+        (l.blocs || []).forEach(function (b) {
+          if (b.type === 'decision') {
+            var effets = {};
+            (b.choix || []).forEach(function (c) {
+              if (c.trace || c.etat) { effets[c.id] = { trace: c.trace || '', etat: c.etat || '' }; }
+            });
+            list.push({ id: b.id, donnee: b.donnee, effets: effets });
+          } else if (b.type === 'activite' && b.carnet) {
+            list.push({ id: b.ref, donnee: b.carnet.donnee, effets: b.carnet.effets || {} });
+          } else if (b.type === 'simulateur') {
+            (b.scenarios || []).forEach(function (s) {
+              if (s.carnet) { list.push({ id: s.id, donnee: s.carnet.donnee, effets: s.carnet.effets || {} }); }
+            });
+          }
+        });
+      });
+    });
+    return list;
+  }
+
+  function contexteCarnet() {
+    var vues = {};
+    var choix = {};
+    catalogue.modules.forEach(function (entree) {
+      var brut = null;
+      if (etat.moteurs[entree.id]) { brut = etat.moteurs[entree.id].etat; }
+      else if (!modeScorm) {
+        var sauve = GDD.TraceurLocal.lire(catalogue.id, entree.id, testeurActif());
+        if (sauve && sauve.etat) {
+          try { brut = JSON.parse(sauve.etat); } catch (e) { brut = null; }
+        }
+      }
+      if (!brut) { return; }
+      (brut.s || []).forEach(function (id) { vues[id] = true; });
+      Object.keys(brut.c || {}).forEach(function (k) { choix[k] = brut.c[k]; });
+    });
+    var numero = modeScorm && contenu.modules[config.module] ? contenu.modules[config.module].numero : null;
+    return { vues: vues, choix: choix, etabliesAvant: numero };
+  }
+
+  function marquerCarnetNouveau() {
+    if (!carnetOuvert()) { etat.carnetNouveau = true; }
+  }
+
+  function optionsCarnet() {
+    return {
+      def: catalogue.carnet,
+      ouvert: carnetOuvert(),
+      nouveau: !!etat.carnetNouveau,
+      entrees: GDD.carnet.assembler(catalogue.carnet, sourcesCarnet(), contexteCarnet()),
+      basculer: basculerCarnet
+    };
+  }
+
+  function avecCarnet(vue) {
+    if (!catalogue.carnet || !Array.isArray(vue)) { return vue; }
+    return [h('div', { class: 'lecon-cadre' + (carnetOuvert() ? ' est-ouvert' : '') }, [
+      UI.carnet(optionsCarnet()),
+      h('div', { class: 'lecon-colonne' }, vue)
+    ])];
+  }
+
+  function rafraichirCarnet() {
+    var ancien = document.getElementById('carnet');
+    if (!ancien || !catalogue.carnet) { return; }
+    ancien.replaceWith(UI.carnet(optionsCarnet()));
+  }
+
   function annoncer(texte) {
     annonces.textContent = '';
     root.setTimeout(function () { annonces.textContent = texte; }, 50);
@@ -99,6 +189,7 @@
   /* ---------- Profils testeurs (site web uniquement) ---------- */
 
   var CLE_PROFIL = 'ups-gdd:v1:profil';
+  var CLE_CARNET = 'ups-gdd:v1:carnet-ouvert';
 
   function testeurActif() {
     if (modeScorm) { return null; }
@@ -612,6 +703,17 @@
         el = UI.simulateur(b, {
           etat: etatSim,
           prefixeId: 'sim-' + cleSim,
+          surChoix: function (scenario, idChoix) {
+            if (!scenario.carnet) { return; }
+            m.choisirCarnet(scenario.id, idChoix);
+            marquerCarnetNouveau();
+            rafraichirCarnet();
+          },
+          surRecommencer: function () {
+            if (!enCoursSim) { return; }
+            b.scenarios.forEach(function (s) { if (s.carnet) { m.oublierCarnet(s.id); } });
+            rafraichirCarnet();
+          },
           surTermine: function (idFocus) {
             etat.focus = idFocus;
             afficher();
@@ -629,6 +731,10 @@
             code: code,
             valider: function (c) {
               var r = m.repondre(b.ref, c);
+              if (b.carnet && b.carnet.effets && b.carnet.effets[c]) {
+                m.choisirCarnet(b.ref, c);
+                marquerCarnetNouveau();
+              }
               etat.focus = 'fb-' + b.ref;
               afficher();
               annoncer(r.correct ? 'Bonne réponse.' : 'Réponse à revoir.');
@@ -636,11 +742,31 @@
             reessayer: function () {
               etat.revele[l.id] = Math.max(etat.revele[l.id] || 1, i + 1);
               m.oublierReponse(b.ref);
+              if (b.carnet) { m.oublierCarnet(b.ref); }
               etat.focus = 'act-' + b.ref;
               afficher();
             }
           }).element
         ]);
+      } else if (b.type === 'decision') {
+        var codeDecision = m.choixCarnet(b.id);
+        if (!codeDecision && i === nb - 1) { bloque = 'Choisis une réponse pour continuer.'; }
+        el = UI.decision(b, {
+          code: codeDecision,
+          choisir: function (c) {
+            m.choisirCarnet(b.id, c);
+            marquerCarnetNouveau();
+            etat.focus = 'decision-' + b.id + '-implication';
+            afficher();
+            annoncer('Conséquence de ton choix affichée.');
+          },
+          modifier: function () {
+            m.oublierCarnet(b.id);
+            etat.revele[l.id] = Math.max(etat.revele[l.id] || 1, i + 1);
+            etat.focus = 'decision-' + b.id;
+            afficher();
+          }
+        });
       } else if (b.type === 'fiche') {
         el = blocFiche(m.module);
       } else {
@@ -1078,7 +1204,7 @@
     if (modeScorm) {
       var m = moteur(config.module);
       if (etat.session) { return pageFinSession(); }
-      if (segments[0] === 'lecon') { return pageLecon(m, (parseInt(segments[1], 10) || 1) - 1); }
+      if (segments[0] === 'lecon') { return avecCarnet(pageLecon(m, (parseInt(segments[1], 10) || 1) - 1)); }
       return pageModule(m);
     }
     if (segments.length === 0) { return pageAccueil(); }
@@ -1092,7 +1218,7 @@
     if (segments[0] === 'module') {
       var mw = moteur(segments[1]);
       if (!mw) { return pageIntrouvable(); }
-      if (segments[2] === 'lecon') { return pageLecon(mw, (parseInt(segments[3], 10) || 1) - 1); }
+      if (segments[2] === 'lecon') { return avecCarnet(pageLecon(mw, (parseInt(segments[3], 10) || 1) - 1)); }
       return pageModule(mw);
     }
     return pageIntrouvable();
@@ -1100,7 +1226,10 @@
 
   function afficher() {
     var vue = route();
+    var surLecon = /lecon/.test(root.location.hash || '');
     conteneur.classList.toggle('page-large', !modeScorm && /^#\/(parcours|testeurs)\/?$/.test(root.location.hash || ''));
+    conteneur.classList.toggle('page-lecon', surLecon);
+    conteneur.classList.toggle('carnet-ouvert', surLecon && carnetOuvert());
     var enteteEl = document.getElementById('entete');
     if (enteteEl && !modeScorm) { enteteEl.innerHTML = ''; enteteEl.appendChild(entete()); }
     conteneur.innerHTML = '';

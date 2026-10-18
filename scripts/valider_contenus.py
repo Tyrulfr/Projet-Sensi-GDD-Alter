@@ -13,7 +13,7 @@ RACINE = Path(__file__).resolve().parent.parent
 DOSSIER_CONTENUS = RACINE / "contenus"
 
 TYPES_BLOCS = {"situation", "texte", "definition", "exemple", "tableau", "schema", "chronologie", "comparateur",
-               "simulateur", "memo", "fiche", "activite", "aretenir"}
+               "simulateur", "memo", "fiche", "visuel", "activite", "aretenir", "decision"}
 RE_SLUG = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 PRESENTATIONS = {"toutes", "une-par-une"}
 CORRECTIONS = {"immediate", "differee"}
@@ -156,7 +156,28 @@ def valider_comparateur(b, lieu, r):
         r.avertir(lieu, "pas d'« avertissement » : préciser que le tableau « après » n'est pas une correction certaine")
 
 
-def valider_simulateur(b, lieu, objectifs, r):
+def valider_lien_carnet(lien, ids_choix, cle, lieu, r, ids_donnees, ids_sources):
+    """lien = { donnee, effets: { idChoix: { trace|etat } } }, rattaché à une activité ou un scénario."""
+    if not isinstance(lien, dict) or not texte_present(lien, "donnee"):
+        r.erreur(lieu, f"{cle} : « donnee » manquant")
+        return
+    if lien["donnee"] not in ids_donnees:
+        r.erreur(lieu, f"{cle} : donnée « {lien['donnee']} » absente du carnet")
+    if cle in ids_sources:
+        r.erreur(lieu, f"{cle} : identifiant déjà utilisé pour le carnet")
+    ids_sources.add(cle)
+    effets = lien.get("effets") or {}
+    if not isinstance(effets, dict) or not effets:
+        r.erreur(lieu, f"{cle} : « effets » doit indiquer au moins un choix")
+        return
+    for cid, ef in effets.items():
+        if cid not in ids_choix:
+            r.erreur(lieu, f"{cle} : effet pour le choix « {cid} » inconnu")
+        if not isinstance(ef, dict) or not (texte_present(ef, "trace") or texte_present(ef, "etat")):
+            r.erreur(lieu, f"{cle}, choix « {cid} » : « trace » ou « etat » est obligatoire")
+
+
+def valider_simulateur(b, lieu, objectifs, r, ids_donnees, ids_sources):
     """Renvoie les objectifs couverts par les scénarios."""
     decisions = b.get("decisions") or []
     ids_dec = [d.get("id") for d in decisions]
@@ -209,6 +230,8 @@ def valider_simulateur(b, lieu, objectifs, r):
         corr = s.get("correction") or {}
         if not (texte_present(corr, "pourquoi") and texte_present(corr, "reflexe")):
             r.erreur(slieu, "« correction » : « pourquoi » et « reflexe » sont obligatoires")
+        if "carnet" in s:
+            valider_lien_carnet(s["carnet"], set(ids_ch), s.get("id") or "", slieu, r, ids_donnees, ids_sources)
         for cle in ("aVerifier", "roles"):
             if cle in corr and (not isinstance(corr[cle], list) or not corr[cle]):
                 r.erreur(slieu, f"« correction.{cle} » doit être une liste non vide")
@@ -232,7 +255,7 @@ def valider_fiche(f, lieu, r):
             r.erreur(lieu, f"« fiche.reflexes » {j} : « titre », « texte » et « question » sont obligatoires")
 
 
-def valider_module(mod, entree, r, ids_globaux, renvois):
+def valider_module(mod, entree, r, ids_globaux, renvois, ids_donnees, ids_sources):
     lieu = f"module {entree.get('id')}"
     if "fiche" in mod:
         valider_fiche(mod["fiche"], lieu, r)
@@ -286,6 +309,36 @@ def valider_module(mod, entree, r, ids_globaux, renvois):
                         utilisations[b["ref"]] += 1
                         if not activites[b["ref"]].get("notation", {}).get("formative", False):
                             r.avertir(blieu, "activité non formative placée dans une leçon")
+                        if "carnet" in b:
+                            act = activites[b["ref"]]
+                            if act.get("type") != "choix-unique":
+                                r.erreur(blieu, "le lien « carnet » ne s'utilise qu'avec une activité à choix unique")
+                            else:
+                                ids_act = {c.get("id") for c in act.get("choix") or []}
+                                valider_lien_carnet(b["carnet"], ids_act, b["ref"], blieu, r, ids_donnees, ids_sources)
+                elif bt == "decision":
+                    if not b.get("id") or not RE_ID.match(str(b.get("id"))):
+                        r.erreur(blieu, "identifiant de décision manquant ou invalide")
+                    elif b["id"] in ids_globaux or b["id"] in ids_sources:
+                        r.erreur(blieu, "identifiant de décision déjà utilisé")
+                    else:
+                        ids_globaux.add(b["id"])
+                        ids_sources.add(b["id"])
+                    if not texte_present(b, "consigne"):
+                        r.erreur(blieu, "« consigne » manquante")
+                    if b.get("donnee") not in ids_donnees:
+                        r.erreur(blieu, f"donnée « {b.get('donnee')} » absente du carnet")
+                    choix = b.get("choix") or []
+                    ids_ch = [c.get("id") for c in choix]
+                    if len(choix) < 2 or len(set(ids_ch)) != len(ids_ch):
+                        r.erreur(blieu, "au moins deux choix aux identifiants distincts sont nécessaires")
+                    for c in choix:
+                        if not RE_ID_CHOIX.match(str(c.get("id", ""))):
+                            r.erreur(blieu, f"identifiant de choix « {c.get('id')} » : un seul caractère a-z ou 0-9")
+                        if not (texte_present(c, "texte") and texte_present(c, "implication")):
+                            r.erreur(blieu, f"choix « {c.get('id')} » : « texte » et « implication » sont obligatoires")
+                        if not (texte_present(c, "trace") or texte_present(c, "etat")):
+                            r.erreur(blieu, f"choix « {c.get('id')} » : « trace » ou « etat » est obligatoire")
                 elif bt == "tableau":
                     cols = b.get("colonnes") or []
                     if not cols or not b.get("lignes"):
@@ -294,8 +347,56 @@ def valider_module(mod, entree, r, ids_globaux, renvois):
                         if len(ligne) != len(cols):
                             r.erreur(blieu, f"ligne {j} : {len(ligne)} cellules pour {len(cols)} colonnes")
                 elif bt == "definition":
-                    if not (texte_present(b, "terme") and texte_present(b, "texte")):
+                    entrees = b.get("entrees")
+                    if entrees:
+                        if len(entrees) < 2:
+                            r.erreur(blieu, "« entrees » doit contenir au moins deux définitions")
+                        for j, e in enumerate(entrees, 1):
+                            if not (texte_present(e, "terme") and texte_present(e, "texte")):
+                                r.erreur(blieu, f"entrée {j} : « terme » et « texte » sont obligatoires")
+                    elif not (texte_present(b, "terme") and texte_present(b, "texte")):
                         r.erreur(blieu, "« terme » et « texte » sont obligatoires")
+                elif bt == "visuel":
+                    if not texte_present(b, "titre"):
+                        r.erreur(blieu, "« titre » est obligatoire")
+                    if b.get("variante") == "services":
+                        cas = b.get("cas") or []
+                        if len(cas) < 2:
+                            r.erreur(blieu, "au moins deux services sont nécessaires")
+                        for j, c in enumerate(cas, 1):
+                            if not (texte_present(c, "service") and texte_present(c, "information")) or not c.get("donnees"):
+                                r.erreur(blieu, f"service {j} : « service », « donnees » et « information » sont obligatoires")
+                        continue
+                    if b.get("variante") == "regards":
+                        regards = b.get("regards") or []
+                        if len(regards) < 2:
+                            r.erreur(blieu, "au moins deux regards sont nécessaires")
+                        for j, g in enumerate(regards, 1):
+                            if not (texte_present(g, "terme") and texte_present(g, "texte") and texte_present(g, "exemple")):
+                                r.erreur(blieu, f"regard {j} : « terme », « texte » et « exemple » sont obligatoires")
+                        commun = b.get("commun") or {}
+                        if not (texte_present(commun, "titre") and texte_present(commun, "texte")):
+                            r.erreur(blieu, "« commun.titre » et « commun.texte » sont obligatoires")
+                        continue
+                    if not texte_present(b, "chapo"):
+                        r.erreur(blieu, "« chapo » est obligatoire")
+                    etapes = b.get("etapes") or []
+                    if len(etapes) < 2:
+                        r.erreur(blieu, "au moins deux étapes sont nécessaires")
+                    for j, e in enumerate(etapes, 1):
+                        if not (texte_present(e, "titre") and texte_present(e, "texte")):
+                            r.erreur(blieu, f"étape {j} : « titre » et « texte » sont obligatoires")
+                        tableau = e.get("tableau")
+                        if tableau:
+                            cols = tableau.get("colonnes") or []
+                            if not cols or not tableau.get("lignes"):
+                                r.erreur(blieu, f"étape {j} : tableau sans colonnes ou sans lignes")
+                            for k, ligne in enumerate(tableau.get("lignes") or [], 1):
+                                if len(ligne) != len(cols):
+                                    r.erreur(blieu, f"étape {j}, ligne {k} : {len(ligne)} cellules pour {len(cols)} colonnes")
+                    for j, p in enumerate(b.get("pied") or [], 1):
+                        if not (texte_present(p, "terme") and texte_present(p, "texte")):
+                            r.erreur(blieu, f"pied {j} : « terme » et « texte » sont obligatoires")
                 elif bt == "schema":
                     if not texte_present(b.get("source") or {}, "libelle") or not texte_present(b, "flux"):
                         r.erreur(blieu, "« source.libelle » et « flux » sont obligatoires")
@@ -310,7 +411,7 @@ def valider_module(mod, entree, r, ids_globaux, renvois):
                 elif bt == "comparateur":
                     valider_comparateur(b, blieu, r)
                 elif bt == "simulateur":
-                    couverts_blocs |= valider_simulateur(b, blieu, objectifs, r)
+                    couverts_blocs |= valider_simulateur(b, blieu, objectifs, r, ids_donnees, ids_sources)
                 elif bt == "fiche":
                     if not mod.get("fiche"):
                         r.erreur(blieu, "bloc « fiche » : le module doit définir « fiche » (titre, introduction, reflexes, rappel)")
@@ -426,6 +527,32 @@ def valider():
         if not texte_present(catalogue, cle):
             r.erreur("catalogue", f"« {cle} » manquant")
     vus, numeros, ids_globaux, renvois = set(), set(), set(), []
+    ids_donnees, ids_sources, ids_lecons = set(), set(), {}
+    carnet = catalogue.get("carnet")
+    if not isinstance(carnet, dict):
+        r.erreur("catalogue", "« carnet » manquant")
+    else:
+        for cle in ("titre", "interrupteur", "vide", "misAJour", "trace", "etat", "fermer"):
+            if not texte_present(carnet, cle):
+                r.erreur("catalogue, carnet", f"« {cle} » manquant")
+        for d in carnet.get("donnees") or []:
+            did = d.get("id")
+            dlieu = f"catalogue, carnet, donnée « {did} »"
+            if not did or not RE_ID.match(str(did)) or did in ids_donnees:
+                r.erreur(dlieu, "identifiant manquant, invalide ou en double")
+            else:
+                ids_donnees.add(did)
+            for cle in ("titre", "creee", "reprises", "absente"):
+                if not texte_present(d, cle):
+                    r.erreur(dlieu, f"« {cle} » manquant")
+            if not isinstance(d.get("module"), int) or isinstance(d.get("module"), bool):
+                r.erreur(dlieu, "« module » doit être le numéro du module")
+            if not d.get("depuis") or not RE_ID.match(str(d.get("depuis"))):
+                r.erreur(dlieu, "« depuis » doit être l'identifiant de la leçon qui révèle la donnée")
+            else:
+                ids_lecons.setdefault(d["depuis"], []).append(did)
+        if not ids_donnees:
+            r.erreur("catalogue, carnet", "aucune donnée")
     for entree in catalogue.get("modules") or []:
         mid = entree.get("id")
         if not mid or not RE_ID.match(mid) or mid in vus:
@@ -437,7 +564,7 @@ def valider():
         if entree.get("etat") == "disponible":
             mod = charger_json(DOSSIER_CONTENUS / "modules" / str(entree.get("fichier")), r)
             if mod is not None:
-                valider_module(mod, entree, r, ids_globaux, renvois)
+                valider_module(mod, entree, r, ids_globaux, renvois, ids_donnees, ids_sources)
                 modules[mid] = mod
         elif entree.get("etat") == "a-venir":
             for cle in ("titre", "objectif"):
@@ -445,6 +572,9 @@ def valider():
                     r.erreur(f"catalogue, module {mid}", f"« {cle} » manquant")
         else:
             r.erreur(f"catalogue, module {mid}", "« etat » doit valoir « disponible » ou « a-venir »")
+    for lid, donnees in ids_lecons.items():
+        if lid not in ids_globaux:
+            r.erreur("catalogue, carnet", f"« depuis » : « {lid} » ne correspond à aucune leçon ({', '.join(donnees)})")
     for id_act, cible in renvois:
         if cible not in vus:
             r.erreur(f"activité {id_act}", f"remediation.module « {cible} » absent du catalogue")

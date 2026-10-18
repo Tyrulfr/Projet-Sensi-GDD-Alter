@@ -71,6 +71,13 @@
       if (!etat.t) { etat.t = {}; }
       etat.t[id] = { i: Math.min(Math.max(parseInt(t.i, 10) || 0, 0), lecon.activites.length - 1), r: codes };
     });
+    Object.keys(brut.c || {}).forEach(function (id) {
+      var code = brut.c[id];
+      if (typeof code === 'string' && code.length > 0 && code.length <= 16) {
+        if (!etat.c) { etat.c = {}; }
+        etat.c[id] = code;
+      }
+    });
     this.etat = etat;
     return true;
   };
@@ -148,6 +155,25 @@
 
   Moteur.prototype.oublierReponse = function (idActivite) {
     delete this.etat.a[idActivite];
+    this.sauvegarder();
+  };
+
+  /* Choix du carnet : un code court par décision. Ne note pas, ne change pas la suite du parcours. */
+  Moteur.prototype.choixCarnet = function (id) {
+    return (this.etat.c && this.etat.c[id]) || null;
+  };
+
+  Moteur.prototype.choisirCarnet = function (id, code) {
+    if (!this.etat.c) { this.etat.c = {}; }
+    if (this.etat.c[id] === code) { return; }
+    this.etat.c[id] = code;
+    this.sauvegarder();
+  };
+
+  Moteur.prototype.oublierCarnet = function (id) {
+    if (!this.etat.c || !this.etat.c[id]) { return; }
+    delete this.etat.c[id];
+    if (!Object.keys(this.etat.c).length) { delete this.etat.c; }
     this.sauvegarder();
   };
 
@@ -237,7 +263,7 @@
     var seuil = this.module.validation.seuilReussite;
     /* Score retenu pour le statut et le LMS : meilleur (défaut) ou dernier résultat. */
     var retenu = resEval ? (this.module.validation.scoreRetenu === 'dernier' ? resEval.d : resEval.b) : null;
-    var commence = this.etat.s.length > 0 || Object.keys(this.etat.a).length > 0 || this.etat.p > 0 || !!this.etat.t;
+    var commence = this.etat.s.length > 0 || Object.keys(this.etat.a).length > 0 || this.etat.p > 0 || !!this.etat.t || !!(this.etat.c && Object.keys(this.etat.c).length);
 
     var completion = 'non-commence';
     if (commence) { completion = 'en-cours'; }

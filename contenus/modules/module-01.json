@@ -24,38 +24,106 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Lundi matin. Une collègue du service RH te transmet un fichier contenant les noms, prénoms et affectations des agents. Tu dois préparer une liste des agents par service pour organiser une réunion."
+          "texte": "Lundi matin. Julie, au service des ressources humaines, te transmet un fichier : les noms, prénoms et affectations des agents. Parmi eux, Karim à la bibliothèque, Noé à la maintenance, Sophie à la gestion des salles. Tu dois préparer la liste des agents par service pour organiser une réunion."
         },
         {
-          "type": "texte",
+          "type": "decision",
+          "id": "m01-d1",
+          "consigne": "Pour préparer la liste des agents par service, que fais-tu ?",
+          "donnee": "affectations",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "J'organise les données du fichier que Julie m'a transmis.",
+              "implication": "Tu t'appuies sur la donnée créée par Julie. Elle reste à un seul endroit, et Sophie peut s'en servir pour la réunion.",
+              "etat": "Tu t'appuies sur le fichier de Julie. Pas de copie en plus."
+            },
+            {
+              "id": "b",
+              "texte": "Je recopie les noms dans un tableau personnel.",
+              "implication": "Une seconde copie apparaît sur ton bureau. Elle n'est pas reliée au fichier de Julie : si une affectation change, ton tableau ne le saura pas.",
+              "trace": "Ton tableau des agents, copie non reliée au fichier de Julie.",
+              "etat": "La même liste existe en deux endroits."
+            }
+          ]
+        },
+        {
+          "type": "visuel",
           "titre": "Ce que tu viens de manipuler",
-          "texte": "Sans y penser, tu utilises des **données** : des noms, des prénoms, des noms de services. Prises une par une, ce sont des éléments bruts.\n\nUne fois rassemblées et organisées pour répondre à une question précise (« qui travaille dans quel service ? »), elles deviennent une **information** utile pour agir."
+          "chapo": "Tu as utilisé des données. Une fois organisées, elles deviennent une information utile.",
+          "etapes": [
+            {
+              "titre": "Données",
+              "texte": "Noms, prénoms, services",
+              "groupes": [
+                { "teinte": "personne", "elements": ["Karim", "Noé", "Sophie"] },
+                { "teinte": "service", "elements": ["Bibliothèque", "Maintenance", "Salles"] }
+              ]
+            },
+            {
+              "titre": "Organisation",
+              "texte": "On relie les personnes à leur service.",
+              "liens": ["Karim", "Noé", "Sophie"]
+            },
+            {
+              "titre": "Information utile",
+              "texte": "Répondre à une question précise.",
+              "question": "Qui travaille dans quel service ?",
+              "tableau": {
+                "colonnes": ["Nom", "Service"],
+                "lignes": [["Karim", "Bibliothèque"], ["Noé", "Maintenance"], ["Sophie", "Salles"]]
+              }
+            }
+          ]
         },
         {
           "type": "definition",
-          "terme": "Donnée",
-          "texte": "Un élément brut enregistré : un nom, une date, un montant, un code, un nombre. Elle peut être écrite sur papier, saisie dans un tableur ou enregistrée dans une application."
+          "entrees": [
+            {
+              "terme": "Donnée",
+              "formule": "élément brut",
+              "icone": "document",
+              "texte": "Un élément brut enregistré : un nom, une date, un montant, un code, un nombre. Elle peut être écrite sur papier, saisie dans un tableur ou enregistrée dans une application."
+            },
+            {
+              "terme": "Information",
+              "formule": "données organisées pour agir",
+              "icone": "graphe",
+              "texte": "Ce que l'on obtient en interprétant des données dans un contexte, pour répondre à une question ou prendre une décision."
+            }
+          ]
         },
         {
-          "type": "definition",
-          "terme": "Information",
-          "texte": "Ce que l'on obtient en interprétant des données dans un contexte, pour répondre à une question ou prendre une décision."
-        },
-        {
-          "type": "tableau",
+          "type": "visuel",
+          "variante": "services",
           "titre": "La même logique dans tous les services",
-          "colonnes": ["Service", "Exemples de données", "Information obtenue"],
-          "lignes": [
-            ["Ressources humaines", "Date d'entrée, grade, affectation", "« 12 agents du service pourront partir à la retraite d'ici deux ans. »"],
-            ["Bibliothèque", "Code-barres d'un ouvrage, date de prêt, date de retour", "« 40 ouvrages sont en retard ce mois-ci. »"],
-            ["Maintenance", "Numéro de salle, type d'équipement, date de la dernière intervention", "« Le chauffage du bâtiment B doit être révisé avant l'hiver. »"],
-            ["Scolarité", "Numéro étudiant, formation, date d'inscription", "« La licence 1 compte 30 inscrits de plus que l'an dernier. »"]
+          "cas": [
+            {
+              "service": "Ressources humaines",
+              "donnees": ["Date d'entrée", "Grade", "Affectation"],
+              "information": "« 12 agents du service pourront partir à la retraite d'ici deux ans. »"
+            },
+            {
+              "service": "Bibliothèque",
+              "donnees": ["Code-barres d'un ouvrage", "Date de prêt", "Date de retour"],
+              "information": "« 40 ouvrages sont en retard ce mois-ci. »"
+            },
+            {
+              "service": "Maintenance",
+              "donnees": ["Numéro de salle", "Type d'équipement", "Date de la dernière intervention"],
+              "information": "« Le chauffage du bâtiment B doit être révisé avant l'hiver. »"
+            },
+            {
+              "service": "Scolarité",
+              "donnees": ["Numéro étudiant", "Formation", "Date d'inscription"],
+              "information": "« La licence 1 compte 30 inscrits de plus que l'an dernier. »"
+            }
           ]
         },
         { "type": "activite", "ref": "m01-a1" },
         {
           "type": "aretenir",
-          "texte": "Une donnée est un élément brut enregistré. Une information naît quand on interprète des données pour répondre à une question. Ton travail quotidien produit et utilise les deux."
+          "texte": "**Une donnée est un élément brut enregistré.** **Une information naît quand on interprète des données pour répondre à une question.** Ton travail quotidien produit et utilise les deux."
         }
       ]
     },
@@ -66,22 +134,71 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "À la bibliothèque, Karim prépare les relances pour les ouvrages en retard. Son tableau contient le titre des livres, la date de retour prévue… mais aussi le nom et l'adresse électronique des lecteurs."
+          "texte": "À la bibliothèque, Karim prépare les relances pour les ouvrages en retard. Son tableau contient le titre des livres, la date de retour prévue… mais aussi le nom et l'adresse électronique des lecteurs. L'un d'eux est un agent dont Julie a déjà enregistré l'identité."
         },
         {
-          "type": "texte",
+          "type": "decision",
+          "id": "m01-d2",
+          "consigne": "Karim prépare une relance. Qu'est-ce qui part dans le message ?",
+          "donnee": "pret",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Le titre de l'ouvrage et la date de retour prévue.",
+              "implication": "La relance peut se faire. Le nom et le mél du lecteur restent dans l'outil de la bibliothèque.",
+              "etat": "Le prêt reste à la bibliothèque. Le nom du lecteur n'est pas repris dans la relance."
+            },
+            {
+              "id": "b",
+              "texte": "Le titre, la date, le nom du lecteur et son adresse électronique.",
+              "implication": "La relance identifie la personne. Ces données personnelles quittent le tableau pour un message, qui peut être transféré.",
+              "trace": "Nom et mél du lecteur repris dans la relance.",
+              "etat": "Une donnée personnelle est jointe au prêt."
+            }
+          ]
+        },
+        {
+          "type": "visuel",
+          "variante": "regards",
           "titre": "Deux façons de regarder une donnée",
-          "texte": "Toutes ces données servent l'activité de la bibliothèque : ce sont des **données métier**. Certaines d'entre elles permettent en plus de savoir de qui il s'agit : ce sont des **données personnelles**.\n\nUne donnée peut donc être à la fois une donnée métier et une donnée personnelle."
+          "chapo": "Une même donnée peut être métier, personnelle… ou les deux.",
+          "regards": [
+            {
+              "terme": "Donnée métier",
+              "texte": "Utilisée pour l'activité de l'établissement.",
+              "exemple": "nombre de livres prêtés",
+              "icone": "mallette",
+              "teinte": "metier"
+            },
+            {
+              "terme": "Donnée personnelle",
+              "texte": "Se rapporte à une personne identifiée ou identifiable.",
+              "exemple": "nom, photo, n° étudiant",
+              "icone": "personne",
+              "teinte": "personne"
+            }
+          ],
+          "commun": {
+            "titre": "Les deux à la fois",
+            "texte": "Le nom d'un étudiant associé à l'emprunt d'un livre"
+          }
         },
         {
           "type": "definition",
-          "terme": "Donnée métier",
-          "texte": "Une donnée produite ou utilisée pour réaliser une activité de l'établissement : inscrire un étudiant, payer une facture, prêter un livre, planifier une intervention."
-        },
-        {
-          "type": "definition",
-          "terme": "Donnée personnelle",
-          "texte": "Toute information se rapportant à une personne physique identifiée ou identifiable, directement (un nom, une photo) ou indirectement (un numéro étudiant, un identifiant de connexion, ou plusieurs données croisées entre elles)."
+          "entrees": [
+            {
+              "terme": "Donnée métier",
+              "formule": "utilisée pour l'activité de l'établissement",
+              "icone": "mallette",
+              "texte": "Une donnée produite ou utilisée pour réaliser une activité de l'établissement : inscrire un étudiant, payer une facture, prêter un livre, planifier une intervention."
+            },
+            {
+              "terme": "Donnée personnelle",
+              "formule": "personne identifiée ou identifiable",
+              "icone": "personne",
+              "texte": "Toute information se rapportant à une personne physique identifiée ou identifiable, directement (un nom, une photo) ou indirectement (un numéro étudiant, un identifiant de connexion, ou plusieurs données croisées entre elles)."
+            }
+          ]
         },
         {
           "type": "exemple",
@@ -96,7 +213,7 @@
         { "type": "activite", "ref": "m01-a2" },
         {
           "type": "aretenir",
-          "texte": "Les données personnelles sont des données qui permettent d'identifier quelqu'un, même indirectement. Elles sont souvent indispensables au travail : elles ne sont pas interdites, elles demandent de l'attention."
+          "texte": "**Les données personnelles sont des données qui permettent d'identifier quelqu'un, même indirectement.** Elles sont souvent indispensables au travail : **elles ne sont pas interdites, elles demandent de l'attention.**"
         }
       ]
     },
@@ -107,7 +224,34 @@
       "blocs": [
         {
           "type": "situation",
-          "texte": "Au service maintenance, Sophie doit savoir quand la chaudière du bâtiment C a été révisée. Elle trouve une date dans un tableur partagé, une autre dans un courriel, et une troisième dans le logiciel de suivi des interventions. Laquelle croire ?"
+          "texte": "Noé est passé sur la chaudière du bâtiment C. Sophie doit savoir quand elle a été révisée, pour dire si la salle est utilisable. Elle trouve une date dans un tableur partagé, une autre dans un courriel, et une troisième dans le logiciel de suivi des interventions. Laquelle croire ?"
+        },
+        {
+          "type": "decision",
+          "id": "m01-d3",
+          "consigne": "Sophie te demande quoi noter pour la chaudière. Que fais-tu ?",
+          "donnee": "intervention",
+          "choix": [
+            {
+              "id": "a",
+              "texte": "Je recopie la date du courriel.",
+              "implication": "Le courriel fige une date à un instant donné. Elle peut déjà être fausse, et une quatrième copie vient de naître.",
+              "trace": "Date du courriel recopiée pour la chaudière du bâtiment C.",
+              "etat": "La date est douteuse : elle ne vient pas de l'outil de Noé."
+            },
+            {
+              "id": "b",
+              "texte": "Je retiens la date du logiciel de suivi des interventions.",
+              "implication": "C'est l'outil où Noé enregistre ses passages. Sophie s'appuie sur cette source, et peut signaler l'écart des autres copies.",
+              "etat": "La date retenue est celle du logiciel de suivi, tenu par Noé."
+            },
+            {
+              "id": "c",
+              "texte": "Je laisse le champ vide et je signale que trois dates circulent.",
+              "implication": "Rien n'est inventé. L'écart reste visible, le temps que Noé confirme la date qui fait référence.",
+              "etat": "La date manque, et l'écart entre les trois supports est signalé."
+            }
+          ]
         },
         {
           "type": "texte",
@@ -128,7 +272,7 @@
         {
           "type": "exemple",
           "titre": "Ce qui s'est passé pour Sophie",
-          "texte": "Trois supports contiennent trois versions de la même donnée. Personne n'a commis de faute : la date a été recopiée, puis chaque copie a vécu sa vie. C'est l'une des difficultés que la gouvernance de la donnée aide à résoudre."
+          "texte": "Noé a enregistré son passage. Ensuite, la date a été recopiée dans un tableur et dans un courriel. Trois supports, trois versions. Personne n'a commis de faute : chaque copie a vécu sa vie. C'est l'une des difficultés que la gouvernance de la donnée aide à résoudre."
         },
         { "type": "activite", "ref": "m01-a3" },
         { "type": "activite", "ref": "m01-a4" },

@@ -43,7 +43,8 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 |---|---|
 | `situation` | `texte` |
 | `texte` | `titre` (facultatif), `texte` |
-| `definition` | `terme`, `texte` |
+| `visuel` | schéma en étapes (module 1) : `titre`, `chapo`, `etapes` (au moins 2 : `titre`, `texte` ; facultatifs : `groupes` de pastilles `{ teinte: personne\|service, elements }`, `liens` (noms reliés à un ensemble), `question`, `tableau` `{ colonnes, lignes }`), `pied` (facultatif : `{ terme, texte, icone: document\|graphe\|mallette\|personne }`). Variante `services` : exemples en parallèle, pas une suite — `titre`, `cas` (au moins 2 : `service`, `donnees`, `information`). Variante `regards` : deux cartes qui se rejoignent — `titre`, `chapo`, `regards` (au moins 2 : `terme`, `texte`, `exemple`, facultatifs `icone`, `teinte` `metier` ou `personne`), `commun` (`titre`, `texte`) |
+| `definition` | une définition : `terme`, `texte`. Plusieurs d'un coup : `entrees` (au moins 2 : `terme`, `texte`, et facultatifs `formule`, `icone` `document`, `graphe`, `mallette` ou `personne`) — elles s'affichent ensemble, avec le rappel court au-dessus |
 | `exemple` | `titre` (facultatif), `texte`, `etiquette` (facultatif, « Exemple » par défaut ; ex. « Point de vigilance ») |
 | `tableau` | `titre`, `colonnes` (liste), `lignes` (liste de listes, même nombre de cellules que de colonnes), `legende` (facultatif, ex. « Données fictives ») |
 | `comparateur` | comparaison « avant / après » (module 3, voir ci-dessous) |
@@ -52,7 +53,8 @@ Une leçon est une suite de **blocs** affichés un par un (bouton « Continuer �
 | `fiche` | encart « Fiche mémo » avec un lien vers la fiche imprimable du module (voir « La fiche mémo ») ; aucun autre champ |
 | `simulateur` | simulateur de situations : décisions (module 4) ou jeu des rôles (module 5), voir ci-dessous |
 | `chronologie` | scénario dévoilé étape par étape (bouton « Étape suivante ») : `titre`, `etapes` (au moins 2 : `titre`, `texte`), `conclusion` (facultatif, affichée à la fin). « Continuer » n'apparaît qu'une fois toutes les étapes vues |
-| `activite` | `ref` : identifiant d'une activité définie dans `activites` |
+| `activite` | `ref` : identifiant d'une activité définie dans `activites`. Facultatif, `carnet` : relie un choix unique au carnet (`donnee`, `effets` par identifiant de choix : `trace` et/ou `etat`) |
+| `decision` | choix sans note, juste après une situation : `id`, `consigne`, `donnee` (une donnée du carnet, dans `catalogue.json`), `choix` (au moins 2 : `id` d'une lettre, `texte`, `implication`, et `trace` ou `etat`). La trace s'affiche dans le carnet « Les données en jeu ». Elle ne change pas la suite du parcours |
 | `aretenir` | `texte` |
 
 Dans les textes : `**mot**` met en gras ; une ligne vide (`\n\n`) crée un nouveau paragraphe ; un paragraphe dont **toutes** les lignes commencent par `- ` devient une liste à puces (le séparer du texte précédent par une ligne vide).
