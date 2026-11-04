@@ -944,6 +944,22 @@
   };
 
   /* Décision narrative : le choix affiche son implication et alimente le carnet. Pas de note. */
+  var LIBELLES_PERTINENCE = { bonne: 'Pertinence bonne', moyenne: 'Pertinence moyenne', faible: 'Pertinence faible' };
+
+  function schemaEcart(schema) {
+    if (!schema) { return null; }
+    return h('figure', { class: 'schema-ecart schema-' + schema.sens }, [
+      h('figcaption', { text: schema.titre }),
+      h('ul', { class: 'schema-branches' }, (schema.branches || []).map(function (br) {
+        return h('li', { class: 'schema-branche' }, [
+          h('span', { class: 'schema-support', text: br.libelle }),
+          h('span', { class: 'schema-trait', 'aria-hidden': 'true' }),
+          h('span', { class: 'schema-valeur', text: br.valeur })
+        ]);
+      }))
+    ]);
+  }
+
   UI.decision = function (bloc, o) {
     o = o || {};
     var id = 'decision-' + bloc.id;
@@ -956,22 +972,31 @@
     ]));
     (bloc.choix || []).forEach(function (c) {
       var cid = id + '-' + c.id;
-      champs.appendChild(h('div', { class: 'option' }, [
+      var pert = choisi && c.id === choisi && LIBELLES_PERTINENCE[c.pertinence] ? c.pertinence : null;
+      champs.appendChild(h('div', { class: 'option' + (pert ? ' option-' + pert : '') }, [
         h('input', {
           type: 'radio', id: cid, name: id, value: c.id,
           checked: c.id === choisi, disabled: !!choisi
         }),
-        h('label', { for: cid }, h('span', { class: 'option-texte', text: c.texte }))
+        h('label', { for: cid }, [
+          h('span', { class: 'option-texte', text: c.texte }),
+          pert ? h('span', { class: 'option-annotation', text: LIBELLES_PERTINENCE[pert] }) : null
+        ])
       ]));
     });
 
     var message = h('div', { class: 'activite-message', id: id + '-message', role: 'status' });
     var implication = null;
     if (choixRetenu) {
-      implication = h('div', { class: 'decision-implication', id: id + '-implication', tabindex: '-1' }, [
+      var texteImplication = [
         h('p', { class: 'feedback-titre', text: 'Ce que ton choix change' }),
         h('p', { text: choixRetenu.implication })
-      ]);
+      ];
+      var figure = schemaEcart(choixRetenu.schema);
+      implication = h('div', {
+        class: 'decision-implication' + (LIBELLES_PERTINENCE[choixRetenu.pertinence] ? ' decision-' + choixRetenu.pertinence : ''),
+        id: id + '-implication', tabindex: '-1'
+      }, figure ? h('div', { class: 'decision-suite' }, [h('div', { class: 'decision-texte' }, texteImplication), figure]) : texteImplication);
     }
 
     var actions = h('div', { class: 'actions' });

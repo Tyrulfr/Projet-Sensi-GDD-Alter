@@ -35,15 +35,33 @@
             {
               "id": "a",
               "texte": "J'organise les données du fichier que Julie m'a transmis.",
+              "pertinence": "bonne",
               "implication": "Tu t'appuies sur la donnée créée par Julie. Elle reste à un seul endroit, et Sophie peut s'en servir pour la réunion.",
-              "etat": "Tu t'appuies sur le fichier de Julie. Pas de copie en plus."
+              "etat": "Tu t'appuies sur le fichier de Julie. Pas de copie en plus.",
+              "schema": {
+                "sens": "convergence",
+                "titre": "Une seule liste",
+                "branches": [
+                  { "libelle": "Fichier de Julie", "valeur": "Affectations" },
+                  { "libelle": "Liste de la réunion", "valeur": "Les mêmes" }
+                ]
+              }
             },
             {
               "id": "b",
               "texte": "Je recopie les noms dans un tableau personnel.",
+              "pertinence": "moyenne",
               "implication": "Une seconde copie apparaît sur ton bureau. Elle n'est pas reliée au fichier de Julie : si une affectation change, ton tableau ne le saura pas.",
               "trace": "Ton tableau des agents, copie non reliée au fichier de Julie.",
-              "etat": "La même liste existe en deux endroits."
+              "etat": "La même liste existe en deux endroits.",
+              "schema": {
+                "sens": "divergence",
+                "titre": "Deux listes s'écartent",
+                "branches": [
+                  { "libelle": "Fichier de Julie", "valeur": "Affectations" },
+                  { "libelle": "Tableau personnel", "valeur": "Copie non reliée" }
+                ]
+              }
             }
           ]
         },
@@ -145,12 +163,14 @@
             {
               "id": "a",
               "texte": "Le titre de l'ouvrage et la date de retour prévue.",
+              "pertinence": "bonne",
               "implication": "La relance peut se faire. Le nom et le mél du lecteur restent dans l'outil de la bibliothèque.",
               "etat": "Le prêt reste à la bibliothèque. Le nom du lecteur n'est pas repris dans la relance."
             },
             {
               "id": "b",
               "texte": "Le titre, la date, le nom du lecteur et son adresse électronique.",
+              "pertinence": "faible",
               "implication": "La relance identifie la personne. Ces données personnelles quittent le tableau pour un message, qui peut être transféré.",
               "trace": "Nom et mél du lecteur repris dans la relance.",
               "etat": "Une donnée personnelle est jointe au prêt."
@@ -235,6 +255,7 @@
             {
               "id": "a",
               "texte": "Je recopie la date du courriel.",
+              "pertinence": "faible",
               "implication": "Le courriel fige une date à un instant donné. Elle peut déjà être fausse, et une quatrième copie vient de naître.",
               "trace": "Date du courriel recopiée pour la chaudière du bâtiment C.",
               "etat": "La date est douteuse : elle ne vient pas de l'outil de Noé."
@@ -242,12 +263,14 @@
             {
               "id": "b",
               "texte": "Je retiens la date du logiciel de suivi des interventions.",
+              "pertinence": "bonne",
               "implication": "C'est l'outil où Noé enregistre ses passages. Sophie s'appuie sur cette source, et peut signaler l'écart des autres copies.",
               "etat": "La date retenue est celle du logiciel de suivi, tenu par Noé."
             },
             {
               "id": "c",
               "texte": "Je laisse le champ vide et je signale que trois dates circulent.",
+              "pertinence": "moyenne",
               "implication": "Rien n'est inventé. L'écart reste visible, le temps que Noé confirme la date qui fait référence.",
               "etat": "La date manque, et l'écart entre les trois supports est signalé."
             }

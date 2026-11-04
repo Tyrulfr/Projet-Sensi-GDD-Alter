@@ -257,7 +257,7 @@
     }
     if (!modeScorm) {
       return h('p', { class: 'note', role: 'note' },
-        'Version de démonstration : ta progression est enregistrée uniquement dans ce navigateur. Elle ne constitue pas un suivi officiel de formation.');
+        'Version test');
     }
     return null;
   }
@@ -276,10 +276,10 @@
         h('div', { class: 'hero-intro', html: GDD.util.richText(catalogue.introduction) }),
         h('ul', { class: 'hero-infos' }, [
           h('li', null, [h('strong', null, 'Durée : '), 'environ ' + dureeTotale + ' minutes']),
-          h('li', null, [h('strong', null, 'Format : '), modules.length + ' modules courts et indépendants']),
+          h('li', null, [h('strong', null, 'Format : '), modules.length + ' modules courts, à suivre dans l\'ordre']),
           h('li', null, [h('strong', null, 'Public : '), catalogue.public])
         ]),
-        h('div', { class: 'actions' }, lienBouton('Commencer la formation', '#/testeurs'))
+        h('div', { class: 'actions' }, lienBouton('Choisir un profil de bêta-test', '#/testeurs'))
       ]),
       avertissement(),
       h('section', { class: 'carte' }, [
@@ -423,7 +423,7 @@
       var bilan = bilanTesteur(t.id);
       var commence = bilan.commences > 0;
       liste.appendChild(h('li', { class: 'carte carte-module carte-testeur' + (profilActif() && profilActif().id === t.id ? ' est-actif' : '') }, [
-        h('p', { class: 'carte-module-numero', text: 'Profil testeur' }),
+        h('p', { class: 'carte-module-numero', text: 'Profil de bêta-test' }),
         h('h2', { class: 'carte-module-titre', text: t.nom }),
         h('p', { class: 'carte-module-duree', text: commence
           ? (bilan.termines
@@ -434,7 +434,7 @@
           h('button', {
             type: 'button', class: 'bouton bouton-principal',
             onclick: function () { choisirTesteur(t.id); aller('#/parcours'); }
-          }, commence ? 'Reprendre la formation' : 'Commencer la formation'),
+          }, commence ? 'Reprendre le parcours' : 'Commencer le parcours'),
           h('button', {
             type: 'button', class: 'bouton bouton-secondaire',
             onclick: function () { reinitialiserTesteur(t); }
@@ -443,8 +443,8 @@
       ]));
     });
     return [
-      h('h1', { tabindex: '-1', text: 'Choisis ton profil' }),
-      h('p', { class: 'chapo', text: 'Dix profils pour l\'essai. Chacun a sa propre progression, comme un apprenant distinct sur une plateforme de formation.' }),
+      h('h1', { tabindex: '-1', text: 'Choisis ton profil de bêta-test' }),
+      h('p', { class: 'chapo', text: 'Dix profils pour l\'essai. Chacun a sa propre progression, comme un apprenant distinct. Sur le parcours, suis les modules dans l\'ordre proposé : chacun prépare le suivant. Tu peux aussi en ouvrir un sans avoir fini les précédents. Les modules 6 et 7 reprennent l\'ensemble.' }),
       h('p', { class: 'note', role: 'note' }, 'Ce n\'est pas une connexion : le profil est mémorisé dans ce navigateur. Réinitialiser un profil ne touche pas les autres. Dans un LMS, c\'est la plateforme qui distingue les apprenants ; les packages SCORM ne changent pas.'),
       liste
     ];
@@ -456,7 +456,7 @@
     return [
       h('p', { class: 'fil' }, h('a', { href: '#/testeurs' }, '← Testeurs')),
       h('h1', { tabindex: '-1', text: 'Parcours de formation' }),
-      profil ? h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Les modules sont indépendants : tu peux les suivre dans l\'ordre proposé ou selon tes besoins.' }) : null,
+      profil ? h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Tu bêta-testes cette version. Suis les modules dans l\'ordre proposé : chacun prépare le suivant. Tu peux aussi en ouvrir un sans avoir fini les précédents ; ta progression reste sur ce profil. Les modules 6 et 7 reprennent l\'ensemble.' }) : null,
       avertissement(),
       carteParcours('h2'),
       listeModules('h2'),
@@ -564,7 +564,7 @@
     return [
       h('p', { class: 'fil' }, h('a', { href: '#/parcours' }, '← Parcours')),
       h('h1', { tabindex: '-1', text: 'Évaluation de la formation' }),
-      h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Quatorze questions, sans bonne réponse. Ce questionnaire ne mesure pas ce que tu as retenu : le module 7 s\'en charge.' }),
+      h('p', { class: 'chapo', text: 'Profil : ' + profil.nom + '. Quatorze questions pour le bêta-test, sans bonne réponse. Ce questionnaire ne mesure pas ce que tu as retenu : le module 7 s\'en charge.' }),
       h('p', { class: 'note', role: 'note' }, 'Réponses gardées dans ce navigateur, pour ce profil seulement. Elles ne sont pas envoyées à une plateforme.'),
       formulaire,
       bilan
@@ -758,7 +758,9 @@
             marquerCarnetNouveau();
             etat.focus = 'decision-' + b.id + '-implication';
             afficher();
-            annoncer('Conséquence de ton choix affichée.');
+            var retenu = (b.choix || []).filter(function (x) { return x.id === c; })[0];
+            var mots = { bonne: 'Pertinence bonne.', moyenne: 'Pertinence moyenne.', faible: 'Pertinence faible.' };
+            annoncer('Conséquence de ton choix affichée.' + (retenu && mots[retenu.pertinence] ? ' ' + mots[retenu.pertinence] : ''));
           },
           modifier: function () {
             m.oublierCarnet(b.id);

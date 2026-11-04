@@ -339,6 +339,22 @@ def valider_module(mod, entree, r, ids_globaux, renvois, ids_donnees, ids_source
                             r.erreur(blieu, f"choix « {c.get('id')} » : « texte » et « implication » sont obligatoires")
                         if not (texte_present(c, "trace") or texte_present(c, "etat")):
                             r.erreur(blieu, f"choix « {c.get('id')} » : « trace » ou « etat » est obligatoire")
+                        if "pertinence" in c and c.get("pertinence") not in ("bonne", "moyenne", "faible"):
+                            r.erreur(blieu, f"choix « {c.get('id')} » : pertinence « bonne », « moyenne » ou « faible »")
+                        schema = c.get("schema")
+                        if schema is not None:
+                            if c.get("pertinence") not in ("bonne", "moyenne", "faible"):
+                                r.erreur(blieu, f"choix « {c.get('id')} » : un schéma exige une pertinence")
+                            if schema.get("sens") not in ("convergence", "divergence"):
+                                r.erreur(blieu, f"choix « {c.get('id')} » : sens « convergence » ou « divergence »")
+                            if not texte_present(schema, "titre"):
+                                r.erreur(blieu, f"choix « {c.get('id')} » : titre de schéma manquant")
+                            branches = schema.get("branches") or []
+                            if len(branches) < 2:
+                                r.erreur(blieu, f"choix « {c.get('id')} » : le schéma compare au moins deux supports")
+                            for j, br in enumerate(branches, 1):
+                                if not isinstance(br, dict) or not (texte_present(br, "libelle") and texte_present(br, "valeur")):
+                                    r.erreur(blieu, f"choix « {c.get('id')} » : branche {j} sans libellé ou sans valeur")
                 elif bt == "tableau":
                     cols = b.get("colonnes") or []
                     if not cols or not b.get("lignes"):
