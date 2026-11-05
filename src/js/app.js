@@ -24,7 +24,8 @@
     final: {},           /* écran de synthèse affiché après le résultat, par évaluation */
     avertissement: null,
     session: null,       /* SCORM : 'terminee' après LMSFinish */
-    focus: null
+    focus: null,
+    remarque: ''
   };
 
   var conteneur, annonces;
@@ -430,6 +431,11 @@
             ? bilan.termines + ' module' + (bilan.termines > 1 ? 's terminés' : ' terminé') + ' sur ' + bilan.total
             : bilan.commences + ' module' + (bilan.commences > 1 ? 's commencés' : ' commencé') + ' sur ' + bilan.total)
           : 'Pas encore commencé' }),
+        UI.barreProgression(
+          bilan.total ? Math.round((bilan.termines / bilan.total) * 100) : 0,
+          'Avancement de ' + t.nom + ' : ' + bilan.termines + ' modules terminés sur ' + bilan.total,
+          bilan.termines + ' / ' + bilan.total
+        ),
         h('div', { class: 'actions' }, [
           h('button', {
             type: 'button', class: 'bouton bouton-principal',
@@ -1199,6 +1205,137 @@
     ];
   }
 
+  /* ---------- Remarque de bêta-test (site web) ---------- */
+
+  var COURRIEL_REMARQUES = 'christophe.dubois@universite-paris-saclay.fr';
+
+  function contexteRemarque() {
+    var brut = root.location.hash || '#/';
+    var segments = brut.replace(/^#\/?/, '').split('/').filter(Boolean);
+    var code = 'accueil';
+    var page = 'Accueil';
+    if (segments[0] === 'testeurs') {
+      code = 'testeurs';
+      page = 'Profils de bêta-test';
+    } else if (segments[0] === 'parcours') {
+      code = 'parcours';
+      page = 'Parcours';
+    } else if (segments[0] === 'evaluation') {
+      code = 'evaluation';
+      page = 'Évaluation du dispositif';
+    } else if (segments[0] === 'module' && contenu.modules[segments[1]]) {
+      var m = moteur(segments[1]);
+      var mod = m.module;
+      code = mod.id;
+      page = 'Module ' + mod.numero + ' — ' + mod.titre;
+      if (segments[2] === 'lecon') {
+        var index = (parseInt(segments[3], 10) || 1) - 1;
+        var l = m.lecons[index];
+        if (l) {
+          code = l.id;
+          page += ' — ' + l.titre;
+          if (l.type === 'evaluation' && l.presentation === 'une-par-une' && l.activites.length) {
+            var indexQ = 0;
+            if (l.correction === 'differee') {
+              var tentative = m.tentativeEnCours(l.id);
+              if (tentative) { indexQ = tentative.i; }
+            } else if (etat.defi[l.id]) {
+              indexQ = etat.defi[l.id].i;
+            }
+            indexQ = Math.min(Math.max(indexQ, 0), l.activites.length - 1);
+            code = l.activites[indexQ];
+            page += ' — question ' + (indexQ + 1) + ' sur ' + l.activites.length;
+          }
+        }
+      }
+    } else if (segments.length) {
+      code = 'introuvable';
+      page = 'Page introuvable';
+    }
+    return { code: code, page: page, hash: brut };
+  }
+
+  function lignesAvancement(idTesteur) {
+    if (!idTesteur) { return { resume: 'aucun profil choisi', lignes: [] }; }
+    var termines = 0, total = 0, lignes = [];
+    catalogue.modules.forEach(function (e) {
+      if (e.etat !== 'disponible' || !contenu.modules[e.id]) { return; }
+      total++;
+      var sauve = GDD.TraceurLocal.lire(catalogue.id, e.id, idTesteur);
+      var completion = sauve && sauve.statut && sauve.statut.completion;
+      var mod = contenu.modules[e.id];
+      var texte = 'non commencé';
+      if (completion === 'termine') {
+        termines++;
+        texte = 'terminé';
+      } else if (completion && completion !== 'non-commence') {
+        var lecon = null;
+        (mod.lecons || []).forEach(function (l) { if (l.id === sauve.position) { lecon = l; } });
+        texte = lecon ? ('en cours — ' + lecon.titre + ' (' + lecon.id + ')') : 'en cours';
+      }
+      lignes.push('M' + mod.numero + ' ' + texte);
+    });
+    var resume = termines + ' module' + (termines > 1 ? 's' : '') + ' terminé' + (termines > 1 ? 's' : '') + ' sur ' + total;
+    return { resume: resume, lignes: lignes };
+  }
+
+  function lienMailto(note) {
+    var ctx = contexteRemarque();
+    var profil = profilActif();
+    var av = lignesAvancement(profil && profil.id);
+    var corps = [
+      'CODE: ' + ctx.code,
+      'PAGE: ' + ctx.page,
+      'ADRESSE: ' + ctx.hash,
+      'PROFIL: ' + (profil ? profil.nom + ' (' + profil.id + ')' : 'aucun'),
+      'AVANCEMENT: ' + av.resume
+    ].concat(av.lignes, ['', 'REMARQUE:', note.trim()]).join('\n');
+    var sujet = '[GDD ' + ctx.code + '] Remarque' + (profil ? ' de ' + profil.nom : '');
+    return 'mailto:' + COURRIEL_REMARQUES + '?subject=' + encodeURIComponent(sujet) + '&body=' + encodeURIComponent(corps);
+  }
+
+  function zoneRemarque() {
+    var ctx = contexteRemarque();
+    var message = h('p', { class: 'remarque-message', role: 'status', tabindex: '-1' });
+    var lien = h('a', { class: 'bouton bouton-principal' }, 'Envoyer par mail');
+    var zone = h('textarea', { id: 'remarque-texte', rows: '5' });
+    function preparerLien() {
+      etat.remarque = zone.value;
+      message.textContent = '';
+      var note = zone.value.trim();
+      var url = note ? lienMailto(note) : '';
+      lien.href = url && url.length <= 1900 ? url : '#remarque-texte';
+    }
+    zone.addEventListener('input', preparerLien);
+    zone.value = etat.remarque || '';
+    preparerLien();
+    lien.addEventListener('click', function (ev) {
+      var note = zone.value.trim();
+      if (!note) {
+        ev.preventDefault();
+        message.textContent = 'Écris ta remarque avant de l\'envoyer.';
+        message.focus();
+        return;
+      }
+      var url = lienMailto(note);
+      if (url.length > 1900) {
+        ev.preventDefault();
+        message.textContent = 'La remarque est trop longue pour préparer le mail. Raccourcis-la, puis réessaie.';
+        message.focus();
+      }
+    });
+    return h('section', { class: 'remarque', 'aria-labelledby': 'remarque-titre' }, [
+      h('h2', { id: 'remarque-titre', text: 'Remarque pour le bêta-test' }),
+      h('p', { text: 'Écris ce qui coince, ce qui est trop simple, ou ce qu\'il faudrait changer. Le bouton ouvre un mail déjà rempli, adressé à ' + COURRIEL_REMARQUES + '. Rien ne part tant que tu ne l\'envoies pas depuis ton logiciel de mail.' }),
+      h('p', { text: 'Le mail indique le code de cette page, ton profil et ton avancement, sans les scores.' }),
+      h('p', { class: 'remarque-code' }, [h('span', { text: 'Code de la page : ' }), h('strong', { text: ctx.code })]),
+      h('label', { for: 'remarque-texte', text: 'Ta remarque' }),
+      zone,
+      h('div', { class: 'actions' }, lien),
+      message
+    ]);
+  }
+
   /* ---------- Routage ---------- */
 
   function route() {
@@ -1236,6 +1373,7 @@
     if (enteteEl && !modeScorm) { enteteEl.innerHTML = ''; enteteEl.appendChild(entete()); }
     conteneur.innerHTML = '';
     (Array.isArray(vue) ? vue : [vue]).forEach(function (n) { if (n) { conteneur.appendChild(n); } });
+    if (!modeScorm) { conteneur.appendChild(zoneRemarque()); }
     var cible = etat.focus ? document.getElementById(etat.focus) : conteneur.querySelector('h1');
     etat.focus = null;
     if (cible) {
