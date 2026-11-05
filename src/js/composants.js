@@ -380,8 +380,11 @@
     function effacerMarques() { Object.keys(boutonsCellules).forEach(function (k) { marquer(k, false); }); }
 
     var compteur = h('p', { class: 'comparateur-compteur', 'aria-live': 'polite' });
+    var cartes = bloc.disposition === 'cartes';
     var detail = h('div', { class: 'comparateur-detail', id: prefixe + '-detail', tabindex: '-1' },
-      h('p', { class: 'schema-invite', text: 'Sélectionne une cellule du tableau ou une difficulté de la liste.' }));
+      h('p', { class: 'schema-invite', text: cartes
+        ? 'Retourne une carte ou sélectionne une cellule du tableau.'
+        : 'Sélectionne une cellule du tableau ou une difficulté de la liste.' }));
     var zoneSuite = h('div', { class: 'comparateur-suite' });
 
     function majSuite() {
@@ -395,14 +398,31 @@
           L.voirApres)));
     }
 
+    function majProbleme(id) {
+      var b = boutonsProblemes[id];
+      if (!b) { return; }
+      if (cartes) {
+        var ouvert = etat.selection === id;
+        b.parentNode.classList.toggle('est-retournee', ouvert);
+        b.parentNode.classList.toggle('est-examinee', !!etat.explores[id]);
+        b.setAttribute('aria-pressed', String(ouvert));
+        b.setAttribute('aria-expanded', String(ouvert));
+        var faces = b.querySelectorAll('.carte-face');
+        faces[0].setAttribute('aria-hidden', ouvert ? 'true' : 'false');
+        faces[1].setAttribute('aria-hidden', ouvert ? 'false' : 'true');
+        b.querySelector('.carte-etat').textContent = etat.explores[id] ? '✓ Examinée' : 'Retourner';
+        return;
+      }
+      b.setAttribute('aria-pressed', String(id === etat.selection));
+      if (etat.explores[id]) { b.querySelector('.schema-cible-etat').textContent = '✓ Examinée'; }
+    }
+
     function selectionner(p) {
       etat.explores[p.id] = true;
+      etat.selection = p.id;
       effacerMarques();
-      Object.keys(boutonsProblemes).forEach(function (id) {
-        var b = boutonsProblemes[id];
-        b.setAttribute('aria-pressed', String(id === p.id));
-        if (etat.explores[id]) { b.querySelector('.schema-cible-etat').textContent = '✓ Examinée'; }
-      });
+      Object.keys(boutonsProblemes).forEach(majProbleme);
+      if (cartes && document.activeElement !== boutonsProblemes[p.id]) { boutonsProblemes[p.id].focus(); }
       var lieux = [];
       p.cellules.forEach(function (lc) {
         if (boutonsCellules[cle(lc[0], lc[1])]) { marquer(cle(lc[0], lc[1]), true); }
@@ -410,7 +430,7 @@
       });
       detail.innerHTML = '';
       detail.appendChild(h('p', { class: 'schema-detail-titre' }, [h('span', { 'aria-hidden': 'true', text: '⚠ ' }), h('strong', { text: p.libelle })]));
-      detail.appendChild(h('div', { html: U.richText(p.explication) }));
+      if (!cartes) { detail.appendChild(h('div', { html: U.richText(p.explication) })); }
       detail.appendChild(h('p', { class: 'comparateur-lieux' }, [h('strong', { text: 'Cellules signalées : ' }), lieux.join(' ; ') + '.']));
       majSuite();
     }
@@ -421,7 +441,8 @@
       });
       if (!concernes.length) {
         effacerMarques();
-        Object.keys(boutonsProblemes).forEach(function (id) { boutonsProblemes[id].setAttribute('aria-pressed', 'false'); });
+        etat.selection = null;
+        Object.keys(boutonsProblemes).forEach(majProbleme);
         detail.innerHTML = '';
         detail.appendChild(h('p', { text: libelleCellule(l, c) + '. ' + (bloc.sansDifficulte || 'Cette cellule ne présente pas de difficulté particulière prise isolément. Essaie une autre cellule.') }));
         return;
@@ -449,17 +470,50 @@
       }))
     ]);
 
-    var liste = h('ul', { class: 'comparateur-problemes' });
+    var liste = h('ul', { class: 'comparateur-problemes' + (cartes ? ' comparateur-cartes' : '') });
     problemes.forEach(function (p) {
-      var b = h('button', {
-        type: 'button', class: 'schema-cible', 'aria-pressed': 'false', 'aria-controls': prefixe + '-detail',
-        onclick: function () { selectionner(p); }
-      }, [
-        h('span', { class: 'schema-cible-libelle', text: p.libelle }),
-        h('span', { class: 'schema-cible-etat', text: etat.explores[p.id] ? '✓ Examinée' : 'Examiner' })
-      ]);
+      var b;
+      if (cartes) {
+        var ouvert = etat.selection === p.id;
+        b = h('button', {
+          type: 'button', class: 'carte-difficulte-bouton',
+          'aria-pressed': ouvert ? 'true' : 'false',
+          'aria-expanded': ouvert ? 'true' : 'false',
+          onclick: function () {
+            if (etat.selection === p.id) {
+              etat.selection = null;
+              majProbleme(p.id);
+              effacerMarques();
+              detail.innerHTML = '';
+              detail.appendChild(h('p', { class: 'schema-invite', text: 'Retourne une carte ou sélectionne une cellule du tableau.' }));
+              return;
+            }
+            selectionner(p);
+          }
+        }, h('span', { class: 'carte-difficulte-inner' }, [
+          h('span', { class: 'carte-face carte-face-avant', 'aria-hidden': ouvert ? 'true' : 'false' }, [
+            h('span', { class: 'carte-libelle', text: p.libelle }),
+            h('span', { class: 'carte-etat', text: etat.explores[p.id] ? '✓ Examinée' : 'Retourner' })
+          ]),
+          h('span', { class: 'carte-face carte-face-dos', 'aria-hidden': ouvert ? 'false' : 'true' }, [
+            h('span', { class: 'carte-libelle', text: p.libelle }),
+            h('span', { class: 'carte-critique', html: U.inlineText(p.explication) })
+          ])
+        ]));
+        liste.appendChild(h('li', {
+          class: 'carte-difficulte' + (ouvert ? ' est-retournee' : '') + (etat.explores[p.id] ? ' est-examinee' : '')
+        }, b));
+      } else {
+        b = h('button', {
+          type: 'button', class: 'schema-cible', 'aria-pressed': 'false', 'aria-controls': prefixe + '-detail',
+          onclick: function () { selectionner(p); }
+        }, [
+          h('span', { class: 'schema-cible-libelle', text: p.libelle }),
+          h('span', { class: 'schema-cible-etat', text: etat.explores[p.id] ? '✓ Examinée' : 'Examiner' })
+        ]);
+        liste.appendChild(h('li', null, b));
+      }
       boutonsProblemes[p.id] = b;
-      liste.appendChild(h('li', null, b));
     });
 
     var apres = null;

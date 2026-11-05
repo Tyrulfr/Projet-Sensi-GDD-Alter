@@ -152,6 +152,8 @@ def valider_comparateur(b, lieu, r):
             if not (isinstance(c, list) and len(c) == 2 and all(isinstance(x, int) for x in c)
                     and 0 <= c[0] < nb_lignes and 0 <= c[1] < nb_cols):
                 r.erreur(plieu, f"cellule {c} invalide : [ligne, colonne] comptées à partir de 0, dans le tableau « avant »")
+    if "disposition" in b and b.get("disposition") != "cartes":
+        r.erreur(lieu, "« disposition » vaut « cartes », ou s'omet pour une liste")
     if not texte_present(apres, "avertissement"):
         r.avertir(lieu, "pas d'« avertissement » : préciser que le tableau « après » n'est pas une correction certaine")
 

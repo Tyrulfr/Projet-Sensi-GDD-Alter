@@ -78,6 +78,7 @@ L'apprenant clique sur une cellule du tableau « avant » (ou sur une difficult�
 - `cellules` : liste de `[ligne, colonne]` du tableau « avant », **comptées à partir de 0** (`[0, 0]` = première ligne de données, première colonne). Une cellule peut appartenir à plusieurs difficultés : un deuxième clic passe à la suivante.
 - Une cellule vide (`""`) s'affiche « (non renseignée) ».
 - `avertissement` : à garder pour rappeler que le tableau « après » n'est pas une correction automatique (le validateur prévient s'il manque).
+- `disposition` (facultatif) : `cartes` affiche chaque difficulté comme une carte qui se retourne au clic pour montrer la critique (module 3). Sans cette clé, les difficultés restent une liste de boutons (module 6).
 - `libelles` (facultatif) adapte les textes de l'interface quand on compare autre chose que des tableaux (module 6 : un formulaire). Clés : `avant`, `difficultes`, `aide` (`{n}` = nombre de difficultés), `voirApres`, `apres`, `atouts`. Une clé absente garde le libellé du module 3.
 - Un tableau de moins de 3 colonnes n'impose pas de largeur minimale (pas de défilement horizontal sur mobile).
 

@@ -33,7 +33,8 @@
         {
           "type": "comparateur",
           "titre": "Qu'est-ce qui rend ce tableau difficile à utiliser ?",
-          "consigne": "Sélectionne une cellule du tableau, ou une difficulté de la liste, pour comprendre ce qui pose problème. Examine les cinq difficultés.",
+          "disposition": "cartes",
+          "consigne": "Retourne une carte, ou sélectionne une cellule du tableau, pour examiner la critique. Examine les cinq difficultés.",
           "avant": {
             "titre": "Tableau A : inscriptions reçues",
             "colonnes": ["Agent", "Service", "Date inscription"],
@@ -369,14 +370,26 @@
       "notation": { "formative": false, "points": 1 },
       "consigne": "Dans une application de gestion, l'affectation d'un agent n'a pas été mise à jour depuis son changement de service. Quelle dimension de qualité est principalement concernée ?",
       "choix": [
-        { "id": "a", "texte": "L'actualité de la donnée." },
-        { "id": "b", "texte": "Sa taille informatique." },
-        { "id": "c", "texte": "Son apparence graphique." }
+        {
+          "id": "b",
+          "texte": "L'exactitude de la donnée.",
+          "feedback": "L'exactitude porte sur une information fausse dès l'enregistrement, par exemple une date de contrôle qui n'est pas la date réelle. Ici, l'affectation était juste : c'est son absence de mise à jour qui pose problème."
+        },
+        {
+          "id": "a",
+          "texte": "L'actualité de la donnée.",
+          "feedback": "L'affectation était juste au moment de la saisie. Elle n'a pas suivi le changement de service : elle n'est plus assez récente pour l'usage."
+        },
+        {
+          "id": "c",
+          "texte": "La cohérence de la donnée.",
+          "feedback": "La cohérence porte sur des données qui se contredisent ou ne suivent pas la même règle, par exemple deux codes pour une même formation. Ici, une seule information n'a pas été mise à jour."
+        }
       ],
       "reponse": "a",
       "explication": {
         "correct": "Une information peut avoir été exacte lors de son enregistrement et devenir obsolète. Sa mise à jour est importante pour les usages qui en dépendent.",
-        "incorrect": "La dimension concernée est l'actualité. Une information peut avoir été exacte lors de son enregistrement et devenir obsolète. Sa mise à jour est importante pour les usages qui en dépendent."
+        "incorrect": "La dimension concernée est l'actualité. L'affectation était exacte au moment de l'enregistrement ; elle est devenue obsolète. Ce n'est ni une erreur de saisie (exactitude), ni une contradiction entre données (cohérence)."
       }
     },
     "m03-q3": {

@@ -461,6 +461,28 @@ tbody th { font-weight: 700; }
   display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: .5rem;
 }
 .comparateur-problemes .schema-cible { min-height: 100%; }
+.comparateur-cartes { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); gap: .75rem; }
+.carte-difficulte { perspective: 900px; }
+.carte-difficulte-bouton {
+  width: 100%; min-height: 10.5rem; padding: 0; border: 0; background: transparent;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+}
+.carte-difficulte-bouton:focus-visible { outline: 3px solid var(--couleur-focus); outline-offset: 3px; }
+.carte-difficulte-inner {
+  display: grid; min-height: 10.5rem; transform-style: preserve-3d; transition: transform .45s ease;
+}
+.carte-difficulte.est-retournee .carte-difficulte-inner { transform: rotateY(180deg); }
+.carte-face {
+  grid-area: 1 / 1; backface-visibility: hidden; display: flex; flex-direction: column;
+  justify-content: space-between; gap: .45rem; min-height: 10.5rem; padding: .9rem 1rem;
+  border: 2px solid var(--couleur-accent); border-radius: var(--rayon); background: var(--couleur-surface);
+}
+.carte-face-dos { transform: rotateY(180deg); background: var(--couleur-alerte-clair); border-color: var(--couleur-alerte); justify-content: flex-start; }
+.carte-libelle { font-weight: 800; line-height: 1.3; }
+.carte-etat { font-size: .8rem; font-weight: 700; color: var(--couleur-accent); }
+.carte-critique { font-size: .92rem; line-height: 1.45; }
+.carte-difficulte.est-examinee:not(.est-retournee) .carte-face-avant { border-color: var(--couleur-succes); }
+.carte-difficulte.est-examinee:not(.est-retournee) .carte-etat { color: var(--couleur-succes); }
 .comparateur-compteur { margin: .75rem 0 .25rem; font-size: .9rem; color: var(--couleur-texte-doux); }
 .comparateur-detail {
   padding: .75rem 1rem; border-radius: var(--rayon); background: #fbfbfd; border: 1px dashed var(--couleur-bordure);
