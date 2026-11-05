@@ -2,7 +2,7 @@
   "id": "m01",
   "numero": 1,
   "titre": "La donnée dans mon quotidien",
-  "duree": 10,
+  "duree": 12,
   "statutContenu": "proposition - à valider",
   "objectif": "Reconnaître les données manipulées dans tes activités professionnelles.",
   "objectifsSpecifiques": [
@@ -309,7 +309,8 @@
       "id": "m01-quiz",
       "type": "evaluation",
       "titre": "Quiz du module",
-      "introduction": "Quatre questions pour faire le point. Il n'y a pas de limite de temps et tu pourras recommencer si tu le souhaites. Le seuil de réussite est de 70 %.",
+      "presentation": "une-par-une",
+      "introduction": "Quatre questions, une à la fois. Tu découvres la correction après chaque réponse. Il n'y a pas de limite de temps et tu pourras recommencer. Le seuil de réussite est de 70 %.",
       "activites": ["m01-q1", "m01-q2", "m01-q3", "m01-q4"]
     }
   ],

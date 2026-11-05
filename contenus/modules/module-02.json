@@ -3,7 +3,7 @@
   "numero": 2,
   "titre": "Une donnée, plusieurs usages",
   "sousTitre": "Comprendre comment les données circulent entre les services.",
-  "duree": 8,
+  "duree": 10,
   "statutContenu": "proposition - à valider",
   "objectif": "Une donnée peut être créée à un endroit, utilisée à plusieurs endroits et produire des conséquences au-delà du service qui l'a enregistrée.",
   "objectifsSpecifiques": [

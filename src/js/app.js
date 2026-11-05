@@ -303,7 +303,9 @@
         h('p', { text: mi.objectif }),
         h('p', { class: 'carte-module-duree', text: 'Durée estimée : ' + mi.duree + ' min' }),
         st ? UI.barreProgression(st.progression, 'Progression du module ' + mi.numero) : null,
-        st && st.score !== null ? h('p', { class: 'carte-module-score', text: 'Meilleur score : ' + st.score + ' %' }) : null,
+        st && st.score !== null ? h('p', { class: 'carte-module-score', text: st.seuil === null
+          ? 'Résultat du défi : ' + st.score + ' %. Il ne décide pas si le module est terminé.'
+          : 'Meilleur score : ' + st.score + ' %' }) : null,
         mi.disponible ? h('div', { class: 'actions' }, lienBouton(st.completion === 'non-commence' ? 'Commencer' : 'Accéder au module', lienModule(mi.id))) : null
       ]));
     });
@@ -611,7 +613,9 @@
       h('section', { class: 'carte carte-statut', 'aria-label': 'Ma progression' }, [
         h('div', { class: 'carte-statut-ligne' }, [UI.badge(st), h('span', { text: 'Durée estimée : ' + mod.duree + ' min' })]),
         UI.barreProgression(st.progression, 'Progression du module'),
-        st.score !== null ? h('p', { text: 'Meilleur score : ' + st.score + ' %' + (st.seuil !== null ? ' (seuil de réussite : ' + st.seuil + ' %)' : '') }) : null,
+        st.score !== null ? h('p', { text: st.seuil === null
+          ? 'Résultat du défi : ' + st.score + ' %. Il ne décide pas si le module est terminé.'
+          : 'Meilleur score : ' + st.score + ' % (seuil de réussite : ' + st.seuil + ' %)' }) : null,
         h('div', { class: 'actions' }, lienBouton(libelleAction, lienLecon(mod.id, cible)))
       ]),
       h('section', { class: 'carte' }, [
@@ -622,7 +626,7 @@
     ];
   }
 
-  function enteteLecon(m, index) {
+  function enteteLecon(m, index, etape) {
     var l = m.lecons[index];
     var nbLecons = m.lecons.filter(function (x) { return x.type === 'lecon'; }).length;
     var rang = m.lecons.slice(0, index + 1).filter(function (x) { return x.type === 'lecon'; }).length;
@@ -630,6 +634,7 @@
       h('p', { class: 'fil' }, h('a', { href: lienModule(m.module.id) }, '← Module ' + m.module.numero + ' : ' + m.module.titre)),
       h('p', { class: 'surtitre', text: l.type === 'lecon' ? 'Leçon ' + rang + ' sur ' + nbLecons : (l.surtitre || 'Évaluation') }),
       h('h1', { tabindex: '-1', text: l.titre }),
+      etape ? h('p', { class: 'etape', text: 'Étape ' + etape.courante + ' sur ' + etape.total }) : null,
       UI.barreProgression(m.statut().progression, 'Progression du module')
     ]);
   }
@@ -803,7 +808,7 @@
       pied = navigationLecon(m, index);
     }
 
-    return [enteteLecon(m, index), avertissement(), blocs, pied];
+    return [enteteLecon(m, index, nb < total ? { courante: nb, total: total } : null), avertissement(), blocs, pied];
   }
 
   function correctionsDepuis(m, lecon, codes) {
@@ -1149,6 +1154,9 @@
           : 'Le seuil de réussite (' + st.seuil + ' %) n\'est pas encore atteint. ' + (texteMessage || 'Relis les corrections ci-dessous, puis recommence quand tu le souhaites.')
       ])
       : (texteMessage ? h('p', { class: 'resultat-message', text: texteMessage }) : null);
+    var phraseSansSeuil = avecSeuil ? null : h('p', {
+      text: 'Ce résultat ne décide pas de la fin du module. Il est terminé dès que les leçons sont vues et le défi fait.'
+    });
 
     var meilleur = avecSeuil ? enregistre.b + ' %' : Math.round(enregistre.b * n / 100) + ' / ' + n;
     return [
@@ -1162,6 +1170,7 @@
           : h('p', { class: 'resultat-score' }, [h('span', { class: 'resultat-valeur', text: bonnes + ' / ' + n }),
             h('span', { text: ' bonne' + (bonnes > 1 ? 's' : '') + ' réponse' + (bonnes > 1 ? 's' : '') + ' (' + enregistre.d + ' %)' })]),
         message,
+        phraseSansSeuil,
         enregistre.n > 1 ? h('p', { text: dernier
           ? 'Tentative n° ' + enregistre.n + ' : c\'est le résultat de la dernière tentative qui est retenu.'
           : 'Meilleur résultat sur ' + enregistre.n + ' tentatives : ' + meilleur + '.' }) : null,

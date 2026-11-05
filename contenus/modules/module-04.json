@@ -4,7 +4,7 @@
   "titre": "Partager sans perdre le contrôle",
   "sousTitre": "Comprendre comment utiliser et transmettre des données de manière responsable.",
   "slugArchive": "partager-sans-perdre-controle",
-  "duree": 10,
+  "duree": 12,
   "statutContenu": "proposition - à valider (notamment par le DPO)",
   "objectif": "Comprendre que le partage des données peut être nécessaire au fonctionnement collectif de l'université, mais qu'il doit respecter des règles adaptées à leur nature, aux finalités de leur utilisation et aux personnes autorisées.",
   "objectifsSpecifiques": [
@@ -49,14 +49,27 @@
           "texte": "Trois demandes arrivent en même temps :\n\n- Noé veut le numéro d'une salle pour une intervention ;\n- Sophie veut la liste des agents du service, avec leurs coordonnées professionnelles ;\n- un collègue veut le tableau des rémunérations individuelles, tenu par Julie.\n\nCes informations n'ont pas la même nature : elles ne demandent pas les mêmes précautions."
         },
         {
-          "type": "definition",
-          "terme": "Donnée personnelle",
-          "texte": "Une information qui se rapporte à une personne physique **identifiée ou identifiable**, directement ou non : nom et prénom, adresse électronique nominative (même professionnelle), numéro étudiant, identifiant agent, adresse personnelle, certaines données de connexion, rémunération individuelle… Elle n'a pas besoin d'être secrète pour être personnelle."
-        },
-        {
-          "type": "definition",
-          "terme": "Donnée non personnelle",
-          "texte": "Une information qui ne permet d'identifier personne : nombre de salles d'un bâtiment, référence d'un équipement, nombre de documents d'une bibliothèque."
+          "type": "tableau",
+          "titre": "Personnelle ou non",
+          "colonnes": ["Repère", "Donnée personnelle", "Donnée non personnelle"],
+          "lignes": [
+            [
+              "En une phrase",
+              "Une information qui se rapporte à une personne physique identifiée ou identifiable, directement ou non.",
+              "Une information qui ne permet d'identifier personne."
+            ],
+            [
+              "Exemples",
+              "Nom et prénom, adresse électronique nominative (même professionnelle), numéro étudiant, identifiant agent, adresse personnelle, certaines données de connexion, rémunération individuelle.",
+              "Nombre de salles d'un bâtiment, référence d'un équipement, nombre de documents d'une bibliothèque."
+            ],
+            [
+              "Ce qu'il ne faut pas en conclure",
+              "Elle n'a pas besoin d'être secrète pour être personnelle.",
+              "Une donnée qui semble anodine peut le devenir si, croisée avec d'autres, elle permet d'identifier quelqu'un."
+            ]
+          ],
+          "legende": "Comparaison pédagogique, à valider. Ce n'est pas le texte officiel de l'article 4 du RGPD."
         },
         {
           "type": "exemple",
